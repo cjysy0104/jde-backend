@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewDTO;
 
 @Mapper
 public interface ReviewMapper {
 
 	// 전체 목록 조회
-	List<ReviewDTO> findAll();
+	List<ReviewDTO> findAll(QueryDTO req);
 	
 	// 리뷰 상세 조회
 	ReviewDTO findById();

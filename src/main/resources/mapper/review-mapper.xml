@@ -5,6 +5,7 @@
 <mapper namespace="com.kh.jde.review.model.dao.ReviewMapper">
 	
 	<select id="findAll"
+			parameterType="QueryDTO"
 			resultType="reviewDTO">
 		SELECT
 				  RV.REVIEW_NO reviewNo
@@ -50,6 +51,19 @@
 				TB_RESTAURANT RT ON (RV.RESTAURANT_NO = RT.RESTAURANT_NO)
 		WHERE 
 				RV.STATUS = 'Y'
+		<if test="query != null">
+		AND 
+				(
+				RV.CONTENT			LIKE	'%' || #{query} || '%'
+				OR RT.NORMAL_NAME	LIKE	'%' || #{query} || '%'
+				OR M.NICKNAME		LIKE	'%' || #{query} || '%'
+				)
+			
+		</if>
+		AND
+				RV.RATING &gt;= #{minRating}
+		AND
+				RV.RATING &lt;= #{maxRating}
 		ORDER
 		BY
 				RV.REVIEW_NO DESC
