@@ -12,8 +12,10 @@ public interface MemberMapper {
 	
 	MemberLoginDTO loadUser(String email);
 	
-	int countByNickname(String memberId);
+	int countByNickname(String nickname); 
 	int countByPhone(String phone);
 	int countByEmail(String email);
+	
+	int withdrawByPassword(String email);
 
 }
