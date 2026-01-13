@@ -47,11 +47,8 @@ public class MemberServiceImpl implements MemberService {
 				                         .memberName(member.getMemberName())
 				                         .phone(member.getPhone())
 				                         .build();
-
-		
 		// 매퍼 호출
 		memberMapper.signUp(signUpMember);
-		
 	}
 
 	@Override
