@@ -72,7 +72,7 @@ public class MemberServiceImpl implements MemberService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
 		// 검증 실패시 예외 발생
-		if(Password.matches(plainPassword, user.getPassword(), passwordEncoder)) {
+		if(!Password.matches(plainPassword, user.getPassword(), passwordEncoder)) {
 			throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
 		}
 		// 검증 성공시 유저정보 반환
