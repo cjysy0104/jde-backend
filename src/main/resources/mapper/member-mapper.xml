@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.jde.member.model.dao.MemberMapper">
+	
+	<sql id="countMember">
+		SELECT 
+		       COUNT(*)
+		  FROM 
+		       TB_MEMBER 
+		 WHERE 
+	</sql>
+	
+	<!-- 회원가입 시 중복 체크 항목 3개 -->
+	<select id="countByNickname" parameterType="string">
+		<include refid="countMember" />
+		    NICKNAME = #{nickname}
+	</select>
+	
+	<select id="countByPhone" parameterType="string">
+    	<include refid="countMember" />
+    		   PHONE = #{phone}
+	</select>
+
+	<select id="countByEmail" parameterType="string">
+		<include refid="countMember" />
+		       EMAIL = #{email}
+	</select>
+	
+	<!-- 회원가입 시 회원정보 DB INSERT -->
+	<insert id="signUp"
+			parameterType="MemberVO">
+		INSERT
+		  INTO
+		       TB_MEMBER (
+		           MEMBER_NO
+		         , EMAIL
+		         , PASSWORD
+		         , MEMBER_NAME
+		         , NICKNAME
+		         , PHONE
+		         , ENROLL_DATE
+		         , STATUS
+		         , ROLE
+		       )
+		VALUES
+		       (
+		       SEQ_MEMBER_NO.NEXTVAL
+		     , #{email}
+		     , #{password}
+		     , #{memberName}
+		     , #{nickname}
+		     , #{phone}
+		     , DEFAULT
+		     , DEFAULT
+		     , DEFAULT
+		       )
+	</insert>
+	
+	<select id="loadUser" parameterType="MemberLoginDTO">
+		SELECT
+			   MEMBER_NO memberId
+		     , PASSWORD 
+			 , MEMBER_NAME memberName
+			 , NICKNAME
+		     , PHONE
+		     , EMAIL
+		     , ROLE
+		     , ENROLL_DATE enrollDate
+		     , STATUS 
+		  FROM
+			   TB_MEMBER
+		 WHERE
+			   EMAIL = #{email}
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
