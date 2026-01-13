@@ -22,7 +22,7 @@
 		  FROM
 		       TB_TOKEN
 		 WHERE
-		       MEMBER_ID = #{email}
+		       EMAIL = #{email}
 	</delete>
 	
 	<delete id="deleteTokenForLogout" parameterType="MemberLogoutDTO" >

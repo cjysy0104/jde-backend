@@ -60,7 +60,7 @@
 	
 	<select id="loadUser" parameterType="MemberLoginDTO">
 		SELECT
-			   MEMBER_NO memberId
+			   MEMBER_NO memberNo
 		     , PASSWORD 
 			 , MEMBER_NAME memberName
 			 , NICKNAME
@@ -75,7 +75,14 @@
 			   EMAIL = #{email}
 	</select>
 
-
+	<update id="withdrawByPassword" parameterType="string">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       EMAIL = #{email}
+	</update>
 
 
 
