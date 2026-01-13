@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class MemberInfomationValidator {
+public class MemberInformationValidator {
 	
 	private final MemberMapper memberMapper;
 	

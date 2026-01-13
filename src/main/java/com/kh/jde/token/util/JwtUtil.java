@@ -1,4 +1,4 @@
-package com.kh.jde.token.utill;
+package com.kh.jde.token.util;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class JwtUtill {
+public class JwtUtil {
 	// 토큰을 만들어내는 기능들을 가지고 있을 클래스
 	// 문자열값이 필요함 > 필드로 등록하면 보안상 위험 > 별도의 파일에 따로 빼서 씀 
 	// 여기선 기본 .yml 파일에 기재 (보통은 별개의 파일 생성), 이 파일들은 gitignore

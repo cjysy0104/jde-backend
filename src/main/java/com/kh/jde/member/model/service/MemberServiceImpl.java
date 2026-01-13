@@ -19,7 +19,7 @@ public class MemberServiceImpl implements MemberService {
 	
 	private final MemberMapper memberMapper;
 	private final PasswordEncoder passwordEncoder;
-	private final MemberInfomationValidator miv;
+	private final MemberInformationValidator miv;
 	
 	@Override
 	public void signUp(MemberSignUpDTO member) {

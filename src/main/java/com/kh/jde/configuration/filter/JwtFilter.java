@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
-import com.kh.jde.token.utill.JwtUtill;
+import com.kh.jde.token.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 	
-	private final JwtUtill jwtUtill;
+	private final JwtUtil jwtUtil;
 	private final UserDetailsService userDetailsService;
 
 	// 필터의 주요로직을 구현하는 메서드, 요청이 들어올 때마다 호출됨
@@ -55,10 +55,18 @@ public class JwtFilter extends OncePerRequestFilter {
 		// 1. 서버에서 관리하는 시크릿키로 만든게 맞는가?
 		// 2. 유효기간이 지나지 않았는가?
 		try {
-			Claims claims = jwtUtill.parseJwt(token);
+			Claims claims = jwtUtil.parseJwt(token);
 			String username = claims.getSubject();
 
 			CustomUserDetails user = (CustomUserDetails)userDetailsService.loadUserByUsername(username);
+			
+            if ("N".equals(user.getStatus())) {
+                // log.info("정지계정? : {}", username);
+                SecurityContextHolder.clearContext();
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 접근권한으로 인해 거절이므로 403 반환
+                response.getWriter().write("정지된 계정입니다.");
+                return;
+            }
 			
 			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 			authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

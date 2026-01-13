@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.token.model.dao.TokenMapper;
 import com.kh.jde.token.model.vo.RefreshToken;
-import com.kh.jde.token.utill.JwtUtill;
+import com.kh.jde.token.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
 	
-	private final JwtUtill tokenUtill;
+	private final JwtUtil tokenUtil;
 	private final TokenMapper tokenMapper;
 
 	public Map<String, String> generateToken(String username) {
@@ -34,8 +34,8 @@ public class TokenServiceImpl implements TokenService {
 	}
 	
 	private Map<String, String> createTokens(String username){
-		String accessToken = tokenUtill.getAccessToken(username);
-		String refreshToken = tokenUtill.getRefreshToken(username);
+		String accessToken = tokenUtil.getAccessToken(username);
+		String refreshToken = tokenUtil.getRefreshToken(username);
 		
 		Map<String, String> tokens = new HashMap();
 		tokens.put("accessToken", accessToken);
@@ -58,7 +58,7 @@ public class TokenServiceImpl implements TokenService {
 		if(token == null || token.getExpiration() < System.currentTimeMillis()) {
 			throw new CustomAuthenticationException("유효하지 않은 요청입니다.");
 		}
-		Claims claims = tokenUtill.parseJwt(refreshToken); 
+		Claims claims = tokenUtil.parseJwt(refreshToken); 
 		String username = claims.getSubject();
 		return createTokens(username);
 	}

@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CommentServiceImple implements CommentService {
+public class CommentServiceImpl implements CommentService {
 
 	private final CommentMapper commentMapper;
 	
