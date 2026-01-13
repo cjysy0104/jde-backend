@@ -1,5 +1,6 @@
 package com.kh.jde.member.model.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.kh.jde.exception.MemberInfomationDuplicatedException;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberInformationValidator {
 	
 	private final MemberMapper memberMapper;
+	private final PasswordEncoder passwordEncoder;
 	
 	public void MemberInfomationDuplicateCheck(String nickname, String email, String phone) {
 		int nicknameCount = memberMapper.countByNickname(nickname);
@@ -27,8 +29,8 @@ public class MemberInformationValidator {
 		int PhoneCount = memberMapper.countByPhone(phone);
 		if(1 <= PhoneCount) {
 			throw new MemberInfomationDuplicatedException("이미 존재하는 휴대전화 번호입니다.");
-		} 
-		
+		} 	
 	}
+	
 	
 }
