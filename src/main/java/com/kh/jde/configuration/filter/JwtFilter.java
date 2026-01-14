@@ -54,7 +54,6 @@ public class JwtFilter extends OncePerRequestFilter {
 		
 		// 1. 서버에서 관리하는 시크릿키로 만든게 맞는가?
 		// 2. 유효기간이 지나지 않았는가?
-		log.info("Authorization header = {}", authorization);
 		try {
 			Claims claims = jwtUtil.parseJwt(token);
 			String username = claims.getSubject();
