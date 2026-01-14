@@ -1,0 +1,33 @@
+package com.kh.jde.review.model.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.kh.jde.auth.model.vo.CustomUserDetails;
+import com.kh.jde.review.model.dao.ReviewMapper;
+import com.kh.jde.review.model.dto.QueryDTO;
+import com.kh.jde.review.model.dto.ReviewDTO;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ReviewServiceImpl implements ReviewService {
+	
+	private final ReviewMapper reviewMapper;
+
+	@Override
+	public List<ReviewDTO> findAll(QueryDTO req, CustomUserDetails principal) {
+		
+		req.setMemberNo(Long.valueOf(principal.getMemberNo()));
+//		req.setMemberNo(Long.valueOf(3));
+		
+		return reviewMapper.findAll(req);
+	}
+
+	@Override
+	public ReviewDTO findById(Long reviewNo) {
+		return reviewMapper.findById(reviewNo);
+	}
+}

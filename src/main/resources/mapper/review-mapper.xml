@@ -4,7 +4,107 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.jde.review.model.dao.ReviewMapper">
 	
-
+	<select id="findAll"
+			parameterType="QueryDTO"
+			resultType="reviewDTO">
+		SELECT
+				  RV.REVIEW_NO reviewNo
+				, (
+					SELECT 
+							RVF.FILE_URL
+					FROM
+							TB_REVIEW_FILE RVF
+					WHERE
+							RV.REVIEW_NO = RVF.REVIEW_NO
+					AND
+							RVF.IS_THUMNAIL = 'Y'
+				) thumbnailUrl
+				, KW.KEYWORDS
+				, CASE WHEN EXISTS (
+			          SELECT 1
+			          FROM TB_REVIEW_LIKE RVL2
+			          WHERE RVL2.REVIEW_NO = RV.REVIEW_NO
+			            AND RVL2.MEMBER_NO = #{memberNo}
+			        )
+			        THEN 'Y' ELSE 'N'
+			      END isLiked
+			    , CASE WHEN EXISTS (
+			          SELECT 1
+			          FROM TB_BOOKMARK RVB2
+			          WHERE RVB2.REVIEW_NO = RV.REVIEW_NO
+			            AND RVB2.MEMBER_NO = #{memberNo}
+			        )
+			        THEN 'Y' ELSE 'N'
+			      END isMarked
+				, RT.NORMAL_NAME restaurantName
+				, M.NICKNAME nickname
+				, RV.CONTENT content
+				, RV.RATING rating
+				, RV.UPDATED_AT updateDate
+				, (
+					SELECT
+							COUNT(*)
+					FROM
+							TB_REVIEW_LIKE RVL
+					WHERE
+							RV.REVIEW_NO = RVL.REVIEW_NO
+				) likeCount
+				, (
+					SELECT
+							COUNT(*)
+					FROM	
+							TB_COMMENT C
+					WHERE 
+							RV.REVIEW_NO = C.REVIEW_NO
+					AND
+							C.STATUS = 'Y'
+				) commentCount
+				, RV.VIEW_COUNT viewCount
+		FROM
+				TB_REVIEW RV
+		JOIN
+				TB_MEMBER M ON (RV.MEMBER_NO = M.MEMBER_NO)
+		JOIN
+				TB_RESTAURANT RT ON (RV.RESTAURANT_NO = RT.RESTAURANT_NO)
+		LEFT
+		JOIN
+				(
+					SELECT
+							  RK.REVIEW_NO
+							, LISTAGG(K.KEYWORD_NAME, ', ') 
+					WITHIN
+					GROUP 	
+							(ORDER BY RK.KEYWORD_NO) KEYWORDS
+					FROM 
+							TB_REVIEW_KEYWORD_MAP RK
+					JOIN 
+							TB_REVIEW R ON (R.REVIEW_NO = RK.REVIEW_NO)
+					JOIN 
+							TB_KEYWORD K ON (K.KEYWORD_NO = RK.KEYWORD_NO)
+					GROUP
+					BY
+							RK.REVIEW_NO
+				) KW ON (KW.REVIEW_NO = RV.REVIEW_NO)
+		WHERE 
+				RV.STATUS = 'Y'
+		<if test="query != null">
+		AND 
+				(
+				RV.CONTENT			LIKE	'%' || #{query} || '%'
+				OR RT.NORMAL_NAME	LIKE	'%' || #{query} || '%'
+				OR M.NICKNAME		LIKE	'%' || #{query} || '%'
+				)
+			
+		</if>
+		AND
+				RV.RATING &gt;= #{minRating}
+		AND
+				RV.RATING &lt;= #{maxRating}
+		ORDER
+		BY
+				RV.REVIEW_NO DESC
+							
+	</select>
 
 
 
