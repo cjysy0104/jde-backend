@@ -37,7 +37,6 @@
     </delete>
 
     <!-- 내 북마크 목록 조회 (좋아요 수/댓글 수/썸네일 1장 포함) -->
-    <!-- Oracle 18: OFFSET/FETCH 지원 -->
     <select id="selectMyBookmarks" resultType="com.kh.jde.bookmark.model.dto.BookmarkResponseDTO">
         SELECT
             b.REVIEW_NO   AS reviewNo,
@@ -95,5 +94,6 @@
         ORDER BY b.ENROLL_DATE DESC, b.REVIEW_NO DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
+
 
 </mapper>
