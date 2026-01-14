@@ -65,6 +65,7 @@ public class BookmarkServiceImpl implements BookmarkService {
     }
 
     @Override
+    @Transactional
     public List<BookmarkResponseDTO> getMyBookmarks(Long memberNo, int page, int size) {
         int offset = page * size;
 
