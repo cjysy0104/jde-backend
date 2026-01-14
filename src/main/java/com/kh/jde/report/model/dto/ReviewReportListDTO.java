@@ -15,6 +15,7 @@ import lombok.ToString;
 @ToString
 public class ReviewReportListDTO {
 	
+	private Long reportNo;
 	private Long reviewReportNo;
 	private Long memberNo;
 	private String memberNickname; // 신고한 회원 닉네임

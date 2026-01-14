@@ -38,4 +38,10 @@ public interface ReportMapper {
 	
 	// 리뷰 신고 페이징 조회
 	List<ReviewReportListDTO> selectReviewReportList(PageInfo pageInfo);
+	
+	// 댓글 신고 상세 조회
+	CommentReportListDTO selectCommentReportByNo(Long reportNo);
+	
+	// 리뷰 신고 상세 조회
+	ReviewReportListDTO selectReviewReportByNo(Long reportNo);
 }

@@ -140,4 +140,15 @@ public class ReportServiceImpl implements ReportService {
 		
 		return new ReportPageResponse<>(reportList, pageInfo);
 	}
+	
+	@Override
+	public CommentReportListDTO getCommentReportByNo(Long reportNo) {
+		return reportMapper.selectCommentReportByNo(reportNo);
+	}
+	
+	@Override
+	public ReviewReportListDTO getReviewReportByNo(Long reportNo) {
+		return reportMapper.selectReviewReportByNo(reportNo);
+	}
+	
 }

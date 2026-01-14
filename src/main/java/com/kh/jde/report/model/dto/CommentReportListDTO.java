@@ -15,6 +15,7 @@ import lombok.ToString;
 @ToString
 public class CommentReportListDTO {
 	
+	private Long reportNo;
 	private Long commentReportNo;
 	private Long memberNo;
 	private String memberNickname; // 신고한 회원 닉네임

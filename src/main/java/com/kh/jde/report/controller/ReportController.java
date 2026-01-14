@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,5 +85,25 @@ public class ReportController {
 		ReportPageResponse<ReviewReportListDTO> reportPageResponse = reportService.getReviewReportList(page);
 		
 		return SuccessResponse.ok(reportPageResponse, "리뷰 신고 목록 조회 성공");
+	}
+	
+	// 댓글 신고 상세 조회
+	@GetMapping("/comment/{reportNo}")
+	public ResponseEntity<SuccessResponse<CommentReportListDTO>> getCommentReportByNo(
+			@PathVariable(name="reportNo") Long reportNo){
+		
+		CommentReportListDTO commentReport = reportService.getCommentReportByNo(reportNo);
+		
+		return SuccessResponse.ok(commentReport, "댓글 신고 상세 조회 성공");
+	}
+	
+	// 리뷰 신고 상세 조회
+	@GetMapping("/review/{reportNo}")
+	public ResponseEntity<SuccessResponse<ReviewReportListDTO>> getReviewReportByNo(
+			@PathVariable(name="reportNo") Long reportNo){
+		
+		ReviewReportListDTO reviewReport = reportService.getReviewReportByNo(reportNo);
+		
+		return SuccessResponse.ok(reviewReport, "리뷰 신고 상세 조회 성공");
 	}
 }

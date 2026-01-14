@@ -19,4 +19,10 @@ public interface ReportService {
 	
 	// 리뷰 신고 페이징 조회
 	ReportPageResponse<ReviewReportListDTO> getReviewReportList(int currentPage);
+
+	// 댓글 신고 상세 조회
+	CommentReportListDTO getCommentReportByNo(Long reportNo);
+	
+	// 리뷰 신고 상세 조회
+	ReviewReportListDTO getReviewReportByNo(Long reportNo);
 }

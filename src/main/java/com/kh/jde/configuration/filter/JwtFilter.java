@@ -77,11 +77,13 @@ public class JwtFilter extends OncePerRequestFilter {
 			log.info("토큰의 유효기간 만료");
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getWriter().write("토큰만료");
+			return;
 
 		} catch(JwtException e) {
 			log.info("서버에서 만들어진 토큰이 아님");
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().write("유효하지 않은 토큰입니다.");
+			return;
 		}
 		filterChain.doFilter(request, response);
 	}
