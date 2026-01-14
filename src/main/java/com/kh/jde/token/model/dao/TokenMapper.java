@@ -10,7 +10,7 @@ public interface TokenMapper {
 	
 	int saveToken(RefreshToken token);
 	
-	void deleteToken(String memberId);
+	int deleteToken(String email);
 
 	RefreshToken findByToken(String refreshToken);
 	

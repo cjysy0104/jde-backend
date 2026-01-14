@@ -1,12 +1,14 @@
 package com.kh.jde.member.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.common.responseData.SuccessResponse;
+import com.kh.jde.member.model.dto.MemberDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.service.MemberService;
 
@@ -27,6 +29,12 @@ public class MemberController {
 		// log.info("멤버 잘들어오나? : {}", member);
 		memberService.signUp(member);
 		return SuccessResponse.created("회원가입에 성공했습니다.");
+	}
+	
+	@DeleteMapping
+	public ResponseEntity<SuccessResponse<String>> withdraw(@Valid @RequestBody String password){
+		memberService.withdraw(password);
+		return SuccessResponse.noContent("탈퇴 되었습니다.");	
 	}
 	
 	
