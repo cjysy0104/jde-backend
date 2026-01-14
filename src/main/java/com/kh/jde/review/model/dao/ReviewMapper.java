@@ -14,7 +14,7 @@ public interface ReviewMapper {
 	List<ReviewDTO> findAll(QueryDTO req);
 	
 	// 리뷰 상세 조회
-	ReviewDTO findById();
+	ReviewDTO findById(Long reviewNo);
 	
 	// 리뷰 작성
 	void save();

@@ -9,4 +9,6 @@ import com.kh.jde.review.model.dto.ReviewDTO;
 public interface ReviewService {
 
 	public List<ReviewDTO> findAll(QueryDTO req, CustomUserDetails principal);
+	
+	public ReviewDTO findById(Long reviewNo);
 }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,6 +34,12 @@ public class ReviewController {
 		List<ReviewDTO> result = reviewService.findAll(req, principal);
 		
 		return SuccessResponse.ok(result, "리뷰 전체 조회 성공");
+	}
+	
+	@GetMapping("/{reviewNo}")
+	public ResponseEntity<SuccessResponse<ReviewDTO>> findById(@PathVariable Long reviewNo){
+		
+		return SuccessResponse.ok(reviewService.findById(reviewNo), "리뷰 상세 조회 성공");
 	}
 	
 }

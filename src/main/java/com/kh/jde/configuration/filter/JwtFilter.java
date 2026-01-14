@@ -78,10 +78,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getWriter().write("토큰만료");
 			return;
-<<<<<<< HEAD
-=======
 
->>>>>>> 2633201e1e754bb134700e895d5d225460d13fb4
 		} catch(JwtException e) {
 			log.info("서버에서 만들어진 토큰이 아님");
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

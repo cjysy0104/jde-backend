@@ -25,4 +25,9 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		return reviewMapper.findAll(req);
 	}
+
+	@Override
+	public ReviewDTO findById(Long reviewNo) {
+		return reviewMapper.findById(reviewNo);
+	}
 }
