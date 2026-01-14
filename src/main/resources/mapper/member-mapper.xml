@@ -75,7 +75,14 @@
 			   EMAIL = #{email}
 	</select>
 
-
+	<update id="withdrawByPassword" parameterType="string">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       EMAIL = #{email}
+	</update>
 
 
 
