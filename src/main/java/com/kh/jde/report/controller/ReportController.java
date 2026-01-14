@@ -1,8 +1,7 @@
 package com.kh.jde.report.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +19,6 @@ import com.kh.jde.report.model.dto.ReviewReportCreateDTO;
 import com.kh.jde.report.model.dto.ReviewReportListDTO;
 import com.kh.jde.report.model.service.ReportService;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,14 +33,12 @@ public class ReportController {
 	
 	//댓글 신고 등록
 	@PostMapping("/comment")
-	public ResponseEntity<SuccessResponse<String>> createCommentReport(
+	public ResponseEntity<SuccessResponse<String>> createCommentReport(@AuthenticationPrincipal CustomUserDetails user,
 			 @RequestBody CommentReportCreateDTO dto) {
 		
 		// 인증된 사용자 정보 가져오기
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//		Long memberNo = userDetails.getMemberNo();
-		
+		//Long memberNo = user.getMemberNo();
+
 		dto.setMemberNo((long)3);
 		// 신고 등록
 		reportService.createCommentReport(dto);
@@ -56,9 +52,7 @@ public class ReportController {
 		 @RequestBody ReviewReportCreateDTO dto) {
 		
 		// 인증된 사용자 정보 가져오기
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//		Long memberNo = userDetails.getMemberNo();
+		//Long memberNo = user.getMemberNo();
 		
 		dto.setMemberNo((long)3);
 		// 신고 등록

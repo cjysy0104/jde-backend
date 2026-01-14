@@ -56,4 +56,9 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
 	}
 	
+	@ExceptionHandler(UnexpectedSQLResponseException.class) 
+	public ResponseEntity<ErrorResponse<String>> handleUnexpectedSQLResponse(UnexpectedSQLResponseException e, HttpServletRequest request){
+		return ErrorResponse.forbidden(e.getMessage(), request.getRequestURI());
+	}
+	
 }
