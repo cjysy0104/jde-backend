@@ -52,6 +52,7 @@ public class SuccessResponse<T> {
 		return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<T>(201, true, message, data, LocalDateTime.now()));
 	}
 	
+	
 	// 204 NO_CONTENT / DELETE, PUT, PATCH / 전달 메세지 있음
 	public static <T> ResponseEntity<SuccessResponse<T>> noContent(String message){
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse(204, true, message, null, LocalDateTime.now()));
