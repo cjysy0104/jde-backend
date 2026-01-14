@@ -60,7 +60,7 @@
 	
 	<select id="loadUser" parameterType="MemberLoginDTO">
 		SELECT
-			   MEMBER_NO memberId
+			   MEMBER_NO memberNo
 		     , PASSWORD 
 			 , MEMBER_NAME memberName
 			 , NICKNAME

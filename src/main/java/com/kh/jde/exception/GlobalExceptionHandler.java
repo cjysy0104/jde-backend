@@ -51,4 +51,9 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.forbidden(e.getMessage(), request.getRequestURI());
 	}
 	
+	@ExceptionHandler(DuplicateReportException.class) 
+	public ResponseEntity<ErrorResponse<String>> handleDuplicateReport(DuplicateReportException e, HttpServletRequest request){
+		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
+	}
+	
 }
