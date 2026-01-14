@@ -61,5 +61,4 @@ public class SuccessResponse<T> {
 	public static <T> ResponseEntity<SuccessResponse<T>> noContent(){
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse(204, true, null, null, LocalDateTime.now()));
 	}
-	
 }
