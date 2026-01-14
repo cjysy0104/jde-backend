@@ -65,12 +65,15 @@ public class BookmarkServiceImpl implements BookmarkService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<BookmarkResponseDTO> getMyBookmarks(Long memberNo, int page, int size) {
-        int safePage = Math.max(page, 0);
-        int safeSize = Math.min(Math.max(size, 1), 100); // 1~100 제한
-        int offset = safePage * safeSize;
+        int offset = page * size;
 
-        return bookmarkMapper.selectMyBookmarks(memberNo, offset, safeSize);
+        BookmarkVO vo = BookmarkVO.builder()
+                .memberNo(memberNo)
+                .offset(offset)
+                .size(size)
+                .build();
+
+        return bookmarkMapper.selectMyBookmarks(vo);
     }
 }

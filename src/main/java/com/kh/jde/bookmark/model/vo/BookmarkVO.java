@@ -12,4 +12,8 @@ import lombok.NoArgsConstructor;
 public class BookmarkVO {
     private Long memberNo;
     private Long reviewNo;
+    
+    // 페이징용
+    private Integer offset;
+    private Integer size;
 }

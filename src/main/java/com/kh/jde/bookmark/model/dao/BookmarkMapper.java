@@ -20,9 +20,5 @@ public interface BookmarkMapper {
 
     int deleteBookmark(BookmarkVO key);
 
-    List<BookmarkResponseDTO> selectMyBookmarks(
-            @Param("memberNo") Long memberNo,
-            @Param("offset") Integer offset,
-            @Param("size") Integer size
-    );
+    List<BookmarkResponseDTO> selectMyBookmarks(BookmarkVO param);
 }
