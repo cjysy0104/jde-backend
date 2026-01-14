@@ -2,21 +2,99 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.kh.jde.review.model.dao.BookmarkMapper">
+<mapper namespace="com.kh.jde.bookmark.model.dao.BookmarkMapper">
 	
+	<!-- 북마크 추가 -->
+	<insert id="insertBookmark">
+	    INSERT 
+	      INTO 
+	           TB_BOOKMARK 
+	           (
+	           MEMBER_NO
+	         , REVIEW_NO
+	         , ENROLL_DATE
+	           )
+	    VALUES 
+	    	   (
+	    	   #{memberNo}
+	    	 , #{reviewNo}
+	    	 , SYSDATE
+	    	   )
+	</insert>
 
+	<!-- 북마크 삭제 -->
+	<delete id="deleteBookmark">
+	    DELETE 
+	      FROM 
+	           TB_BOOKMARK
+	     WHERE 
+	           MEMBER_NO = #{memberNo}
+	       AND 
+	           REVIEW_NO = #{reviewNo}
+	</delete>
 
+	<!-- 북마크 존재 여부 (있으면 1, 없으면 0) -->
+	<select id="existsBookmark" resultType="int">
+	    SELECT 
+	      CASE 
+	      WHEN 
+	           COUNT(*) > 0 THEN 1 ELSE 0 END
+	      FROM 
+	           TB_BOOKMARK
+	     WHERE 
+	           MEMBER_NO = #{memberNo}
+	       AND 
+	           REVIEW_NO = #{reviewNo}
+	</select>
 
+	<!-- 내 북마크 총 개수 -->
+	<select id="countByMember" resultType="long">
+	    SELECT 
+	           COUNT(*)
+	      FROM 
+	           TB_BOOKMARK
+	     WHERE 
+	           MEMBER_NO = #{memberNo}
+	</select>
 
+	<!-- 내 북마크 목록 (무한스크롤) -->
+    <select id="selectMyBookmarks" resultType="com.kh.jde.bookmark.model.dto.BookmarkDTO">
+        SELECT
+            b.REVIEW_NO      AS reviewNo,
+            b.ENROLL_DATE    AS enrollDate,
 
+            r.CONTENT        AS reviewContent,
+            r.RATING         AS rating,
+            r.VIEW_COUNT     AS viewCount,
 
+            rf.FILE_URL      AS thumbnailUrl
+        FROM TB_BOOKMARK b
+        JOIN TB_REVIEW r
+          ON r.REVIEW_NO = b.REVIEW_NO
+        LEFT JOIN TB_REVIEW_FILE rf
+          ON rf.REVIEW_NO = r.REVIEW_NO
+         AND rf.IS_THUMNAIL = 'Y'
+        WHERE b.MEMBER_NO = #{memberNo}
 
+        <if test="cursorDate != null and cursorReviewNo != null">
+            AND (
+                b.ENROLL_DATE &lt; #{cursorDate}
+                OR (b.ENROLL_DATE = #{cursorDate} AND b.REVIEW_NO &lt; #{cursorReviewNo})
+            )
+        </if>
 
+        ORDER BY b.ENROLL_DATE DESC, b.REVIEW_NO DESC
+        FETCH FIRST #{size} ROWS ONLY
+    </select>
 
-
-
-
-
-
+	<!-- 특정 리뷰 북마크 수 -->
+	<select id="countByReview" resultType="long">
+	    SELECT 
+	           COUNT(*)
+	      FROM 
+	           TB_BOOKMARK
+	     WHERE 
+	           REVIEW_NO = #{reviewNo}
+	</select>
 
 </mapper>
