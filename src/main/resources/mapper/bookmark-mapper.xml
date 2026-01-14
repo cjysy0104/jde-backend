@@ -95,5 +95,4 @@
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
-
 </mapper>
