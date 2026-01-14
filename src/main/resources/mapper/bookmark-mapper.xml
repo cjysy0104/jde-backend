@@ -46,7 +46,12 @@
 	        bookmarkEnrollDate,
 	        content,
 	        rating,
-	        reviewCreatedAt
+	        reviewCreatedAt,
+	        writerMemberNo,
+	        writerNickname,
+	        likeCount,
+	        commentCount,
+	        thumbnailUrl
 	    FROM (
 	        SELECT
 	            t.reviewNo,
@@ -54,24 +59,50 @@
 	            t.content,
 	            t.rating,
 	            t.reviewCreatedAt,
+	            t.writerMemberNo,
+	            t.writerNickname,
+	            t.likeCount,
+	            t.commentCount,
+	            t.thumbnailUrl,
 	            ROWNUM rn
 	        FROM (
 	            SELECT
 	                b.REVIEW_NO   AS reviewNo,
 	                b.ENROLL_DATE AS bookmarkEnrollDate,
+	
 	                r.CONTENT     AS content,
 	                r.RATING      AS rating,
-	                r.CREATED_AT  AS reviewCreatedAt
+	                r.CREATED_AT  AS reviewCreatedAt,
+	
+	                r.MEMBER_NO   AS writerMemberNo,     -- (리뷰 작성자 컬럼명이 MEMBER_NO 라고 가정)
+	                m.NICKNAME    AS writerNickname,
+	
+	                (SELECT COUNT(*)
+	                   FROM TB_REVIEW_LIKE rl
+	                  WHERE rl.REVIEW_NO = r.REVIEW_NO) AS likeCount,
+	
+	                (SELECT COUNT(*)
+	                   FROM TB_COMMENT c
+	                  WHERE c.REVIEW_NO = r.REVIEW_NO
+	                    AND c.STATUS = 'Y') AS commentCount,
+	
+	                (SELECT rf.FILE_URL
+					   FROM TB_REVIEW_FILE rf
+					  WHERE rf.REVIEW_NO = r.REVIEW_NO
+					    AND rf.IS_THUMNAIL = 'Y'
+					  ORDER BY rf.SORT_ORDER ASC, rf.FILE_NO ASC
+					  FETCH FIRST 1 ROWS ONLY) AS thumbnailUrl
+	
 	            FROM TB_BOOKMARK b
-	            JOIN TB_REVIEW r
-	              ON r.REVIEW_NO = b.REVIEW_NO
+	            JOIN TB_REVIEW r ON r.REVIEW_NO = b.REVIEW_NO
+	            JOIN TB_MEMBER m ON m.MEMBER_NO = r.MEMBER_NO
 	            WHERE b.MEMBER_NO = #{memberNo}
 	              AND r.STATUS = 'Y'
 	            ORDER BY b.ENROLL_DATE DESC, b.REVIEW_NO DESC
 	        ) t
-	        WHERE ROWNUM <![CDATA[<=]]> (#{offset} + #{size})
+	        WHERE ROWNUM &lt;= (#{offset} + #{size})
 	    )
-	    WHERE rn <![CDATA[>]]> #{offset}
+	    WHERE rn > #{offset}
 	
 	</select>
 
