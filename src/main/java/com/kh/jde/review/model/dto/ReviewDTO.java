@@ -1,6 +1,7 @@
 package com.kh.jde.review.model.dto;
 
 import java.sql.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class ReviewDTO {
 
 	private Long reviewNo;
 	private String thumbnailUrl;
+	private String keywords;
 	private String restaurantName;
 	private String nickname;
 	private String content;

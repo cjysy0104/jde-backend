@@ -19,6 +19,7 @@
 					AND
 							RVF.IS_THUMNAIL = 'Y'
 				) thumbnailUrl
+				, KW.KEYWORDS
 				, RT.NORMAL_NAME restaurantName
 				, M.NICKNAME nickname
 				, RV.CONTENT content
@@ -49,6 +50,25 @@
 				TB_MEMBER M ON (RV.MEMBER_NO = M.MEMBER_NO)
 		JOIN
 				TB_RESTAURANT RT ON (RV.RESTAURANT_NO = RT.RESTAURANT_NO)
+		LEFT
+		JOIN
+				(
+					SELECT
+							  RK.REVIEW_NO
+							, LISTAGG(K.KEYWORD_NAME, ', ') 
+					WITHIN
+					GROUP 	
+							(ORDER BY RK.KEYWORD_NO) KEYWORDS
+					FROM 
+							TB_REVIEW_KEYWORD_MAP RK
+					JOIN 
+							TB_REVIEW R ON (R.REVIEW_NO = RK.REVIEW_NO)
+					JOIN 
+							TB_KEYWORD K ON (K.KEYWORD_NO = RK.KEYWORD_NO)
+					GROUP
+					BY
+							RK.REVIEW_NO
+				) KW ON (KW.REVIEW_NO = RV.REVIEW_NO)
 		WHERE 
 				RV.STATUS = 'Y'
 		<if test="query != null">
