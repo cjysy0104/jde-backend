@@ -42,9 +42,9 @@ public class JwtFilter extends OncePerRequestFilter {
 		// log.info("요청 어케 옴? : {}", uri); // => /auth/login
 		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 		// 로그인 요청일때는 다음 필터체인으로 바로 넘어가게 처리
-		if(authorization == null || uri.equals("/auth/login")) {
-			filterChain.doFilter(request, response);
-			return;
+		if (authorization == null || uri.equals("/api/auth/login") || uri.equals("/api/auth/refresh")) {
+		    filterChain.doFilter(request, response);
+		    return;
 		}
 		
 		// 토큰 검증
@@ -78,6 +78,10 @@ public class JwtFilter extends OncePerRequestFilter {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getWriter().write("토큰만료");
 			return;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2633201e1e754bb134700e895d5d225460d13fb4
 		} catch(JwtException e) {
 			log.info("서버에서 만들어진 토큰이 아님");
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
