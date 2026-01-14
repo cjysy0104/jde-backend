@@ -1,5 +1,15 @@
 package com.kh.jde.bookmark.model.vo;
 
-public class BookmarkVO {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class BookmarkVO {
+    private Long memberNo;
+    private Long reviewNo;
 }

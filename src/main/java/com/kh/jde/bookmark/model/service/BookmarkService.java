@@ -2,13 +2,16 @@ package com.kh.jde.bookmark.model.service;
 
 import java.util.List;
 
-import com.kh.jde.bookmark.model.dto.BookmarkDTO;
+import com.kh.jde.bookmark.model.dto.BookmarkResponseDTO;
 import com.kh.jde.bookmark.model.dto.BookmarkToggleDTO;
 
 public interface BookmarkService {
 
-    BookmarkToggleDTO toggleBookmark(long memberNo, long reviewNo);
+	BookmarkToggleDTO toggle(Long memberNo, Long reviewNo);
 
-    // 무한스크롤: cursor 없으면 null
-    List<BookmarkDTO> getMyBookmarks(long memberNo, int size, String cursor);
+    // 필요하면 프론트에서 "추가/삭제"를 따로 호출할 수도 있어서 열어둠
+    void add(Long memberNo, Long reviewNo);
+    void remove(Long memberNo, Long reviewNo);
+
+    List<BookmarkResponseDTO> getMyBookmarks(Long memberNo, int page, int size);
 }
