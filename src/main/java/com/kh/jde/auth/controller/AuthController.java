@@ -34,7 +34,7 @@ public class AuthController {
 	@PostMapping("logout")
 	public ResponseEntity<SuccessResponse<String>> logout(@Valid @RequestBody MemberLogoutDTO member){
 		authService.logout(member);
-		return SuccessResponse.noContent("로그아웃 되었습니다.");
+		return SuccessResponse.ok("로그아웃 되었습니다.");
 	}
 
 }

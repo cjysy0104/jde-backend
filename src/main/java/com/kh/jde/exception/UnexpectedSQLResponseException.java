@@ -5,4 +5,5 @@ public class UnexpectedSQLResponseException extends RuntimeException {
 	public UnexpectedSQLResponseException(String message) {
 		super(message);
 	}
+	
 }
