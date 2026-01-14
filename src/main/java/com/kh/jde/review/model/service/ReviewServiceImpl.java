@@ -19,6 +19,8 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public List<ReviewDTO> findAll(QueryDTO req) {
 		
+		req.setMemberNo(Long.valueOf(3));
+		
 		return reviewMapper.findAll(req);
 	}
 }

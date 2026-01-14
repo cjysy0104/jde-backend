@@ -18,4 +18,6 @@ public class QueryDTO {
 	private Integer size;
 	private String sort;
 	
+	private Long memberNo;
+	
 }

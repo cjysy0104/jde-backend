@@ -20,6 +20,22 @@
 							RVF.IS_THUMNAIL = 'Y'
 				) thumbnailUrl
 				, KW.KEYWORDS
+				, CASE WHEN EXISTS (
+			          SELECT 1
+			          FROM TB_REVIEW_LIKE RVL2
+			          WHERE RVL2.REVIEW_NO = RV.REVIEW_NO
+			            AND RVL2.MEMBER_NO = #{memberNo}
+			        )
+			        THEN 'Y' ELSE 'N'
+			      END isLiked
+			    , CASE WHEN EXISTS (
+			          SELECT 1
+			          FROM TB_BOOKMARK RVB2
+			          WHERE RVB2.REVIEW_NO = RV.REVIEW_NO
+			            AND RVB2.MEMBER_NO = #{memberNo}
+			        )
+			        THEN 'Y' ELSE 'N'
+			      END isMarked
 				, RT.NORMAL_NAME restaurantName
 				, M.NICKNAME nickname
 				, RV.CONTENT content

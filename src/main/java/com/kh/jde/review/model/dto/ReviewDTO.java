@@ -27,5 +27,6 @@ public class ReviewDTO {
 	private int likeCount;
 	private int commentCount;
 	private int viewCount;
-	
+	private String isLiked;
+	private String isMarked;
 }
