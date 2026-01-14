@@ -15,9 +15,4 @@ spring:
     - private
 
 server:
-  port: 8081
-
-logging:
-  level:
-    com.kh.jde: DEBUG
-    java.sql: DEBUG
+  port: 8080

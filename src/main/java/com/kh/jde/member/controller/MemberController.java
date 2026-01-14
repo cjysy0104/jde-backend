@@ -52,5 +52,5 @@ public class MemberController {
 		return SuccessResponse.ok(captains, message);
 	}
 	
-	
+
 }

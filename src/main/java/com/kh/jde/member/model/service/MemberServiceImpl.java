@@ -88,12 +88,13 @@ public class MemberServiceImpl implements MemberService {
 		return user;
 	}
 
+
 	@Override // 리뷰로 좋아요 많이 받은 상위3명의 명단 보내기
 	public List<CaptainDTO> getCaptainList() {
 		List<CaptainDTO> captains = memberMapper.getCaptainList();
 		return captains;
 	}
 	
-	
 
 }
+

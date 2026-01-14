@@ -56,7 +56,9 @@ public class SuccessResponse<T> {
 		return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<T>(201, true, message, data, LocalDateTime.now()));
 	}
 	
+
 	/* SpringNVC의 경우 noContent의 Body를 강제적으로 지워 응답객체를 담아서 사용할 수가 없으므로 사용하지 않기로 정책 결정됨.
+
 	// 204 NO_CONTENT / DELETE, PUT, PATCH / 전달 메세지 있음
 	public static <T> ResponseEntity<SuccessResponse<T>> noContent(String message){
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse(204, true, message, null, LocalDateTime.now()));
@@ -66,6 +68,7 @@ public class SuccessResponse<T> {
 	public static <T> ResponseEntity<SuccessResponse<T>> noContent(){
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse(204, true, null, null, LocalDateTime.now()));
 	}
+
 	*/
-	
+
 }
