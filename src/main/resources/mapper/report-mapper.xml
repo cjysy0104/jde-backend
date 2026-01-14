@@ -305,5 +305,31 @@
 		       R.REVIEW_REPORT_NO = #{reportNo}
 		   AND R.STATUS = 'Y'
 	</select>
+	
+	<!-- 댓글 신고 처리 업데이트 -->
+	<update id="updateCommentReportProcess" parameterType="CommentReportProcessDTO">
+		UPDATE
+		       TB_COMMENT_REPORT
+		   SET
+		       REPORT_PROCESS = #{reportProcess}
+		     , UPDATE_AT = SYSDATE
+		 WHERE
+		       COMMENT_REPORT_NO = #{reportNo}
+		   AND 
+		       STATUS = 'Y'
+	</update>
+	
+	<!-- 리뷰 신고 처리 업데이트 -->
+	<update id="updateReviewReportProcess" parameterType="ReviewReportProcessDTO">
+		UPDATE
+		       TB_REVIEW_REPORT
+		   SET
+		       REPORT_PROCESS = #{reportProcess}
+		     , UPDATE_AT = SYSDATE
+		 WHERE
+		       REVIEW_REPORT_NO = #{reportNo}
+		   AND 
+		       STATUS = 'Y'
+	</update>
 
 </mapper>
