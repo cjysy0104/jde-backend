@@ -29,7 +29,7 @@ public class BookmarkController {
     @PostMapping("/{reviewNo}/toggle")
     public ResponseEntity<SuccessResponse<BookmarkToggleDTO>> toggle(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long reviewNo) {
+            @PathVariable("reviewNo") Long reviewNo) {
         Long memberNo = user.getMemberNo();
         return SuccessResponse.ok(bookmarkService.toggle(memberNo, reviewNo), "북마크 토글 성공!");
     }
@@ -38,7 +38,7 @@ public class BookmarkController {
     @PostMapping("/{reviewNo}")
     public ResponseEntity<SuccessResponse<Void>> add(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long reviewNo) {
+            @PathVariable("reviewNo") Long reviewNo) {
         Long memberNo = user.getMemberNo();
         bookmarkService.add(memberNo, reviewNo);
         return SuccessResponse.ok(null, "북마크 추가 성공!");
@@ -48,7 +48,7 @@ public class BookmarkController {
     @DeleteMapping("/{reviewNo}")
     public ResponseEntity<SuccessResponse<Void>> remove(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long reviewNo) {
+            @PathVariable("reviewNo") Long reviewNo) {
         Long memberNo = user.getMemberNo();
         bookmarkService.remove(memberNo, reviewNo);
         return SuccessResponse.ok(null, "북마크 삭제 성공!");
