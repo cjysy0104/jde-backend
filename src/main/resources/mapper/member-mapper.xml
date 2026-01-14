@@ -74,6 +74,15 @@
 		 WHERE
 			   EMAIL = #{email}
 	</select>
+	
+	<select id="findPasswordByEmail" parameterType="string">
+		SELECT
+		       PASSWORD
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       EMAIL = #{email}
+	</select>
 
 	<update id="withdrawByPassword" parameterType="string">
 		UPDATE
@@ -83,8 +92,63 @@
 		 WHERE
 		       EMAIL = #{email}
 	</update>
+	
+	<select id="getCaptainList">
+		SELECT
+       		   m.MEMBER_NO memberNo
+     		 , m.NICKNAME
+     		 , f.FILE_URL fileUrl
+     		 , COUNT(DISTINCT r.REVIEW_NO) reviewCount
+     		 , COUNT(rl.REVIEW_NO) likeCount
+  		  FROM 
+       		   TB_MEMBER m
+  		  JOIN 
+       		   TB_REVIEW r ON r.MEMBER_NO = m.MEMBER_NO
+   		   AND 
+               r.STATUS = 'Y'
+          LEFT
+          JOIN 
+               TB_REVIEW_LIKE rl ON rl.REVIEW_NO = r.REVIEW_NO
+          LEFT
+          JOIN
+               TB_MEMBER_FILE f ON m.MEMBER_NO = f.MEMBER_NO
+         WHERE
+               m.MEMBER_NO IN 
+                             (
+          					  SELECT 
+               						 MEMBER_NO
+          						FROM 
+               						 (
+               						  SELECT
+                      						 r.MEMBER_NO
+                    					   , COUNT(rl.REVIEW_NO) AS LIKE_COUNT
+                 						FROM 
+                      						 TB_REVIEW r
+                 						JOIN 
+                      						 TB_REVIEW_LIKE rl ON rl.REVIEW_NO = r.REVIEW_NO
+                					   WHERE 
+                      						 r.STATUS = 'Y'
+                					   GROUP 
+                   						  BY 
+                      						 r.MEMBER_NO
+                					   ORDER 
+                                          BY 
+                                             LIKE_COUNT DESC
+                                     )
+          					   WHERE 
+                				     ROWNUM &lt;= 3
+         					  )
+ 		  GROUP
+             BY 
+       			m.MEMBER_NO
+     		  , m.NICKNAME
+     		  , f.FILE_URL
+ 		  ORDER
+   			 BY 
+       			likeCount DESC
+	</select>
 
-
+	
 
 
 

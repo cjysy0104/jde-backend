@@ -1,6 +1,8 @@
 package com.kh.jde.member.model.service;
 
-import com.kh.jde.member.model.dto.MemberDTO;
+import java.util.List;
+
+import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 
 public interface MemberService {
@@ -8,5 +10,7 @@ public interface MemberService {
 	void signUp(MemberSignUpDTO member);
 	
 	void withdraw(String password);
+	
+	List<CaptainDTO> getCaptainList();
 
 }

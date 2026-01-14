@@ -1,5 +1,7 @@
 package com.kh.jde.member.model.service;
 
+import java.util.List;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +12,7 @@ import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.member.model.dao.MemberMapper;
+import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.vo.MemberVO;
 import com.kh.jde.member.model.vo.Password;
@@ -68,15 +71,29 @@ public class MemberServiceImpl implements MemberService {
 	}
 	
 	private CustomUserDetails validatePassword(String plainPassword) {
+		// 이미 탈퇴한 회원인지 유효성 검증 필요함.!!
+		
+		
 		// 사용작 입력한 비밀번호가 DB에 저장된 비밀번호 암호문이랑 맞는지 검증
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
-		// 검증 실패시 예외 발생
-		if(!Password.matches(plainPassword, user.getPassword(), passwordEncoder)) {
+		
+		String encodedPassword = memberMapper.findPasswordByEmail(user.getUsername());
+		
+		// 비밀번호 검증 실패시 예외 발생
+		if(!Password.matches(plainPassword, encodedPassword, passwordEncoder)) {
 			throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
 		}
 		// 검증 성공시 유저정보 반환
 		return user;
 	}
+
+	@Override // 리뷰로 좋아요 많이 받은 상위3명의 명단 보내기
+	public List<CaptainDTO> getCaptainList() {
+		List<CaptainDTO> captains = memberMapper.getCaptainList();
+		return captains;
+	}
+	
+	
 
 }

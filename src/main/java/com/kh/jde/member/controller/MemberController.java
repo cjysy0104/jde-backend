@@ -1,15 +1,19 @@
 package com.kh.jde.member.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.common.responseData.SuccessResponse;
-import com.kh.jde.member.model.dto.MemberDTO;
+import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
+import com.kh.jde.member.model.dto.MemberWithdrawDTO;
 import com.kh.jde.member.model.service.MemberService;
 
 import jakarta.validation.Valid;
@@ -32,11 +36,21 @@ public class MemberController {
 	}
 	
 	@DeleteMapping
-	public ResponseEntity<SuccessResponse<String>> withdraw(@Valid @RequestBody String password){
-		memberService.withdraw(password);
-		return SuccessResponse.noContent("탈퇴 되었습니다.");	
+	public ResponseEntity<SuccessResponse<String>> withdraw(@Valid @RequestBody MemberWithdrawDTO member){
+		memberService.withdraw(member.getPassword());
+		return SuccessResponse.ok("탈퇴 되었습니다.");
 	}
 	
+	@GetMapping
+	public ResponseEntity<SuccessResponse<List<CaptainDTO>>> getCaptainList(){
+		List<CaptainDTO> captains = memberService.getCaptainList();
+		
+		String message = captains.isEmpty()
+		        			? "아직 미식대장이 없습니다."
+		        			: "미식대장 조회에 성공했습니다.";
+
+		return SuccessResponse.ok(captains, message);
+	}
 	
 	
 }

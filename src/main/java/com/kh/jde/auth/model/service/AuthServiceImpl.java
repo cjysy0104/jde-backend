@@ -55,9 +55,9 @@ public class AuthServiceImpl implements AuthService {
 														 .enrollDate(user.getEnrollDate())
 														 .role(user.getRole())
 														 .build();
-		
 		return loginResponse;
 	}
+	
 	
 	@Override
 	@Transactional
@@ -71,5 +71,6 @@ public class AuthServiceImpl implements AuthService {
 			throw new LogoutFailureException("로그아웃 오류 발생, 관리자에게 문의해주세요.");
 		}
 	}
+	
 
 }
