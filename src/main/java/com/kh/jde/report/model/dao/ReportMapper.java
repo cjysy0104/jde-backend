@@ -7,8 +7,10 @@ import java.util.List;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.report.model.dto.CommentReportCreateDTO;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
+import com.kh.jde.report.model.dto.CommentReportProcessDTO;
 import com.kh.jde.report.model.dto.ReviewReportCreateDTO;
 import com.kh.jde.report.model.dto.ReviewReportListDTO;
+import com.kh.jde.report.model.dto.ReviewReportProcessDTO;
 import com.kh.jde.report.model.vo.CommentReportVO;
 import com.kh.jde.report.model.vo.ReviewReportVO;
 
@@ -44,4 +46,10 @@ public interface ReportMapper {
 	
 	// 리뷰 신고 상세 조회
 	ReviewReportListDTO selectReviewReportByNo(Long reportNo);
+	
+	// 댓글 신고 처리
+	int updateCommentReportProcess(CommentReportProcessDTO dto);
+	
+	// 리뷰 신고 처리
+	int updateReviewReportProcess(ReviewReportProcessDTO dto);
 }
