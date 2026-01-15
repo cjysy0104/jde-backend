@@ -14,6 +14,7 @@ import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.member.model.dao.MemberMapper;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
+import com.kh.jde.member.model.dto.ChangeNicknameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.vo.MemberVO;
@@ -120,6 +121,25 @@ public class MemberServiceImpl implements MemberService {
 	    int result = memberMapper.updateNameByEmail(param);
 	    if (result < 1) {
 	        throw new UnexpectedSQLResponseException("이름 변경 실패");
+	    }
+	}
+	
+	@Override
+	@Transactional
+	public void changeNickname(ChangeNicknameDTO changeNickname) {
+	    CustomUserDetails user = validatePassword(changeNickname.getCurrentPassword());
+
+	    // 닉네임 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
+	    // miv.MemberInfomationDuplicateCheck(dto.getNickname(), null, null);
+
+	    MemberVO param = MemberVO.builder()
+	            .email(user.getUsername())
+	            .nickname(changeNickname.getNickname())
+	            .build();
+
+	    int result = memberMapper.updateNicknameByEmail(param);
+	    if (result < 1) {
+	        throw new UnexpectedSQLResponseException("닉네임 변경 실패");
 	    }
 	}
 	
