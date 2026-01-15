@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.jde.admin.model.dao.AdminMapper;
+import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
@@ -129,6 +130,15 @@ public class AdminServiceImpl implements AdminService {
 		List<MemberListDTO> memberList = adminMapper.selectMemberList(pageInfo);
 		
 		return new ReportPageResponse<>(memberList, pageInfo);
+	}
+	
+	@Override
+	public MemberDetailDTO getMemberByNo(Long memberNo) {
+		MemberDetailDTO member = adminMapper.selectMemberByNo(memberNo);
+		if (member == null) {
+			throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
+		}
+		return member; // DB에서 이미 마스킹된 데이터를 조회하므로 그대로 반환
 	}
 	
 	// 권한 유효성 검증

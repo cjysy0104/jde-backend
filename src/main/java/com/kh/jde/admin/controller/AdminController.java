@@ -106,6 +106,14 @@ public class AdminController {
 		return SuccessResponse.ok(memberPageResponse, "회원 목록 조회 성공");
 	}
 	
-	
+	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
+	@GetMapping("/members/{memberNo}")
+	public ResponseEntity<SuccessResponse<MemberDetailDTO>> getMemberByNo(
+			@PathVariable(name="memberNo") Long memberNo){
+		
+		MemberDetailDTO member = adminService.getMemberByNo(memberNo);
+		
+		return SuccessResponse.ok(member, "회원 상세 조회 성공");
+	}
 
 }
