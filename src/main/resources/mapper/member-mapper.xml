@@ -121,7 +121,11 @@
                						 (
                						  SELECT
                       						 r.MEMBER_NO
-                    					   , COUNT(rl.REVIEW_NO) AS LIKE_COUNT
+                    					   , RANK() OVER (
+                          								   ORDER
+                          								      BY 
+                          								         COUNT(rl.REVIEW_NO) DESC
+                         								 ) AS ranking
                  						FROM 
                       						 TB_REVIEW r
                  						JOIN 
@@ -131,12 +135,18 @@
                 					   GROUP 
                    						  BY 
                       						 r.MEMBER_NO
-                					   ORDER 
-                                          BY 
-                                             LIKE_COUNT DESC
                                      )
           					   WHERE 
-                				     ROWNUM &lt;= 3
+                				     ranking &lt;= (
+                           							SELECT 
+                           								   TOP_N
+                           							  FROM  
+                           							       TB_RANKING_POLICY
+                           							 WHERE 
+                           							       POLICY_CODE = 'CAPTAIN_RANK'
+                           							   AND    
+                           							       STATUS = 'Y'
+                         						   )
          					  )
  		  GROUP
              BY 
