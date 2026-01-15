@@ -1,5 +1,6 @@
 package com.kh.jde.admin.model.service;
 
+import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
@@ -44,5 +45,11 @@ public interface AdminService {
 
 	// 회원 삭제 (STATUS를 'N'으로 변경)
 	void deleteMember(Long memberNo);
+	
+	// 댓글 페이징 조회
+	ReportPageResponse<CommentListDTO> getCommentList(int currentPage);
+	
+	// 댓글 상세 조회
+	CommentListDTO getCommentByNo(Long commentNo);
 	
 }

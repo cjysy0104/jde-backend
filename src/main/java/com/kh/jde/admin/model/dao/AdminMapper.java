@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
@@ -58,6 +59,14 @@ public interface AdminMapper {
 
 	// 회원 삭제 (STATUS = 'N'으로 변경)
 	int deleteMember(Long memberNo);
-
+	
+	// 댓글 전체 개수 조회
+	int countAllComments();
+	
+	// 댓글 페이징 조회
+	List<CommentListDTO> selectCommentList(PageInfo pageInfo);
+	
+	// 댓글 상세 조회
+	CommentListDTO selectCommentByNo(Long commentNo);
 	
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.jde.admin.model.dao.AdminMapper;
+import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
@@ -202,6 +203,29 @@ public class AdminServiceImpl implements AdminService {
 		if (result != 1) {
 			throw new IllegalStateException("회원 삭제에 실패했습니다. 회원 번호를 확인해주세요.");
 		}
+	}
+	
+	@Override
+	public ReportPageResponse<CommentListDTO> getCommentList(int currentPage) {
+		// 전체 개수 조회
+		int listCount = adminMapper.countAllComments();
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, currentPage, PAGE_LIMIT, BOARD_LIMIT);
+		
+		// 페이징 조회
+		List<CommentListDTO> commentList = adminMapper.selectCommentList(pageInfo);
+		
+		return new ReportPageResponse<>(commentList, pageInfo);
+	}
+	
+	@Override
+	public CommentListDTO getCommentByNo(Long commentNo) {
+		CommentListDTO comment = adminMapper.selectCommentByNo(commentNo);
+		if (comment == null) {
+			throw new IllegalArgumentException("댓글을 찾을 수 없습니다.");
+		}
+		return comment;
 	}
 
 }
