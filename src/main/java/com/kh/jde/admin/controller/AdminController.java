@@ -1,8 +1,8 @@
 package com.kh.jde.admin.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
-import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.service.AdminService;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
@@ -118,7 +117,8 @@ public class AdminController {
 	
 	// 미식대장 랭킹 몇위까지 보여줄 것인지 변경 가능	
 	@PatchMapping
-	public ResponseEntity<SuccessRepsonse<String>> updateCaptainLankPolicy(@PathVariable(name="topN") int topN){
+	public ResponseEntity<SuccessResponse<String>> updateCaptainLankPolicy(@PathVariable(name="topN") int topN){
+		
 		
 		
 		return null;
