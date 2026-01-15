@@ -137,7 +137,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new IllegalArgumentException("권한은 필수입니다.");
 		}
 		
-		boolean isValid = role.equals("ROLE_USER") || role.equals("ROLE_ADMIN");
+		boolean isValid = role.equals("ROLE_ADMIN");
 		if (!isValid) {
 			throw new IllegalArgumentException("유효하지 않은 권한입니다. (ROLE_USER, ROLE_ADMIN 중 하나여야 합니다.)");
 		}
