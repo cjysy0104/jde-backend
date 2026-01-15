@@ -66,5 +66,5 @@ public class MemberController {
 	    memberService.changeName(ChangeName);
 	    return SuccessResponse.ok("이름이 변경되었습니다.");
 	}
-
+	
 }

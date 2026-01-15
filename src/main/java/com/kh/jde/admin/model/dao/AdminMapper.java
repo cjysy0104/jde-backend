@@ -48,5 +48,8 @@ public interface AdminMapper {
 	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO selectMemberByNo(Long memberNo);
+
+	// 회원 삭제 (STATUS = 'N'으로 변경)
+	int deleteMember(Long memberNo);
 	
 }

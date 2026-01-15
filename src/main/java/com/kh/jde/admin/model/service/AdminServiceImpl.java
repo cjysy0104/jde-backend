@@ -152,5 +152,14 @@ public class AdminServiceImpl implements AdminService {
 			throw new IllegalArgumentException("유효하지 않은 권한입니다. (ROLE_USER, ROLE_ADMIN 중 하나여야 합니다.)");
 		}
 	}
-
+	
+	@Override
+	@Transactional
+	public void deleteMember(Long memberNo) {
+		// 회원 삭제 (STATUS를 'N'으로 변경)
+		int result = adminMapper.deleteMember(memberNo);
+		if (result != 1) {
+			throw new IllegalStateException("회원 삭제에 실패했습니다. 회원 번호를 확인해주세요.");
+		}
+	}
 }
