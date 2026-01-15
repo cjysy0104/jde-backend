@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.CaptainDTO;
+import com.kh.jde.member.model.dto.ChangePasswordDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.dto.MemberWithdrawDTO;
 import com.kh.jde.member.model.service.MemberService;
@@ -52,5 +54,10 @@ public class MemberController {
 		return SuccessResponse.ok(captains, message);
 	}
 	
+	@PatchMapping("/password")
+	public ResponseEntity<SuccessResponse<String>> changePassword(@Valid @RequestBody ChangePasswordDTO changePassword) {
+	    memberService.changePassword(changePassword);
+	    return SuccessResponse.ok("비밀번호가 변경되었습니다.");
+	}
 
 }

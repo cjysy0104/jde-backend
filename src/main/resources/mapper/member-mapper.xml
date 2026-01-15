@@ -158,7 +158,16 @@
        			likeCount DESC
 	</select>
 
-	
+	<!-- 비밀번호 변경 -->
+	<update id="updatePasswordByEmail" parameterType="com.kh.jde.member.model.vo.MemberVO">
+	    UPDATE
+	           TB_MEMBER
+	       SET
+	           PASSWORD = #{password}
+	     WHERE
+	           EMAIL = #{email}
+	       AND STATUS = 'Y'
+	</update>
 
 
 
