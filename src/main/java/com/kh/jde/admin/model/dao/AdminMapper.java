@@ -66,4 +66,7 @@ public interface AdminMapper {
 	// 댓글 페이징 조회
 	List<CommentListDTO> selectCommentList(PageInfo pageInfo);
 	
+	// 댓글 상세 조회
+	CommentListDTO selectCommentByNo(Long commentNo);
+	
 }
