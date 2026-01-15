@@ -46,5 +46,7 @@ public interface AdminMapper {
 	// 회원 페이징 조회
 	List<MemberListDTO> selectMemberList(PageInfo pageInfo);
 	
+	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
+	MemberDetailDTO selectMemberByNo(Long memberNo);
 	
 }
