@@ -188,6 +188,38 @@
 		   AND R.STATUS = 'Y'
 	</select>
 	
+	<!-- 댓글 신고 상세 조회 (처리 후 조회용 - STATUS 조건 없음) -->
+	<select id="selectCommentReportByNoAfterProcess" resultType="CommentReportListDTO">
+		SELECT
+		       R.COMMENT_REPORT_NO commentReportNo
+		     , R.COMMENT_REPORT_NO reportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.COMMENT_NO commentNo
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       TB_COMMENT_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.COMMENT_REPORT_NO = #{reportNo}
+	</select>
+	
 	<!-- 리뷰 신고 상세 조회 -->
 	<select id="selectReviewReportByNo" resultType="ReviewReportListDTO">
 		SELECT
@@ -218,6 +250,37 @@
 		 WHERE
 		       R.REVIEW_REPORT_NO = #{reportNo}
 		   AND R.STATUS = 'Y'
+	</select>
+	
+	<!-- 리뷰 신고 상세 조회 (처리 후 조회용 - STATUS 조건 없음) -->
+	<select id="selectReviewReportByNoAfterProcess" resultType="ReviewReportListDTO">
+		SELECT
+		       R.REVIEW_REPORT_NO reviewReportNo
+		     , R.REVIEW_REPORT_NO reportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.REVIEW_NO reviewNo
+		     , RV.CONTENT reviewContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       TB_REVIEW_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_REVIEW RV
+		    ON R.REVIEW_NO = RV.REVIEW_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.REVIEW_REPORT_NO = #{reportNo}
 	</select>
 	
 	<!-- 댓글 신고 처리 업데이트 -->

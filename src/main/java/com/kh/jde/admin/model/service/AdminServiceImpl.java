@@ -80,7 +80,8 @@ public class AdminServiceImpl implements AdminService {
 		validateUpdateResult(result, "댓글");
 		
 		// 업데이트된 신고 정보 조회 (처리 시간 포함)
-		return adminMapper.selectCommentReportByNo(dto.getReportNo());
+		// 처리 완료/반려 시 STATUS가 'N'으로 변경되므로 STATUS 조건 없는 메서드 사용
+		return adminMapper.selectCommentReportByNoAfterProcess(dto.getReportNo());
 	}
 	
 	@Override
@@ -94,7 +95,8 @@ public class AdminServiceImpl implements AdminService {
 		validateUpdateResult(result, "리뷰");
 		
 		// 업데이트된 신고 정보 조회 (처리 시간 포함)
-		return adminMapper.selectReviewReportByNo(dto.getReportNo());
+		// 처리 완료/반려 시 STATUS가 'N'으로 변경되므로 STATUS 조건 없는 메서드 사용
+		return adminMapper.selectReviewReportByNoAfterProcess(dto.getReportNo());
 	}
 	
 	// 처리 상태 유효성 검증
