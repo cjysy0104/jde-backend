@@ -48,7 +48,7 @@ public class SecurityConfigure {
 							   
 							   requests.requestMatchers(HttpMethod.PUT, "/api/members", "/api/reviews/**", "/api/comments/**").authenticated(); // 테이블의 행 전체 수정, 부분 수정(전체수정일지 부분 수정일지 알 수 없을 때), 인증 필요한 기능
 							   requests.requestMatchers(HttpMethod.PATCH, "/api/members/**").authenticated(); // 테이블의 행 중 부분만 수정
-							   requests.requestMatchers(HttpMethod.PUT, "/api/admin/reports/**").permitAll();
+							   requests.requestMatchers(HttpMethod.PUT, "/api/admin/**").permitAll();
 							   requests.requestMatchers(HttpMethod.DELETE, "/api/bookmarks/**", "/api/members", "/api/reviews/**", "/api/comments/**").authenticated(); // 삭제, 인증 필요한 기능
 							   requests.requestMatchers(HttpMethod.DELETE,"api/admin/**").permitAll();
 							   requests.requestMatchers(HttpMethod.GET, "/api/bookmarks/**").authenticated();

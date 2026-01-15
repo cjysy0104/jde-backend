@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kh.jde.admin.model.dao.AdminMapper;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
+import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
@@ -141,13 +142,31 @@ public class AdminServiceImpl implements AdminService {
 		return member; // DB에서 이미 마스킹된 데이터를 조회하므로 그대로 반환
 	}
 	
+	@Override
+	@Transactional
+	public void updateMemberRole(MemberRoleUpdateDTO dto) {
+		// 자기 자신의 권한은 수정할 수 없음
+		if (dto.getMemberNo().equals(dto.getCurrentMemberNo())) {
+			throw new IllegalArgumentException("자기 자신의 권한은 변경할 수 없습니다.");
+		}
+		
+		// 권한 유효성 검증
+		validateRole(dto.getRole());
+		
+		// 회원 권한 변경
+		int result = adminMapper.updateMemberRole(dto);
+		if (result != 1) {
+			throw new IllegalStateException("회원 권한 변경에 실패했습니다. 회원 번호를 확인해주세요.");
+		}
+	}
+	
 	// 권한 유효성 검증
 	private void validateRole(String role) {
 		if (role == null || role.isBlank()) {
 			throw new IllegalArgumentException("권한은 필수입니다.");
 		}
 		
-		boolean isValid = role.equals("ROLE_ADMIN");
+		boolean isValid = role.equals("ROLE_USER") || role.equals("ROLE_ADMIN");
 		if (!isValid) {
 			throw new IllegalArgumentException("유효하지 않은 권한입니다. (ROLE_USER, ROLE_ADMIN 중 하나여야 합니다.)");
 		}
