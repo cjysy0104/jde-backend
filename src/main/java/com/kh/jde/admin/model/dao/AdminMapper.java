@@ -3,7 +3,10 @@ package com.kh.jde.admin.model.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
+import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -36,4 +39,12 @@ public interface AdminMapper {
 	
 	// 리뷰 신고 처리
 	int updateReviewReportProcess(ReviewReportProcessDTO dto);
+	
+	// 회원 전체 개수 조회
+	int countAllMembers();
+	
+	// 회원 페이징 조회
+	List<MemberListDTO> selectMemberList(PageInfo pageInfo);
+	
+	
 }

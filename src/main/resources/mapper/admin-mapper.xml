@@ -253,5 +253,127 @@
 		   AND 
 		       STATUS = 'Y'
 	</update>
+	
+	<!-- 회원 전체 개수 조회 -->
+	<select id="countAllMembers" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 회원 페이징 조회 (개인정보 마스킹) -->
+	<select id="selectMemberList" resultType="MemberListDTO">
+		SELECT
+		       MEMBER_NO memberNo
+		     , CASE 
+		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
+		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
+		       END email
+		     , CASE 
+		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
+		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
+		            ELSE SUBSTR(MEMBER_NAME, 1, FLOOR(LENGTH(MEMBER_NAME)/2)) || '*' || SUBSTR(MEMBER_NAME, FLOOR(LENGTH(MEMBER_NAME)/2) + 2)
+		       END memberName
+		     , NICKNAME nickname
+		     , CASE 
+		            WHEN INSTR(PHONE, '-') = 0 THEN PHONE
+		            ELSE SUBSTR(PHONE, 1, 3) || '-****-' || SUBSTR(PHONE, -4)
+		       END phone
+		     , ENROLL_DATE enrollDate
+		     , STATUS status
+		     , ROLE role
+		  FROM
+		       (
+		       SELECT
+		              MEMBER_NO
+		            , EMAIL
+		            , MEMBER_NAME
+		            , NICKNAME
+		            , PHONE
+		            , ENROLL_DATE
+		            , STATUS
+		            , ROLE
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     MEMBER_NO
+		                   , EMAIL
+		                   , MEMBER_NAME
+		                   , NICKNAME
+		                   , PHONE
+		                   , ENROLL_DATE
+		                   , STATUS
+		                   , ROLE
+		                FROM
+		                     TB_MEMBER
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     ENROLL_DATE DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       )
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       ENROLL_DATE DESC
+	</select>
+	
+	<!-- 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹) -->
+	<select id="selectMemberByNo" resultType="MemberDetailDTO">
+		SELECT
+		       MEMBER_NO memberNo
+		     , CASE 
+		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
+		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
+		       END email
+		     , CASE 
+		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
+		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
+		            ELSE SUBSTR(MEMBER_NAME, 1, FLOOR(LENGTH(MEMBER_NAME)/2)) || '*' || SUBSTR(MEMBER_NAME, FLOOR(LENGTH(MEMBER_NAME)/2) + 2)
+		       END memberName
+		     , NICKNAME nickname
+		     , CASE 
+		            WHEN INSTR(PHONE, '-') = 0 THEN PHONE
+		            ELSE SUBSTR(PHONE, 1, 3) || '-****-' || SUBSTR(PHONE, -4)
+		       END phone
+		     , ENROLL_DATE enrollDate
+		     , STATUS status
+		     , ROLE role
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</select>
+	
+	<!-- 회원 권한 변경 -->
+	<update id="updateMemberRole">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       ROLE = #{role}
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+	<!-- 회원 삭제 (STATUS를 'N'으로 변경) -->
+	<update id="deleteMember">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</update>
 
 </mapper>
