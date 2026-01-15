@@ -253,5 +253,105 @@
 		   AND 
 		       STATUS = 'Y'
 	</update>
+	
+	<!-- 회원 전체 개수 조회 -->
+	<select id="countAllMembers" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 회원 페이징 조회 -->
+	<select id="selectMemberList" resultType="MemberListDTO">
+		SELECT
+		       MEMBER_NO memberNo
+		     , EMAIL email
+		     , MEMBER_NAME memberName
+		     , NICKNAME nickname
+		     , PHONE phone
+		     , ENROLL_DATE enrollDate
+		     , STATUS status
+		     , ROLE role
+		  FROM
+		       (
+		       SELECT
+		              MEMBER_NO
+		            , EMAIL
+		            , MEMBER_NAME
+		            , NICKNAME
+		            , PHONE
+		            , ENROLL_DATE
+		            , STATUS
+		            , ROLE
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     MEMBER_NO
+		                   , EMAIL
+		                   , MEMBER_NAME
+		                   , NICKNAME
+		                   , PHONE
+		                   , ENROLL_DATE
+		                   , STATUS
+		                   , ROLE
+		                FROM
+		                     TB_MEMBER
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     ENROLL_DATE DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       )
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       ENROLL_DATE DESC
+	</select>
+	
+	<!-- 회원 상세 조회 (비밀번호 제외) -->
+	<select id="selectMemberByNo" resultType="MemberDetailDTO">
+		SELECT
+		       MEMBER_NO memberNo
+		     , EMAIL email
+		     , MEMBER_NAME memberName
+		     , NICKNAME nickname
+		     , PHONE phone
+		     , ENROLL_DATE enrollDate
+		     , STATUS status
+		     , ROLE role
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</select>
+	
+	<!-- 회원 권한 변경 -->
+	<update id="updateMemberRole">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       ROLE = #{role}
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+	<!-- 회원 삭제 (STATUS를 'N'으로 변경) -->
+	<update id="deleteMember">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</update>
 
 </mapper>

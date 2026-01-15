@@ -1,5 +1,8 @@
 package com.kh.jde.admin.model.service;
 
+import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.MemberListDTO;
+import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
 import com.kh.jde.report.model.dto.ReportPageResponse;
@@ -25,4 +28,9 @@ public interface AdminService {
 	
 	// 리뷰 신고 처리
 	ReviewReportListDTO processReviewReport(ReviewReportProcessDTO dto);
+	
+	// 회원 페이징 조회
+	ReportPageResponse<MemberListDTO> getMemberList(int currentPage);
+	
+	
 }
