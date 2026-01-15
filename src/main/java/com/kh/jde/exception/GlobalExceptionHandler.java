@@ -31,6 +31,11 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
 	}
 	
+	@ExceptionHandler(IllegalStateException.class)
+	public ResponseEntity<ErrorResponse<String>> handleIllegalState(IllegalStateException e, HttpServletRequest request){
+		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
+	}
+	
 	@ExceptionHandler(MethodArgumentNotValidException.class) // Controller - dto에서 Valid로 인해 에러응답할때 어떤 에러인지 정보를 담기위해서
 	public ResponseEntity<ErrorResponse<String>> handleArgumentsNotValid(MethodArgumentNotValidException e, HttpServletRequest request){
 		return ErrorResponse.badRequest(e.getBindingResult().getFieldError().getDefaultMessage(), request.getRequestURI());
