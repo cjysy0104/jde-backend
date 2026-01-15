@@ -21,4 +21,5 @@ public class LoginResponseDTO {
     private Long memberNo;
     private Date enrollDate;
     private String role;
+    
 }
