@@ -1,11 +1,10 @@
 package com.kh.jde.exception;
 
-import java.security.InvalidParameterException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.kh.jde.common.responseData.ErrorResponse;
 
@@ -34,6 +33,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class) // Controller - dto에서 Valid로 인해 에러응답할때 어떤 에러인지 정보를 담기위해서
 	public ResponseEntity<ErrorResponse<String>> handleArgumentsNotValid(MethodArgumentNotValidException e, HttpServletRequest request){
 		return ErrorResponse.badRequest(e.getBindingResult().getFieldError().getDefaultMessage(), request.getRequestURI());
+	}
+	
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class) // Controller - dto에서 Valid로 인해 에러응답할때 어떤 에러인지 정보를 담기위해서
+	public ResponseEntity<ErrorResponse<String>> handleArgumentsNotValid(MethodArgumentTypeMismatchException e, HttpServletRequest request){
+		return ErrorResponse.badRequest("파라미터에 잘못된 값이 전달되었습니다.", request.getRequestURI());
 	}
 	
 	@ExceptionHandler(LogoutFailureException.class) 

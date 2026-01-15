@@ -115,5 +115,13 @@ public class AdminController {
 		
 		return SuccessResponse.ok(member, "회원 상세 조회 성공");
 	}
+	
+	// 미식대장 랭킹 몇위까지 보여줄 것인지 변경 가능	
+	@PatchMapping
+	public ResponseEntity<SuccessRepsonse<String>> updateCaptainLankPolicy(@PathVariable(name="topN") int topN){
+		
+		
+		return null;
+	}
 
 }
