@@ -1,9 +1,11 @@
 package com.kh.jde.review.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewDTO;
 
@@ -14,7 +16,7 @@ public interface ReviewMapper {
 	List<ReviewDTO> findAll(QueryDTO req);
 	
 	// 리뷰 상세 조회
-	ReviewDTO findById(Long reviewNo);
+	DetailReviewDTO findById(Map<String,Object> param);
 	
 	// 리뷰 작성
 	void save();
@@ -24,4 +26,6 @@ public interface ReviewMapper {
 	
 	// 리뷰 삭제(소프트)
 	void deleteById();
+
+	DetailReviewDTO getDetailReview(Map<String, Object> param);
 }
