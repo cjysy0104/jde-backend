@@ -21,6 +21,4 @@ public class ChangePasswordDTO {
     @NotBlank(message = "새 비밀번호는 필수 입력사항입니다.")
     private String newPassword;
 
-    @NotBlank(message = "새 비밀번호 확인은 필수 입력사항입니다.")
-    private String newPasswordConfirm;
 }

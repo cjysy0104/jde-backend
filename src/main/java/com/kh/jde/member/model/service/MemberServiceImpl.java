@@ -93,10 +93,6 @@ public class MemberServiceImpl implements MemberService {
 	public void changePassword(ChangePasswordDTO changePassword) {
 	    CustomUserDetails user = validatePassword(changePassword.getCurrentPassword());
 
-	    if (!changePassword.getNewPassword().equals(changePassword.getNewPasswordConfirm())) {
-	        throw new CustomAuthenticationException("새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.");
-	    }
-
 	    Password newEncoded = Password.toEncoded(changePassword.getNewPassword(), passwordEncoder);
 
 	    MemberVO param = MemberVO.builder()
