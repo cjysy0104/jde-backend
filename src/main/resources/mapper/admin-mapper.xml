@@ -264,14 +264,25 @@
 		       STATUS = 'Y'
 	</select>
 	
-	<!-- 회원 페이징 조회 -->
+	<!-- 회원 페이징 조회 (개인정보 마스킹) -->
 	<select id="selectMemberList" resultType="MemberListDTO">
 		SELECT
 		       MEMBER_NO memberNo
-		     , EMAIL email
-		     , MEMBER_NAME memberName
+		     , CASE 
+		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
+		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
+		       END email
+		     , CASE 
+		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
+		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
+		            ELSE SUBSTR(MEMBER_NAME, 1, FLOOR(LENGTH(MEMBER_NAME)/2)) || '*' || SUBSTR(MEMBER_NAME, FLOOR(LENGTH(MEMBER_NAME)/2) + 2)
+		       END memberName
 		     , NICKNAME nickname
-		     , PHONE phone
+		     , CASE 
+		            WHEN INSTR(PHONE, '-') = 0 THEN PHONE
+		            ELSE SUBSTR(PHONE, 1, 3) || '-****-' || SUBSTR(PHONE, -4)
+		       END phone
 		     , ENROLL_DATE enrollDate
 		     , STATUS status
 		     , ROLE role
@@ -314,14 +325,25 @@
 		       ENROLL_DATE DESC
 	</select>
 	
-	<!-- 회원 상세 조회 (비밀번호 제외) -->
+	<!-- 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹) -->
 	<select id="selectMemberByNo" resultType="MemberDetailDTO">
 		SELECT
 		       MEMBER_NO memberNo
-		     , EMAIL email
-		     , MEMBER_NAME memberName
+		     , CASE 
+		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
+		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
+		       END email
+		     , CASE 
+		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
+		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
+		            ELSE SUBSTR(MEMBER_NAME, 1, FLOOR(LENGTH(MEMBER_NAME)/2)) || '*' || SUBSTR(MEMBER_NAME, FLOOR(LENGTH(MEMBER_NAME)/2) + 2)
+		       END memberName
 		     , NICKNAME nickname
-		     , PHONE phone
+		     , CASE 
+		            WHEN INSTR(PHONE, '-') = 0 THEN PHONE
+		            ELSE SUBSTR(PHONE, 1, 3) || '-****-' || SUBSTR(PHONE, -4)
+		       END phone
 		     , ENROLL_DATE enrollDate
 		     , STATUS status
 		     , ROLE role
