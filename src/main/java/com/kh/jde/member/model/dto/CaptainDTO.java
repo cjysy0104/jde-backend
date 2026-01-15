@@ -18,5 +18,6 @@ public class CaptainDTO {
 	private String fileUrl;
 	private Long reviewCount;
 	private Long likeCount;
+	private int topN;
 	
 }

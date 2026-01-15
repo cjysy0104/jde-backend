@@ -116,12 +116,11 @@ public class AdminController {
 	}
 	
 	// 미식대장 랭킹 몇위까지 보여줄 것인지 변경 가능	
-	@PatchMapping
-	public ResponseEntity<SuccessResponse<String>> updateCaptainLankPolicy(@PathVariable(name="topN") int topN){
+	@PatchMapping("/captainRank/{topN}")
+	public ResponseEntity<SuccessResponse<String>> updateCaptainRankPolicy(@PathVariable(name="topN") int topN){
+		adminService.updateCaptainRankPolicy(topN);
 		
-		
-		
-		return null;
+		return SuccessResponse.ok("미식대장 랭킹 기준을 변경했습니다.");
 	}
 
 }

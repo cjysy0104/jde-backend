@@ -375,5 +375,15 @@
 		       MEMBER_NO = #{memberNo}
 		   AND STATUS = 'Y'
 	</update>
+	
+	<!-- 미식대장 랭킹 기준 변경 -->
+	<update id="updateCaptainRankPolicy">
+		UPDATE
+		       TB_RANKING_POLICY
+		   SET
+		       TOP_N = #{topN}
+		 WHERE
+		       POLICY_CODE = 'CAPTAIN_RANK'
+	</update>
 
 </mapper>

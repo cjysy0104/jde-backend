@@ -10,6 +10,7 @@ import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
+import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
 import com.kh.jde.report.model.dto.ReportPageResponse;
@@ -150,6 +151,25 @@ public class AdminServiceImpl implements AdminService {
 		boolean isValid = role.equals("ROLE_ADMIN");
 		if (!isValid) {
 			throw new IllegalArgumentException("유효하지 않은 권한입니다. (ROLE_USER, ROLE_ADMIN 중 하나여야 합니다.)");
+		}
+	}
+	
+	// 미식대장 랭킹 제한 기준 변경(미식대장을 몇 명이나 선정해서 보여줄것인지)
+	@Override
+	@Transactional
+	public void updateCaptainRankPolicy(int topN) {
+		validateTopN(topN);
+		
+		int result = adminMapper.updateCaptainRankPolicy(topN);
+		if(result < 1) {
+			throw new UnexpectedSQLResponseException("미식대장 랭킹 기준 변경에 실패했습니다.");
+		}
+	}
+	
+	// 미식대장 랭킹 제한 기준 입력값 유효성 검증
+	private void validateTopN(int topN) {
+		if(topN < 0) {
+			throw new IllegalArgumentException("0이상의 정수만 입력해주세요.");
 		}
 	}
 

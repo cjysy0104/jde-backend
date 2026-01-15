@@ -38,6 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		// log.info("진짜로 요청이 들어올 때마다 요친구가 호출되는지 확인");
 		
+
 		String uri = request.getRequestURI();
 		// log.info("요청 어케 옴? : {}", uri); // => /auth/login
 		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -46,6 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		    filterChain.doFilter(request, response);
 		    return;
 		}
+		
 		
 		// 토큰 검증
 		// log.info("헤더에 포함시킨 Authorization : {}", authorization);
