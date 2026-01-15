@@ -6,6 +6,7 @@ import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
 import com.kh.jde.member.model.dto.ChangeNicknameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
+import com.kh.jde.member.model.dto.ChangePhoneDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 
 public interface MemberService {
@@ -19,5 +20,5 @@ public interface MemberService {
 	void changePassword(ChangePasswordDTO changePassword);
 	void changeName(ChangeNameDTO changeName);
 	void changeNickname(ChangeNicknameDTO changeNickname);
-
+	void changePhone(ChangePhoneDTO changePhone);
 }
