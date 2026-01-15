@@ -3,6 +3,7 @@ package com.kh.jde.member.model.service;
 import java.util.List;
 
 import com.kh.jde.member.model.dto.CaptainDTO;
+import com.kh.jde.member.model.dto.ChangePasswordDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 
 public interface MemberService {
@@ -12,5 +13,7 @@ public interface MemberService {
 	void withdraw(String password);
 	
 	List<CaptainDTO> getCaptainList();
+	
+	void changePassword(ChangePasswordDTO changePassword);
 
 }

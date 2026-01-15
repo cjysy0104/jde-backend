@@ -13,6 +13,7 @@ import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.member.model.dao.MemberMapper;
 import com.kh.jde.member.model.dto.CaptainDTO;
+import com.kh.jde.member.model.dto.ChangePasswordDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.vo.MemberVO;
 import com.kh.jde.member.model.vo.Password;
@@ -88,7 +89,28 @@ public class MemberServiceImpl implements MemberService {
 		return user;
 	}
 
+	@Override
+	@Transactional
+	public void changePassword(ChangePasswordDTO changePassword) {
+	    CustomUserDetails user = validatePassword(changePassword.getCurrentPassword());
 
+	    if (!changePassword.getNewPassword().equals(changePassword.getNewPasswordConfirm())) {
+	        throw new CustomAuthenticationException("새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.");
+	    }
+
+	    Password newEncoded = Password.toEncoded(changePassword.getNewPassword(), passwordEncoder);
+
+	    MemberVO param = MemberVO.builder()
+	            .email(user.getUsername())
+	            .password(newEncoded.password())
+	            .build();
+
+	    int result = memberMapper.updatePasswordByEmail(param);
+	    if (result < 1) {
+	        throw new UnexpectedSQLResponseException("비밀번호 변경 실패");
+	    }
+	}
+	
 	@Override // 리뷰로 좋아요 많이 받은 상위3명의 명단 보내기
 	public List<CaptainDTO> getCaptainList() {
 		List<CaptainDTO> captains = memberMapper.getCaptainList();

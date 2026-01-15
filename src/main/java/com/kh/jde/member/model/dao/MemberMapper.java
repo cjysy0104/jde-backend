@@ -24,5 +24,8 @@ public interface MemberMapper {
 	List<CaptainDTO> getCaptainList();
 	
 	String findPasswordByEmail(String email);
-
+	
+	int updatePasswordByEmail(MemberVO member);
+	
+	
 }
