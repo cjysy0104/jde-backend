@@ -1,6 +1,7 @@
 package com.kh.jde.admin.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -9,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.MemberListDTO;
+import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.service.AdminService;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
@@ -91,5 +95,17 @@ public class AdminController {
 		
 		return SuccessResponse.ok(updatedReport, "리뷰 신고가 처리되었습니다.");
 	}
+	
+	// 회원 페이징 조회
+	@GetMapping("/members")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<MemberListDTO>>> getMemberList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<MemberListDTO> memberPageResponse = adminService.getMemberList(page);
+		
+		return SuccessResponse.ok(memberPageResponse, "회원 목록 조회 성공");
+	}
+	
+	
 
 }

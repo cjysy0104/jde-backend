@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.jde.admin.model.dao.AdminMapper;
+import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
@@ -113,6 +114,32 @@ public class AdminServiceImpl implements AdminService {
 	private void validateUpdateResult(int result, String reportType) {
 		if (result != 1) {
 			throw new IllegalStateException(reportType + " 신고 처리에 실패했습니다. 신고 번호를 확인해주세요.");
+		}
+	}
+	
+	@Override
+	public ReportPageResponse<MemberListDTO> getMemberList(int currentPage) {
+		// 전체 개수 조회
+		int listCount = adminMapper.countAllMembers();
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, currentPage, PAGE_LIMIT, BOARD_LIMIT);
+		
+		// 페이징 조회 (DB에서 마스킹된 데이터 조회)
+		List<MemberListDTO> memberList = adminMapper.selectMemberList(pageInfo);
+		
+		return new ReportPageResponse<>(memberList, pageInfo);
+	}
+	
+	// 권한 유효성 검증
+	private void validateRole(String role) {
+		if (role == null || role.isBlank()) {
+			throw new IllegalArgumentException("권한은 필수입니다.");
+		}
+		
+		boolean isValid = role.equals("ROLE_ADMIN");
+		if (!isValid) {
+			throw new IllegalArgumentException("유효하지 않은 권한입니다. (ROLE_USER, ROLE_ADMIN 중 하나여야 합니다.)");
 		}
 	}
 
