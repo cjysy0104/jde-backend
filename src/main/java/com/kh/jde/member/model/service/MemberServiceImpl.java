@@ -173,7 +173,7 @@ public class MemberServiceImpl implements MemberService {
 	    // 현재 비밀번호 재검증 + principal 반환
 	    CustomUserDetails user = validatePassword(plainPassword);
 
-	    Long memberNo = user.getMemberNo(); // ✅ 여기서 바로 사용 (DB 재조회 X)
+	    Long memberNo = user.getMemberNo(); // 여기서 바로 사용 (DB 재조회 X)
 
 	    String fileUrl;
 	    try {
