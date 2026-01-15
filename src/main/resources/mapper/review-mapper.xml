@@ -3,12 +3,56 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.jde.review.model.dao.ReviewMapper">
+
+<!-- 리뷰 전체조회-->	
+	<resultMap id="reviewListMap" type="reviewDTO">
+		<id property="reviewNo" column="REVIEW_NO"/>
+
+		<result property="thumbnailUrl" column="THUMBNAIL_URL"/>
+		<result property="restaurantName" column="NORMAL_NAME"/>
+		<result property="nickname" column="NICKNAME"/>
+		
+		<result property="content" column="CONTENT"/>
+		<result property="rating" column="RATING"/>
+		<result property="updateDate" column="UPDATED_AT"/>
+		
+		<result property="viewCount" column="VIEW_COUNT"/>
+		<result property="likeCount" column="LIKE_COUNT"/>
+		<result property="commentCount" column="COMMENT_COUNT"/>
+		
+		<result property="isLiked" column="IS_LIKED"/>
+		<result property="isMarked" column="IS_MARKED"/>
+	</resultMap>
 	
-	<select id="findAll"
-			parameterType="QueryDTO"
-			resultType="reviewDTO">
+	<select id="getKeywordsByIds"
+			parameterType="list"
+			resultType="map">
 		SELECT
-				  RV.REVIEW_NO reviewNo
+		    	  RKM.REVIEW_NO  reviewNo
+		    	, K.KEYWORD_NO   keywordNo
+		    	, K.KEYWORD_NAME keywordName
+		FROM 
+				TB_REVIEW_KEYWORD_MAP RKM
+		JOIN 
+				TB_KEYWORD K ON (K.KEYWORD_NO = RKM.KEYWORD_NO)
+		WHERE 
+				RKM.REVIEW_NO IN
+				<foreach collection="list" item="no" open="(" separator="," close=")">
+				  #{no}
+				</foreach>
+		ORDER
+		BY 
+				RKM.REVIEW_NO, K.KEYWORD_NO
+	</select>
+	
+
+
+	<select id="getReviewList"
+			parameterType="QueryDTO"
+			resultMap="reviewListMap">
+		SELECT
+				  RV.REVIEW_NO
+				  
 				, (
 					SELECT 
 							RVF.FILE_URL
@@ -18,75 +62,80 @@
 							RV.REVIEW_NO = RVF.REVIEW_NO
 					AND
 							RVF.IS_THUMNAIL = 'Y'
-				) thumbnailUrl
-				, KW.KEYWORDS
-				, CASE WHEN EXISTS (
-			          SELECT 1
-			          FROM TB_REVIEW_LIKE RVL
-			          WHERE RVL.REVIEW_NO = RV.REVIEW_NO
-			            AND RVL.MEMBER_NO = #{memberNo}
+				) THUMBNAIL_URL
+				, RT.NORMAL_NAME 
+				, M.NICKNAME 
+				
+				, RV.CONTENT 
+				, RV.RATING 
+				, RV.UPDATED_AT 
+				
+				, RV.VIEW_COUNT
+				, NVL(LC.LIKE_COUNT, 0) LIKE_COUNT
+				, NVL(CC.COMMENT_COUNT, 0) COMMENT_COUNT
+				
+				, CASE 
+					WHEN 
+						#{memberNo} IS NOT NULL
+					AND 
+						EXISTS (
+				          SELECT 1
+				          FROM 	TB_REVIEW_LIKE RVL
+				          WHERE RVL.REVIEW_NO = RV.REVIEW_NO
+				            AND	RVL.MEMBER_NO = #{memberNo}
 			        )
 			        THEN 'Y' ELSE 'N'
-			      END isLiked
-			    , CASE WHEN EXISTS (
-			          SELECT 1
-			          FROM TB_BOOKMARK RVB
-			          WHERE RVB.REVIEW_NO = RV.REVIEW_NO
-			            AND RVB.MEMBER_NO = #{memberNo}
+			      END IS_LIKED
+				, CASE 
+					WHEN 
+						#{memberNo} IS NOT NULL
+					AND 
+						EXISTS (
+				          SELECT 1
+				          FROM 	TB_BOOKMARK B
+				          WHERE B.REVIEW_NO = RV.REVIEW_NO
+				            AND	B.MEMBER_NO = #{memberNo}
 			        )
 			        THEN 'Y' ELSE 'N'
-			      END isMarked
-				, RT.NORMAL_NAME restaurantName
-				, M.NICKNAME nickname
-				, RV.CONTENT content
-				, RV.RATING rating
-				, RV.UPDATED_AT updateDate
-				, (
-					SELECT
-							COUNT(*)
-					FROM
-							TB_REVIEW_LIKE RVL
-					WHERE
-							RV.REVIEW_NO = RVL.REVIEW_NO
-				) likeCount
-				, (
-					SELECT
-							COUNT(*)
-					FROM	
-							TB_COMMENT C
-					WHERE 
-							RV.REVIEW_NO = C.REVIEW_NO
-					AND
-							C.STATUS = 'Y'
-				) commentCount
-				, RV.VIEW_COUNT viewCount
+			      END IS_MARKED
 		FROM
 				TB_REVIEW RV
 		JOIN
 				TB_MEMBER M ON (RV.MEMBER_NO = M.MEMBER_NO)
 		JOIN
 				TB_RESTAURANT RT ON (RV.RESTAURANT_NO = RT.RESTAURANT_NO)
+		<!-- 좋아요 COUNT-->
 		LEFT
-		JOIN
-				(
+		JOIN	(
 					SELECT
-							  RK.REVIEW_NO
-							, LISTAGG(K.KEYWORD_NAME, ', ') 
-					WITHIN
-					GROUP 	
-							(ORDER BY RK.KEYWORD_NO) KEYWORDS
-					FROM 
-							TB_REVIEW_KEYWORD_MAP RK
-					JOIN 
-							TB_REVIEW R ON (R.REVIEW_NO = RK.REVIEW_NO)
-					JOIN 
-							TB_KEYWORD K ON (K.KEYWORD_NO = RK.KEYWORD_NO)
+							  REVIEW_NO
+							, COUNT(*) LIKE_COUNT
+					FROM
+							TB_REVIEW_LIKE
 					GROUP
 					BY
-							RK.REVIEW_NO
-				) KW ON (KW.REVIEW_NO = RV.REVIEW_NO)
+							REVIEW_NO
+				)
+				LC ON (LC.REVIEW_NO = RV.REVIEW_NO)
+		<!-- 댓글 COUNT-->
+		LEFT
+		JOIN	(
+					SELECT
+							  REVIEW_NO
+							, COUNT(*) COMMENT_COUNT
+					FROM
+							TB_COMMENT
+					WHERE
+							STATUS = 'Y'
+					GROUP
+					BY
+							REVIEW_NO
+				)
+				CC ON (CC.REVIEW_NO = RV.REVIEW_NO)
+				
 		WHERE 
 				RV.STATUS = 'Y'
+		<!-- 검색 필터-->
 		<if test="query != null">
 		AND 
 				(
@@ -96,16 +145,81 @@
 				)
 			
 		</if>
+		
+		<!-- 별점 필터-->
+		<if test="minRating != null">
 		AND
 				RV.RATING &gt;= #{minRating}
+		</if>
+		<if test="maxRating != null">
 		AND
 				RV.RATING &lt;= #{maxRating}
-		ORDER
-		BY
-				RV.REVIEW_NO DESC
-							
-	</select>
+		</if>
+		
+		<!-- Cursor 조건 설정-->
+		<choose>
 
+			<!-- latest -->
+			<when test="sort == null or sort == 'latest'">
+				<if test="cursor != null">
+					AND RV.REVIEW_NO &lt; #{cursor}
+				</if>
+			</when>
+			
+			<!-- oldest-->
+			<when test="sort == 'oldest'">
+				<if test="cursor != null">
+					AND RV.REVIEW_NO &gt; #{cursor}
+				</if>
+			</when>
+			
+			<!-- rating -->
+			<when test="sort == 'rating'">
+			  <if test="cursorRating != null and cursor != null">
+			    AND (
+			         	RV.RATING &lt; #{cursorRating}
+			      	OR (RV.RATING = #{cursorRating} AND RV.REVIEW_NO &lt; #{cursor})
+			    	)
+			  </if>
+			</when>
+			
+			<!-- liked -->
+			<when test="sort == 'liked'">
+			  <if test="cursorLikeCount != null and cursor != null">
+			    AND (
+			         	NVL(LC.LIKE_COUNT,0) &lt; #{cursorLikeCount}
+			      	OR (NVL(LC.LIKE_COUNT,0) = #{cursorLikeCount} AND RV.REVIEW_NO &lt; #{cursor})
+			    	)
+			  </if>
+			</when>
+		  
+		</choose>
+		
+		<!-- 정렬하기-->
+		<choose>
+			<when test="sort == 'oldest'">
+				ORDER BY RV.REVIEW_NO ASC
+			</when>
+			
+			<when test="sort == 'rating'">
+				ORDER BY RV.RATING DESC, RV.REVIEW_NO DESC
+			</when>
+	
+			<when test="sort == 'liked'">
+				ORDER BY NVL(LC.LIKE_COUNT,0) DESC, RV.REVIEW_NO DESC
+			</when>
+	
+			<otherwise>
+				ORDER BY RV.REVIEW_NO DESC
+			</otherwise>
+		</choose>
+	
+		FETCH FIRST #{sizePlusOne} ROWS ONLY				
+	</select>
+	
+	
+
+<!-- 리뷰 상세조회-->
 	<resultMap id="detailReviewMap" type="DetailReviewDTO">
 		<id property="reviewNo" column="REVIEW_NO"/>
 		<result property="content" column="CONTENT"/>
@@ -191,9 +305,9 @@
 			    ) LIKE_COUNT
 				, CASE WHEN EXISTS (
 			          SELECT 1
-			          FROM TB_REVIEW_LIKE RVL2
-			          WHERE RVL2.REVIEW_NO = RV.REVIEW_NO
-			            AND RVL2.MEMBER_NO = #{memberNo}
+			          FROM TB_REVIEW_LIKE RVL
+			          WHERE RVL.REVIEW_NO = RV.REVIEW_NO
+			            AND RVL.MEMBER_NO = #{memberNo}
 			      ) THEN 'Y' ELSE 'N'
 			      END IS_LIKED
 			    , CASE WHEN EXISTS (

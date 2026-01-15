@@ -28,19 +28,19 @@ public class ReviewController {
 	private final ReviewService reviewService;
 	
 	@GetMapping
-	public ResponseEntity<SuccessResponse<List<ReviewDTO>>> findAll(@ModelAttribute QueryDTO req
+	public ResponseEntity<SuccessResponse<List<ReviewDTO>>> getReviewList(@ModelAttribute QueryDTO req
 																, @AuthenticationPrincipal CustomUserDetails principal){
 		
-		List<ReviewDTO> result = reviewService.findAll(req, principal);
+		List<ReviewDTO> result = reviewService.getReviewList(req, principal);
 		
 		return SuccessResponse.ok(result, "리뷰 전체 조회 성공");
 	}
 	
 	@GetMapping("/{reviewNo}")
-	public ResponseEntity<SuccessResponse<ReviewDTO>> findById(@PathVariable("reviewNo") Long reviewNo
+	public ResponseEntity<SuccessResponse<ReviewDTO>> getDetailReview(@PathVariable("reviewNo") Long reviewNo
 															, @AuthenticationPrincipal CustomUserDetails principal){
 		
-		return SuccessResponse.ok(reviewService.findById(reviewNo, principal), "리뷰 상세 조회 성공");
+		return SuccessResponse.ok(reviewService.getDetailReview(reviewNo, principal), "리뷰 상세 조회 성공");
 	}
 	
 }
