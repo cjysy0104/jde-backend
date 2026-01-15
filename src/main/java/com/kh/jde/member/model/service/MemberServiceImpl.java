@@ -150,7 +150,7 @@ public class MemberServiceImpl implements MemberService {
 	    CustomUserDetails user = validatePassword(changePhone.getCurrentPassword());
 
 	    // 폰 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
-	    // miv.MemberInfomationDuplicateCheck(null, null, dto.getPhone());
+	    miv.MemberInfomationDuplicateCheck(null, null, changePhone.getPhone());
 
 	    MemberVO param = MemberVO.builder()
 	            .email(user.getUsername())
