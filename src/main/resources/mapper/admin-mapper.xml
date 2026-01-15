@@ -385,5 +385,79 @@
 		 WHERE
 		       POLICY_CODE = 'CAPTAIN_RANK'
 	</update>
+	
+	<!-- 댓글 전체 개수 조회 -->
+	<select id="countAllComments" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 댓글 페이징 조회 -->
+	<select id="selectCommentList" resultType="CommentListDTO">
+		SELECT
+		       C.COMMENT_NO commentNo
+		     , C.MEMBER_NO memberNo
+		     , C.AUTHOR author
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , C.COMMENT_DATE commentDate
+		     , C.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              COMMENT_NO
+		            , MEMBER_NO
+		            , AUTHOR
+		            , REVIEW_NO
+		            , CONTENT
+		            , COMMENT_DATE
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     COMMENT_NO
+		                   , MEMBER_NO
+		                   , AUTHOR
+		                   , REVIEW_NO
+		                   , CONTENT
+		                   , COMMENT_DATE
+		                   , STATUS
+		                FROM
+		                     TB_COMMENT
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     COMMENT_DATE DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) C
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       C.COMMENT_DATE DESC
+	</select>
+	
+	<!-- 댓글 상세 조회 -->
+	<select id="selectCommentByNo" resultType="CommentListDTO">
+		SELECT
+		       COMMENT_NO commentNo
+		     , MEMBER_NO memberNo
+		     , AUTHOR author
+		     , REVIEW_NO reviewNo
+		     , CONTENT commentContent
+		     , COMMENT_DATE commentDate
+		     , STATUS status
+		  FROM
+		       TB_COMMENT
+		 WHERE
+		       COMMENT_NO = #{commentNo}
+		   AND STATUS = 'Y'
+	</select>
 
 </mapper>
