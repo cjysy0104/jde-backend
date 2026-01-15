@@ -7,8 +7,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
+import com.kh.jde.common.s3.S3Uploader;
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.member.model.dao.MemberMapper;
@@ -18,6 +20,7 @@ import com.kh.jde.member.model.dto.ChangeNicknameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
 import com.kh.jde.member.model.dto.ChangePhoneDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
+import com.kh.jde.member.model.vo.MemberFileVO;
 import com.kh.jde.member.model.vo.MemberVO;
 import com.kh.jde.member.model.vo.Password;
 import com.kh.jde.token.model.dao.TokenMapper;
@@ -34,6 +37,7 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final MemberInformationValidator miv;
 	private final TokenMapper tokenMapper;
+	private final S3Uploader s3Uploader;
 	
 	@Override
 	@Transactional
@@ -131,7 +135,7 @@ public class MemberServiceImpl implements MemberService {
 	    CustomUserDetails user = validatePassword(changeNickname.getCurrentPassword());
 
 	    // 닉네임 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
-	    // miv.MemberInfomationDuplicateCheck(dto.getNickname(), null, null);
+	    miv.MemberInfomationDuplicateCheck(changeNickname.getNickname(), null, null);
 
 	    MemberVO param = MemberVO.builder()
 	            .email(user.getUsername())
@@ -161,6 +165,34 @@ public class MemberServiceImpl implements MemberService {
 	    if (result < 1) {
 	        throw new UnexpectedSQLResponseException("전화번호 변경 실패");
 	    }
+	}
+
+	@Override
+	@Transactional
+	public String updateMyProfileImage(String plainPassword, MultipartFile file) {
+	    // 현재 비밀번호 재검증 + principal 반환
+	    CustomUserDetails user = validatePassword(plainPassword);
+
+	    Long memberNo = user.getMemberNo(); // ✅ 여기서 바로 사용 (DB 재조회 X)
+
+	    String fileUrl;
+	    try {
+	        fileUrl = s3Uploader.uploadProfileImage(file, memberNo);
+	    } catch (Exception e) {
+	        throw new RuntimeException("S3 업로드 실패", e);
+	    }
+
+	    MemberFileVO vo = MemberFileVO.builder()
+	            .memberNo(memberNo)
+	            .fileUrl(fileUrl)
+	            .build();
+
+	    int result = memberMapper.upsertProfileImage(vo);
+	    if (result < 1) {
+	        throw new UnexpectedSQLResponseException("프로필 이미지 저장 실패");
+	    }
+
+	    return fileUrl;
 	}
 	
 	@Override // 리뷰로 좋아요 많이 받은 상위3명의 명단 보내기
