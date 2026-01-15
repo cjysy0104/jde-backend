@@ -37,9 +37,10 @@ public class ReviewController {
 	}
 	
 	@GetMapping("/{reviewNo}")
-	public ResponseEntity<SuccessResponse<ReviewDTO>> findById(@PathVariable Long reviewNo){
+	public ResponseEntity<SuccessResponse<ReviewDTO>> findById(@PathVariable("reviewNo") Long reviewNo
+															, @AuthenticationPrincipal CustomUserDetails principal){
 		
-		return SuccessResponse.ok(reviewService.findById(reviewNo), "리뷰 상세 조회 성공");
+		return SuccessResponse.ok(reviewService.findById(reviewNo, principal), "리뷰 상세 조회 성공");
 	}
 	
 }

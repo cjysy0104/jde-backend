@@ -1,6 +1,9 @@
 package com.kh.jde.review.model.dto;
 
 import java.sql.Date;
+import java.util.List;
+
+import com.kh.jde.member.model.dto.CaptainDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,19 +16,28 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ReviewDTO {
+public class DetailReviewDTO {
 
+	// 게시글 정보
 	private Long reviewNo;
-	private String thumbnailUrl;
-	private String keywords;
-	private String restaurantName;
-	private String nickname;
 	private String content;
 	private float rating;
+	private Date createDate;
 	private Date updateDate;
-	private int likeCount;
-	private int commentCount;
 	private int viewCount;
+	private int likeCount;
 	private String isLiked;
 	private String isMarked;
+	
+	// 작성자
+	private CaptainDTO writer;
+	
+	// 식당 정보
+	private RestaurantDTO restaurant;
+	
+	// 이미지
+	private List<ReviewFileDTO> files;
+	
+	// 키워드
+	private List<KeywordDTO> keywords;
 }
