@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -117,6 +118,16 @@ public class AdminController {
 		
 		return SuccessResponse.ok(member, "회원 상세 조회 성공");
 	}
+	
+
+	// 미식대장 랭킹 몇위까지 보여줄 것인지 변경 가능	
+	@PatchMapping("/captainRank/{topN}")
+	public ResponseEntity<SuccessResponse<String>> updateCaptainRankPolicy(@PathVariable(name="topN") int topN){
+		adminService.updateCaptainRankPolicy(topN);
+		
+		return SuccessResponse.ok("미식대장 랭킹 기준을 변경했습니다.");
+	}
+	
 	
 	// 회원 권한 변경
 	@PutMapping("/members/{memberNo}/role")

@@ -11,6 +11,7 @@ import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
+import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
 import com.kh.jde.report.model.dto.ReportPageResponse;
@@ -172,6 +173,27 @@ public class AdminServiceImpl implements AdminService {
 		}
 	}
 	
+
+	// 미식대장 랭킹 제한 기준 변경(미식대장을 몇 명이나 선정해서 보여줄것인지)
+	@Override
+	@Transactional
+	public void updateCaptainRankPolicy(int topN) {
+		validateTopN(topN);
+		
+		int result = adminMapper.updateCaptainRankPolicy(topN);
+		if(result < 1) {
+			throw new UnexpectedSQLResponseException("미식대장 랭킹 기준 변경에 실패했습니다.");
+		}
+	}
+	
+	// 미식대장 랭킹 제한 기준 입력값 유효성 검증
+	private void validateTopN(int topN) {
+		if(topN < 0) {
+			throw new IllegalArgumentException("0이상의 정수만 입력해주세요.");
+		}
+	}
+
+
 	@Override
 	@Transactional
 	public void deleteMember(Long memberNo) {
@@ -181,4 +203,5 @@ public class AdminServiceImpl implements AdminService {
 			throw new IllegalStateException("회원 삭제에 실패했습니다. 회원 번호를 확인해주세요.");
 		}
 	}
+
 }
