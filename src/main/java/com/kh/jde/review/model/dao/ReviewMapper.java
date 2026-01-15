@@ -28,4 +28,5 @@ public interface ReviewMapper {
 	void deleteById();
 
 	DetailReviewDTO getDetailReview(Map<String, Object> param);
+	
 }
