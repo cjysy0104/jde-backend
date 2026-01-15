@@ -1,11 +1,39 @@
 package com.kh.jde.admin.model.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+
+import com.kh.jde.common.page.PageInfo;
+import com.kh.jde.report.model.dto.CommentReportListDTO;
+import com.kh.jde.report.model.dto.CommentReportProcessDTO;
+import com.kh.jde.report.model.dto.ReviewReportListDTO;
+import com.kh.jde.report.model.dto.ReviewReportProcessDTO;
 
 @Mapper
 public interface AdminMapper {
 	
+	// 댓글 신고 전체 개수 조회
+	int countAllCommentReports();
 	
+	// 댓글 신고 페이징 조회
+	List<CommentReportListDTO> selectCommentReportList(PageInfo pageInfo);
 	
+	// 리뷰 신고 전체 개수 조회
+	int countAllReviewReports();
 	
+	// 리뷰 신고 페이징 조회
+	List<ReviewReportListDTO> selectReviewReportList(PageInfo pageInfo);
+	
+	// 댓글 신고 상세 조회
+	CommentReportListDTO selectCommentReportByNo(Long reportNo);
+	
+	// 리뷰 신고 상세 조회
+	ReviewReportListDTO selectReviewReportByNo(Long reportNo);
+	
+	// 댓글 신고 처리
+	int updateCommentReportProcess(CommentReportProcessDTO dto);
+	
+	// 리뷰 신고 처리
+	int updateReviewReportProcess(ReviewReportProcessDTO dto);
 }
