@@ -26,6 +26,6 @@ public interface MemberMapper {
 	String findPasswordByEmail(String email);
 	
 	int updatePasswordByEmail(MemberVO member);
-	
+	int updateNameByEmail(MemberVO member);
 	
 }

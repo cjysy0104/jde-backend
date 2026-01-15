@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.CaptainDTO;
+import com.kh.jde.member.model.dto.ChangeNameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.dto.MemberWithdrawDTO;
@@ -58,6 +59,12 @@ public class MemberController {
 	public ResponseEntity<SuccessResponse<String>> changePassword(@Valid @RequestBody ChangePasswordDTO changePassword) {
 	    memberService.changePassword(changePassword);
 	    return SuccessResponse.ok("비밀번호가 변경되었습니다.");
+	}
+	
+	@PatchMapping("/name")
+	public ResponseEntity<SuccessResponse<String>> changeName(@Valid @RequestBody ChangeNameDTO ChangeName) {
+	    memberService.changeName(ChangeName);
+	    return SuccessResponse.ok("이름이 변경되었습니다.");
 	}
 
 }
