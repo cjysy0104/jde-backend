@@ -13,6 +13,7 @@ import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.member.model.dao.MemberMapper;
 import com.kh.jde.member.model.dto.CaptainDTO;
+import com.kh.jde.member.model.dto.ChangeNameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.vo.MemberVO;
@@ -103,6 +104,22 @@ public class MemberServiceImpl implements MemberService {
 	    int result = memberMapper.updatePasswordByEmail(param);
 	    if (result < 1) {
 	        throw new UnexpectedSQLResponseException("비밀번호 변경 실패");
+	    }
+	}
+	
+	@Override
+	@Transactional
+	public void changeName(ChangeNameDTO changeName) {
+	    CustomUserDetails user = validatePassword(changeName.getCurrentPassword());
+
+	    MemberVO param = MemberVO.builder()
+	            .email(user.getUsername())
+	            .memberName(changeName.getMemberName())
+	            .build();
+
+	    int result = memberMapper.updateNameByEmail(param);
+	    if (result < 1) {
+	        throw new UnexpectedSQLResponseException("이름 변경 실패");
 	    }
 	}
 	
