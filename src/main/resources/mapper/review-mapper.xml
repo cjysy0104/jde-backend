@@ -22,17 +22,17 @@
 				, KW.KEYWORDS
 				, CASE WHEN EXISTS (
 			          SELECT 1
-			          FROM TB_REVIEW_LIKE RVL2
-			          WHERE RVL2.REVIEW_NO = RV.REVIEW_NO
-			            AND RVL2.MEMBER_NO = #{memberNo}
+			          FROM TB_REVIEW_LIKE RVL
+			          WHERE RVL.REVIEW_NO = RV.REVIEW_NO
+			            AND RVL.MEMBER_NO = #{memberNo}
 			        )
 			        THEN 'Y' ELSE 'N'
 			      END isLiked
 			    , CASE WHEN EXISTS (
 			          SELECT 1
-			          FROM TB_BOOKMARK RVB2
-			          WHERE RVB2.REVIEW_NO = RV.REVIEW_NO
-			            AND RVB2.MEMBER_NO = #{memberNo}
+			          FROM TB_BOOKMARK RVB
+			          WHERE RVB.REVIEW_NO = RV.REVIEW_NO
+			            AND RVB.MEMBER_NO = #{memberNo}
 			        )
 			        THEN 'Y' ELSE 'N'
 			      END isMarked
@@ -106,9 +106,123 @@
 							
 	</select>
 
+	<resultMap id="detailReviewMap" type="DetailReviewDTO">
+		<id property="reviewNo" column="REVIEW_NO"/>
+		<result property="content" column="CONTENT"/>
+		<result property="rating" column="RATING"/>
+		<result property="createDate" column="CREATED_AT"/>
+		<result property="updateDate" column="UPDATED_AT"/>
+		<result property="viewCount" column="VIEW_COUNT"/>
+		<result property="likeCount" column="LIKE_COUNT"/>
+		<result property="isLiked" column="IS_LIKED"/>
+		<result property="isMarked" column="IS_MARKED"/>
 
-
-
+		
+		<association property="writer" javaType="CaptainDTO">
+			<id property="memberNo" column="MEMBER_NO"/>
+			<result property="nickname" column="NICKNAME"/>
+		</association>
+		
+		<association property="restaurant" javaType="RestaurantDTO">
+			<id property="restaurantNo" column="RESTAURANT_NO"/>
+			<result property="normalName" column="NORMAL_NAME"/>
+			<result property="address" column="ADDRESS"/>
+			<result property="latitude" column="LATITUDE"/>
+			<result property="longitude" column="LONGITUDE"/>
+		</association>
+		
+		<collection property="files" 
+					ofType="ReviewFileDTO"
+					select="getFiles"
+					column="REVIEW_NO" />
+					
+		<collection property="keywords" 
+					ofType="KeywordDTO"
+					select="getKeywords"
+					column="REVIEW_NO" />
+	</resultMap>
+	
+	<select id="getFiles" parameterType="Long" resultType="ReviewFileDTO">
+		SELECT
+				  RF.FILE_NO fileNo
+				, RF.FILE_URL fileUrl
+				, RF.SORT_ORDER sortOrder
+				
+		FROM
+				TB_REVIEW_FILE RF
+		WHERE
+				RF.REVIEW_NO = #{value}
+		ORDER
+		BY
+				RF.SORT_ORDER ASC
+		
+	</select>
+	
+	<select id="getKeywords" parameterType="Long" resultType="KeywordDTO">
+		SELECT
+				  K.KEYWORD_NO keywordNo
+				, K.KEYWORD_NAME keywordName
+		FROM
+				TB_REVIEW_KEYWORD_MAP RKM
+		JOIN
+				TB_KEYWORD K ON	(K.KEYWORD_NO = RKM.KEYWORD_NO)
+		WHERE
+				RKM.REVIEW_NO = #{value}
+		ORDER
+		BY
+				K.KEYWORD_NO ASC
+	</select>
+	
+	<select id="getDetailReview" parameterType="map" resultMap="detailReviewMap">
+		SELECT
+				  RV.REVIEW_NO
+				, RV.CONTENT
+			    , RV.RATING
+			    , RV.CREATED_AT
+			    , RV.UPDATED_AT
+			    , RV.VIEW_COUNT
+			    , (
+			    	SELECT
+			    			COUNT(*)
+			    	FROM
+			    			TB_REVIEW_LIKE RVL
+			    	WHERE
+			    			RV.REVIEW_NO = RVL.REVIEW_NO
+			    ) LIKE_COUNT
+				, CASE WHEN EXISTS (
+			          SELECT 1
+			          FROM TB_REVIEW_LIKE RVL2
+			          WHERE RVL2.REVIEW_NO = RV.REVIEW_NO
+			            AND RVL2.MEMBER_NO = #{memberNo}
+			      ) THEN 'Y' ELSE 'N'
+			      END IS_LIKED
+			    , CASE WHEN EXISTS (
+			          SELECT 1
+			          FROM TB_BOOKMARK RVB2
+			          WHERE RVB2.REVIEW_NO = RV.REVIEW_NO
+			            AND RVB2.MEMBER_NO = #{memberNo}
+			      ) THEN 'Y' ELSE 'N'
+			      END IS_MARKED
+			      
+			    , M.MEMBER_NO
+			    , M.NICKNAME
+			
+			    , RT.RESTAURANT_NO
+			    , RT.NORMAL_NAME
+			    , RT.ADDRESS
+			    , RT.LATITUDE
+			    , RT.LONGITUDE
+		FROM
+				TB_REVIEW RV
+		JOIN	
+				TB_MEMBER M ON (M.MEMBER_NO = RV.MEMBER_NO)
+		JOIN
+				TB_RESTAURANT RT ON (RT.RESTAURANT_NO = RV.RESTAURANT_NO)
+		WHERE
+				RV.REVIEW_NO = #{reviewNo}
+		AND
+				RV.STATUS = 'Y'
+	</select>
 
 
 
