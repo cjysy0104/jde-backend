@@ -115,5 +115,15 @@ public class AdminController {
 		
 		return SuccessResponse.ok(member, "회원 상세 조회 성공");
 	}
+	
+	// 회원 삭제
+	@DeleteMapping("members/{memberNo}")
+	public ResponseEntity<SuccessResponse<String>> deleteMember(
+			@PathVariable(name="memberNo") Long memberNo){
+		
+		adminService.deleteMember(memberNo);
+		
+		return SuccessResponse.ok("회원이 삭제 되었습니다.");
+	}
 
 }

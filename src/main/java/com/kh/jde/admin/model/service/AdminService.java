@@ -34,5 +34,8 @@ public interface AdminService {
 	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO getMemberByNo(Long memberNo);
+
+	// 회원 삭제 (STATUS를 'N'으로 변경)
+	void deleteMember(Long memberNo);
 	
 }

@@ -50,6 +50,7 @@ public class SecurityConfigure {
 							   requests.requestMatchers(HttpMethod.PATCH, "/api/members/**").authenticated(); // 테이블의 행 중 부분만 수정
 							   requests.requestMatchers(HttpMethod.PUT, "/api/admin/reports/**").permitAll();
 							   requests.requestMatchers(HttpMethod.DELETE, "/api/bookmarks/**", "/api/members", "/api/reviews/**", "/api/comments/**").authenticated(); // 삭제, 인증 필요한 기능
+							   requests.requestMatchers(HttpMethod.DELETE,"api/admin/**").permitAll();
 							   requests.requestMatchers(HttpMethod.GET, "/api/bookmarks/**").authenticated();
 							   requests.requestMatchers(HttpMethod.POST, "/api/bookmarks/**", "/api/reviews", "/api/comments", "/api/admin/reports/**", "/api/auth/logout").authenticated(); // 게시글 작성 및 신고 시 로그인 필요
 							   
