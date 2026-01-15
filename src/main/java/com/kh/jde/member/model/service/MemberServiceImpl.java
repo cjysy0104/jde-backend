@@ -33,6 +33,7 @@ public class MemberServiceImpl implements MemberService {
 	private final TokenMapper tokenMapper;
 	
 	@Override
+	@Transactional
 	public void signUp(MemberSignUpDTO member) {
 		miv.MemberInfomationDuplicateCheck(member.getNickname(), member.getEmail(), member.getPhone());
 		// 닉네임, 이메일, 휴대폰 중복 체크
@@ -51,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
 				                         .memberName(member.getMemberName())
 				                         .phone(member.getPhone())
 				                         .build();
-		// 매퍼 호출
+		// 회원 가입 SQL문
 		memberMapper.signUp(signUpMember);
 	}
 
@@ -72,13 +73,11 @@ public class MemberServiceImpl implements MemberService {
 	}
 	
 	private CustomUserDetails validatePassword(String plainPassword) {
-		// 이미 탈퇴한 회원인지 유효성 검증 필요함.!!
-		
-		
-		// 사용작 입력한 비밀번호가 DB에 저장된 비밀번호 암호문이랑 맞는지 검증
+		// 이미 N인 회원은 JwtFilter에서 이미 걸러짐.
+		// 입력한 비밀번호는 진짜 비밀번호인지 볼거임.
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
-		
+
 		String encodedPassword = memberMapper.findPasswordByEmail(user.getUsername());
 		
 		// 비밀번호 검증 실패시 예외 발생
@@ -112,8 +111,12 @@ public class MemberServiceImpl implements MemberService {
 	}
 	
 	@Override // 리뷰로 좋아요 많이 받은 상위3명의 명단 보내기
+	@Transactional(readOnly = true)
 	public List<CaptainDTO> getCaptainList() {
+		
+		
 		List<CaptainDTO> captains = memberMapper.getCaptainList();
+		
 		return captains;
 	}
 	
