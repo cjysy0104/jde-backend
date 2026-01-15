@@ -1,6 +1,8 @@
 package com.kh.jde.admin.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
+import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.service.AdminService;
+import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -115,12 +119,39 @@ public class AdminController {
 		return SuccessResponse.ok(member, "회원 상세 조회 성공");
 	}
 	
+
 	// 미식대장 랭킹 몇위까지 보여줄 것인지 변경 가능	
 	@PatchMapping("/captainRank/{topN}")
 	public ResponseEntity<SuccessResponse<String>> updateCaptainRankPolicy(@PathVariable(name="topN") int topN){
 		adminService.updateCaptainRankPolicy(topN);
 		
 		return SuccessResponse.ok("미식대장 랭킹 기준을 변경했습니다.");
+	}
+	
+	
+	// 회원 권한 변경
+	@PutMapping("/members/{memberNo}/role")
+	public ResponseEntity<SuccessResponse<String>> updateMemberRole(
+			@PathVariable(name="memberNo") Long memberNo,
+			@RequestBody MemberRoleUpdateDTO dto,
+			@AuthenticationPrincipal CustomUserDetails user){
+		
+		dto.setMemberNo(memberNo);
+		dto.setCurrentMemberNo(user.getMemberNo());
+		
+		adminService.updateMemberRole(dto);
+		
+		return SuccessResponse.ok("회원 권한이 변경되었습니다.");
+	}
+	
+	// 회원 삭제
+	@DeleteMapping("/members/{memberNo}")
+	public ResponseEntity<SuccessResponse<String>> deleteMember(
+			@PathVariable(name="memberNo") Long memberNo){
+		
+		adminService.deleteMember(memberNo);
+		
+		return SuccessResponse.ok("회원이 삭제 되었습니다.");
 	}
 
 }

@@ -355,7 +355,7 @@
 	</select>
 	
 	<!-- 회원 권한 변경 -->
-	<update id="updateMemberRole">
+	<update id="updateMemberRole" parameterType="MemberRoleUpdateDTO">
 		UPDATE
 		       TB_MEMBER
 		   SET

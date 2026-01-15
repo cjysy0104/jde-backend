@@ -180,9 +180,27 @@
 	       AND STATUS = 'Y'
 	</update>
 
+	<!-- 닉네임 변경 -->
+	<update id="updateNicknameByEmail" parameterType="com.kh.jde.member.model.vo.MemberVO">
+	    UPDATE
+	           TB_MEMBER
+	       SET
+	           NICKNAME = #{nickname}
+	     WHERE
+	           EMAIL = #{email}
+	       AND STATUS = 'Y'
+	</update>
 
-
-
+	<!-- 전화번호 변경 -->
+	<update id="updatePhoneByEmail" parameterType="com.kh.jde.member.model.vo.MemberVO">
+	    UPDATE
+	           TB_MEMBER
+	       SET
+	           PHONE = #{phone}
+	     WHERE
+	           EMAIL = #{email}
+	       AND STATUS = 'Y'
+	</update>
 
 
 </mapper>

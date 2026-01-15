@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
+import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -51,5 +52,12 @@ public interface AdminMapper {
 	
 	// 미식대장 랭킹 제한 기준 변경
 	int updateCaptainRankPolicy(int topN);
+
+	// 회원 권한 변경
+	int updateMemberRole(MemberRoleUpdateDTO dto);
+
+	// 회원 삭제 (STATUS = 'N'으로 변경)
+	int deleteMember(Long memberNo);
+
 	
 }

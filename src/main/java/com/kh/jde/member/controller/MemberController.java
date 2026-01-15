@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
+import com.kh.jde.member.model.dto.ChangeNicknameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
+import com.kh.jde.member.model.dto.ChangePhoneDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.dto.MemberWithdrawDTO;
 import com.kh.jde.member.model.service.MemberService;
@@ -66,5 +68,16 @@ public class MemberController {
 	    memberService.changeName(ChangeName);
 	    return SuccessResponse.ok("이름이 변경되었습니다.");
 	}
-
+	
+	@PatchMapping("/nickname")
+	public ResponseEntity<SuccessResponse<String>> changeNickname(@Valid @RequestBody ChangeNicknameDTO changeNickname) {
+	    memberService.changeNickname(changeNickname);
+	    return SuccessResponse.ok("닉네임이 변경되었습니다.");
+	}
+	
+	@PatchMapping("/phone")
+	public ResponseEntity<SuccessResponse<String>> changePhone(@Valid @RequestBody ChangePhoneDTO changePhone) {
+	    memberService.changePhone(changePhone);
+	    return SuccessResponse.ok("전화번호가 변경되었습니다.");
+	}
 }

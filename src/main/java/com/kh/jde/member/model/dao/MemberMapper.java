@@ -27,5 +27,7 @@ public interface MemberMapper {
 	
 	int updatePasswordByEmail(MemberVO member);
 	int updateNameByEmail(MemberVO member);
+	int updateNicknameByEmail(MemberVO member);
+	int updatePhoneByEmail(MemberVO member);
 	
 }
