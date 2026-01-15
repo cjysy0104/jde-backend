@@ -33,8 +33,14 @@ public interface AdminMapper {
 	// 댓글 신고 상세 조회
 	CommentReportListDTO selectCommentReportByNo(Long reportNo);
 	
+	// 댓글 신고 상세 조회 (처리 후 조회용 - STATUS 조건 없음)
+	CommentReportListDTO selectCommentReportByNoAfterProcess(Long reportNo);
+	
 	// 리뷰 신고 상세 조회
 	ReviewReportListDTO selectReviewReportByNo(Long reportNo);
+	
+	// 리뷰 신고 상세 조회 (처리 후 조회용 - STATUS 조건 없음)
+	ReviewReportListDTO selectReviewReportByNoAfterProcess(Long reportNo);
 	
 	// 댓글 신고 처리
 	int updateCommentReportProcess(CommentReportProcessDTO dto);
