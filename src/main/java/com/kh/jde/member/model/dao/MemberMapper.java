@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.MemberLoginDTO;
+import com.kh.jde.member.model.vo.MemberFileVO;
 import com.kh.jde.member.model.vo.MemberVO;
 
 @Mapper
@@ -29,5 +30,7 @@ public interface MemberMapper {
 	int updateNameByEmail(MemberVO member);
 	int updateNicknameByEmail(MemberVO member);
 	int updatePhoneByEmail(MemberVO member);
-	
+
+    int upsertProfileImage(MemberFileVO vo);
+    
 }
