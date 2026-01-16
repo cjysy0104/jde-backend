@@ -55,6 +55,7 @@ public class AuthServiceImpl implements AuthService {
 														 .enrollDate(user.getEnrollDate())
 														 .role(user.getRole())
 														 .fileUrl(user.getFileUrl())
+														 .status(user.getStatus())
 														 .build();
 		return loginResponse;
 	}
