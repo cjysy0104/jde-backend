@@ -61,4 +61,5 @@ public class S3Uploader {
             default -> "jpg";
         };
     }
+    
 }
