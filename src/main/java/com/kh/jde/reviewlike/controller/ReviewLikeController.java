@@ -27,7 +27,7 @@ public class ReviewLikeController {
     // 리뷰 좋아요 등록
     @PostMapping("/{reviewNo}")
     public ResponseEntity<?> like(@AuthenticationPrincipal CustomUserDetails user,
-                                  @PathVariable Long reviewNo,
+                                  @PathVariable("reviewNo") Long reviewNo,
                                   HttpServletRequest request) {
 
         String path = request.getRequestURI();
