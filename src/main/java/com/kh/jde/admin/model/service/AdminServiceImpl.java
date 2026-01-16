@@ -10,6 +10,7 @@ import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
@@ -232,6 +233,21 @@ public class AdminServiceImpl implements AdminService {
 		if (result != 1) {
 			throw new IllegalStateException("댓글 삭제에 실패했습니다. 댓글 번호를 확인해주세요.");
 		}
+	}
+
+	@Override
+	public ReportPageResponse<ReviewListDTO> getReviewList(int currentPage) {
+
+		// 전체 개수 조회
+		int listCount = adminMapper.countAllComments();
+				
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, currentPage, PAGE_LIMIT, BOARD_LIMIT);
+				
+		// 페이징 조회
+		List<ReviewListDTO> reviewList = adminMapper.selectReviewList(pageInfo);
+		
+		return new ReportPageResponse<>(reviewList, pageInfo);
 	}
 
 }

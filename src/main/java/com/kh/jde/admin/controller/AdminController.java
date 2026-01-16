@@ -16,6 +16,7 @@ import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.service.AdminService;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
@@ -185,5 +186,14 @@ public class AdminController {
 		
 		return SuccessResponse.ok("댓글이 삭제 되었습니다.");
 	}
-
+	
+	// 리뷰 페이징 조회
+	@GetMapping("/reviews")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewListDTO>>> getReviewList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<ReviewListDTO> commentPageResponse = adminService.getReviewList(page);
+		
+		return SuccessResponse.ok(commentPageResponse, "리뷰 목록 조회 성공");
+	}
 }

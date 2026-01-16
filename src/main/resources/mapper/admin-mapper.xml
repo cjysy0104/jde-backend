@@ -533,5 +533,55 @@
 		       COMMENT_NO = #{commentNo}
 		   AND STATUS = 'Y'
 	</update>
+	
+	<!-- 리뷰 페이징 조회 -->
+	<select id="selectReviewList" resultType="ReviewListDTO">
+		SELECT
+		       R.REVIEW_NO reviewNo
+		     , R.MEMBER_NO memberNo
+		     , R.RESTAURANT_NO restaurantNo
+		     , RE.NORMAL_NAME normalName
+		     , R.CONTENT reviewContent
+		     , R.CREATED_AT createdAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              REVIEW_NO
+		            , MEMBER_NO
+		            , RESTAURANT_NO
+		            , CONTENT
+		            , CREATED_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                      REVIEW_NO
+		            		, MEMBER_NO
+		            		, RESTAURANT_NO
+		            		, CONTENT
+		            		, CREATED_AT
+		            		, STATUS
+		            		, ROWNUM RNUM
+		                FROM
+		                     TB_REVIEW
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) 
+		  R
+		  LEFT JOIN
+		       TB_RESTAURANT RE
+		       ON RE.RESTAURANT_NO = R.RESTAURANT_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
 
 </mapper>
