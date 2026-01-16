@@ -4,6 +4,7 @@ import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
 import com.kh.jde.report.model.dto.ReportPageResponse;
@@ -54,5 +55,9 @@ public interface AdminService {
 	
 	// 댓글 삭제 (STATUS를 'N'으로 변경)
 	void deleteComment(Long commentNo);
+
+	// 리뷰 페이징 조회
+	ReportPageResponse<ReviewListDTO> getReviewList(int currentPage);
+
 	
 }

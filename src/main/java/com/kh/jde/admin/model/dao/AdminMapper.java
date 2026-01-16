@@ -9,6 +9,7 @@ import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -77,5 +78,8 @@ public interface AdminMapper {
 	
 	// 댓글 삭제 (STATUS = 'N'으로 변경)
 	int deleteComment(Long commentNo);
+	
+	// 리뷰 페이징 조회
+	List<ReviewListDTO> selectReviewList(PageInfo pageInfo);
 	
 }
