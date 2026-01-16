@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.file.FileRenamePolicy;
+
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -16,6 +18,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class S3Uploader {
 
     private final S3Client s3Client;
+    private final FileRenamePolicy fileRenamePolicy;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -23,8 +26,9 @@ public class S3Uploader {
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    public S3Uploader(S3Client s3Client) {
+    public S3Uploader(S3Client s3Client, FileRenamePolicy fileRenamePolicy) {
         this.s3Client = s3Client;
+        this.fileRenamePolicy = fileRenamePolicy;
     }
 
     public String uploadProfileImage(MultipartFile file, Long memberNo) throws IOException {
@@ -32,9 +36,9 @@ public class S3Uploader {
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("이미지 파일만 업로드할 수 있습니다.");
         }
-
-        String ext = guessExt(contentType);
-        String key = "profile/" + memberNo + "/" + UUID.randomUUID() + "." + ext;
+        String changeName = fileRenamePolicy.rename();
+        String extensionName = getExtensionName(contentType);
+        String key = "profile/" + memberNo + "/" + changeName + "." + extensionName;
 
         PutObjectRequest req = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -48,7 +52,8 @@ public class S3Uploader {
         return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + key;
     }
 
-    private String guessExt(String contentType) {
+    // contentType(MIME)로부터 확장자명을 가져오는 메서드 (이름 생략 없이)
+    private String getExtensionName(String contentType) {
         return switch (contentType) {
             case MediaType.IMAGE_PNG_VALUE -> "png";
             case MediaType.IMAGE_GIF_VALUE -> "gif";

@@ -29,4 +29,6 @@ public interface ReviewMapper {
 
 	DetailReviewDTO getDetailReview(Map<String, Object> param);
 	
+	int existsReview(Long reviewNo);          // 리뷰 존재(정상) 여부
+	
 }
