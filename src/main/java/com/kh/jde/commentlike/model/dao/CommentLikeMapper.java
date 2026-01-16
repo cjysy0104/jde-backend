@@ -1,4 +1,4 @@
-package com.kh.jde.commentLike.model.dao;
+package com.kh.jde.commentlike.model.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 

@@ -75,4 +75,7 @@ public interface AdminMapper {
 	// 댓글 상세 조회
 	CommentListDTO selectCommentByNo(Long commentNo);
 	
+	// 댓글 삭제 (STATUS = 'N'으로 변경)
+	int deleteComment(Long commentNo);
+	
 }

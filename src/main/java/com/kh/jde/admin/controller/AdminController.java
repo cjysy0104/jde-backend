@@ -177,12 +177,24 @@ public class AdminController {
 		return SuccessResponse.ok(comment, "댓글 상세 조회 성공");
 	}
 	
+
+	// 댓글 삭제
+	@DeleteMapping("/comments/{commentNo}")
+	public ResponseEntity<SuccessResponse<String>> deleteComment(
+			@PathVariable(name="commentNo") Long commentNo){
+		
+		adminService.deleteComment(commentNo);
+		
+		return SuccessResponse.ok("댓글이 삭제 되었습니다.");
+	}
+
 	// 디폴트 프로필 이미지 등록하기
 	@PostMapping("/defaultImage")
 	public ResponseEntity<SuccessResponse<String>> createDefaultImage(){
-	
+		
 		return SuccessResponse.created("회원 기본 이미지 등록에 성공했습니다.");
 	}
+
 }
 
 

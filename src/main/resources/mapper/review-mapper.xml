@@ -224,7 +224,13 @@
 				RV.STATUS = 'Y'
 	</select>
 
-
+	<!-- 리뷰 존재 확인 -->
+    <select id="existsReview" resultType="int">
+        SELECT COUNT(1)
+        FROM TB_REVIEW
+        WHERE REVIEW_NO = #{reviewNo}
+          AND STATUS = 'Y'
+    </select>
 
 
 
