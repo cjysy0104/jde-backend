@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
+import com.kh.jde.commentlike.model.dto.CommentLikeDTO;
 import com.kh.jde.common.responseData.ErrorResponse;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.reviewlike.dto.ReviewLikeDTO;
@@ -26,7 +27,7 @@ public class ReviewLikeController {
     private final ReviewLikeService reviewLikeService;
 
     @PostMapping("/{reviewNo}")
-    public ResponseEntity<?> createLike(@AuthenticationPrincipal CustomUserDetails user,
+    public ResponseEntity<SuccessResponse<ReviewLikeDTO>> createLike(@AuthenticationPrincipal CustomUserDetails user,
                                   @PathVariable("reviewNo") Long reviewNo) {
 
         ReviewLikeDTO reviewLike = reviewLikeService.createLike(reviewNo, user.getMemberNo());
@@ -34,7 +35,7 @@ public class ReviewLikeController {
     }
 
     @DeleteMapping("/{reviewNo}")
-    public ResponseEntity<?> deleteLike(@AuthenticationPrincipal CustomUserDetails user,
+    public ResponseEntity<SuccessResponse<ReviewLikeDTO>> deleteLike(@AuthenticationPrincipal CustomUserDetails user,
                                     @PathVariable("reviewNo") Long reviewNo) {
 
         ReviewLikeDTO reviewLike = reviewLikeService.deleteLike(reviewNo, user.getMemberNo());
