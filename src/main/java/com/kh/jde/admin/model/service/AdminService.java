@@ -59,5 +59,10 @@ public interface AdminService {
 	// 리뷰 페이징 조회
 	ReportPageResponse<ReviewListDTO> getReviewList(int currentPage);
 
+	// 리뷰 상세 조회
+	ReviewListDTO getReviewByNo(Long reviewNo);
+
+	// 리뷰 삭제 (STATUS를 'N'으로 변경)
+	void deleteReview(Long reviewNo);
 	
 }

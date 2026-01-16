@@ -81,5 +81,11 @@ public interface AdminMapper {
 	
 	// 리뷰 페이징 조회
 	List<ReviewListDTO> selectReviewList(PageInfo pageInfo);
+
+	// 리뷰 상세 조회
+	ReviewListDTO selectReviewByNo(Long reviewNo);
+
+	// 리뷰 삭제 (STATUS = 'N'으로 변경)
+	int deleteReview(Long reviewNo);
 	
 }
