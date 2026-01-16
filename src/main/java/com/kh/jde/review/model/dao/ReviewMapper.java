@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kh.jde.review.model.dto.DetailReviewDTO;
+import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewDTO;
 
@@ -18,6 +19,7 @@ public interface ReviewMapper {
 	// 리뷰 상세 조회
 	DetailReviewDTO getDetailReview(Map<String,Object> param);
 	
+	List<KeywordRowDTO> getKeywordsByIds(List<Long> reviewNo);
 	
 	// 리뷰 작성
 	void save();

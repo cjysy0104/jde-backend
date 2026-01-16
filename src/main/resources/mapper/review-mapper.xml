@@ -26,7 +26,7 @@
 	
 	<select id="getKeywordsByIds"
 			parameterType="list"
-			resultType="map">
+			resultType="KeywordRowDTO">
 		SELECT
 		    	  RKM.REVIEW_NO  reviewNo
 		    	, K.KEYWORD_NO   keywordNo
@@ -63,7 +63,7 @@
 					AND
 							RVF.IS_THUMNAIL = 'Y'
 				) THUMBNAIL_URL
-				, RT.NORMAL_NAME 
+				, RT.NORMAL_NAME NORMAL_NAME
 				, M.NICKNAME 
 				
 				, RV.CONTENT 
@@ -74,30 +74,30 @@
 				, NVL(LC.LIKE_COUNT, 0) LIKE_COUNT
 				, NVL(CC.COMMENT_COUNT, 0) COMMENT_COUNT
 				
-				, CASE 
-					WHEN 
-						#{memberNo} IS NOT NULL
-					AND 
-						EXISTS (
-				          SELECT 1
-				          FROM 	TB_REVIEW_LIKE RVL
-				          WHERE RVL.REVIEW_NO = RV.REVIEW_NO
-				            AND	RVL.MEMBER_NO = #{memberNo}
-			        )
-			        THEN 'Y' ELSE 'N'
-			      END IS_LIKED
-				, CASE 
-					WHEN 
-						#{memberNo} IS NOT NULL
-					AND 
-						EXISTS (
-				          SELECT 1
-				          FROM 	TB_BOOKMARK B
-				          WHERE B.REVIEW_NO = RV.REVIEW_NO
-				            AND	B.MEMBER_NO = #{memberNo}
-			        )
-			        THEN 'Y' ELSE 'N'
-			      END IS_MARKED
+			<choose>
+				<when test="memberNo != null">
+				, CASE WHEN
+					EXISTS (
+			          SELECT 1
+			          FROM 	TB_REVIEW_LIKE RVL
+			          WHERE RVL.REVIEW_NO = RV.REVIEW_NO
+			            AND	RVL.MEMBER_NO = #{memberNo}
+			        ) THEN 'Y' ELSE 'N'
+		      	  END IS_LIKED
+				, CASE WHEN 
+					EXISTS (
+			          SELECT 1
+			          FROM 	TB_BOOKMARK B
+			          WHERE B.REVIEW_NO = RV.REVIEW_NO
+			            AND	B.MEMBER_NO = #{memberNo}
+		        	) THEN 'Y' ELSE 'N'
+		      	  END IS_MARKED
+				</when>
+				<otherwise>
+				, 'N' IS_LIKED
+    			, 'N' IS_MARKED
+				</otherwise>
+			</choose>
 		FROM
 				TB_REVIEW RV
 		JOIN
@@ -136,7 +136,7 @@
 		WHERE 
 				RV.STATUS = 'Y'
 		<!-- 검색 필터-->
-		<if test="query != null">
+		<if test="query != null and query != ''">
 		AND 
 				(
 				RV.CONTENT			LIKE	'%' || #{query} || '%'
