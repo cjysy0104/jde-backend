@@ -6,10 +6,14 @@
 	
 	<!-- 좋아요 존재 확인 -->
 	<select id="existsLike" parameterType="com.kh.jde.commentlike.model.vo.CommentLikeVO" resultType="int">
-        SELECT COUNT(1)
-        FROM TB_COMMENT_LIKE
-        WHERE COMMENT_NO = #{commentNo}
-          AND MEMBER_NO = #{memberNo}
+        SELECT 
+               COUNT(1)
+          FROM 
+               TB_COMMENT_LIKE
+         WHERE 
+               COMMENT_NO = #{commentNo}
+           AND 
+               MEMBER_NO = #{memberNo}
     </select>
 	
 	<!-- 좋아요 등록 -->

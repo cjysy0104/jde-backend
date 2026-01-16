@@ -25,7 +25,7 @@ public class CommentLikeController {
     private final CommentLikeService commentLikeService;
 
     @PostMapping("/{commentNo}")
-    public ResponseEntity<?> createLike(@AuthenticationPrincipal CustomUserDetails user,
+    public ResponseEntity<SuccessResponse<CommentLikeDTO>> createLike(@AuthenticationPrincipal CustomUserDetails user,
                                   @PathVariable("commentNo") Long commentNo) {
     	
     	log.info("HIT commentLike POST, commentNo={}", commentNo);
@@ -34,7 +34,7 @@ public class CommentLikeController {
     }
 
     @DeleteMapping("/{commentNo}")
-    public ResponseEntity<?> deleteLike(@AuthenticationPrincipal CustomUserDetails user,
+    public ResponseEntity<SuccessResponse<CommentLikeDTO>> deleteLike(@AuthenticationPrincipal CustomUserDetails user,
                                     @PathVariable("commentNo") Long commentNo) {
 
         CommentLikeDTO commentLike = commentLikeService.deleteLike(commentNo, user.getMemberNo());
