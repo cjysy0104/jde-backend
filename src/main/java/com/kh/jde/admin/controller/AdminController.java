@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
@@ -153,6 +154,26 @@ public class AdminController {
 		adminService.deleteMember(memberNo);
 		
 		return SuccessResponse.ok("회원이 삭제 되었습니다.");
+	}
+	
+	// 댓글 페이징 조회
+	@GetMapping("/comments")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentListDTO>>> getCommentList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<CommentListDTO> commentPageResponse = adminService.getCommentList(page);
+		
+		return SuccessResponse.ok(commentPageResponse, "댓글 목록 조회 성공");
+	}
+	
+	// 댓글 상세 조회
+	@GetMapping("/comments/{commentNo}")
+	public ResponseEntity<SuccessResponse<CommentListDTO>> getCommentByNo(
+			@PathVariable(name="commentNo") Long commentNo){
+		
+		CommentListDTO comment = adminService.getCommentByNo(commentNo);
+		
+		return SuccessResponse.ok(comment, "댓글 상세 조회 성공");
 	}
 
 }

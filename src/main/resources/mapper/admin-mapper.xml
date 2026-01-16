@@ -188,6 +188,38 @@
 		   AND R.STATUS = 'Y'
 	</select>
 	
+	<!-- 댓글 신고 상세 조회 (처리 후 조회용 - STATUS 조건 없음) -->
+	<select id="selectCommentReportByNoAfterProcess" resultType="CommentReportListDTO">
+		SELECT
+		       R.COMMENT_REPORT_NO commentReportNo
+		     , R.COMMENT_REPORT_NO reportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.COMMENT_NO commentNo
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       TB_COMMENT_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.COMMENT_REPORT_NO = #{reportNo}
+	</select>
+	
 	<!-- 리뷰 신고 상세 조회 -->
 	<select id="selectReviewReportByNo" resultType="ReviewReportListDTO">
 		SELECT
@@ -218,6 +250,37 @@
 		 WHERE
 		       R.REVIEW_REPORT_NO = #{reportNo}
 		   AND R.STATUS = 'Y'
+	</select>
+	
+	<!-- 리뷰 신고 상세 조회 (처리 후 조회용 - STATUS 조건 없음) -->
+	<select id="selectReviewReportByNoAfterProcess" resultType="ReviewReportListDTO">
+		SELECT
+		       R.REVIEW_REPORT_NO reviewReportNo
+		     , R.REVIEW_REPORT_NO reportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.REVIEW_NO reviewNo
+		     , RV.CONTENT reviewContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       TB_REVIEW_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_REVIEW RV
+		    ON R.REVIEW_NO = RV.REVIEW_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.REVIEW_REPORT_NO = #{reportNo}
 	</select>
 	
 	<!-- 댓글 신고 처리 업데이트 -->
@@ -385,5 +448,79 @@
 		 WHERE
 		       POLICY_CODE = 'CAPTAIN_RANK'
 	</update>
+	
+	<!-- 댓글 전체 개수 조회 -->
+	<select id="countAllComments" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 댓글 페이징 조회 -->
+	<select id="selectCommentList" resultType="CommentListDTO">
+		SELECT
+		       C.COMMENT_NO commentNo
+		     , C.MEMBER_NO memberNo
+		     , C.AUTHOR author
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , C.COMMENT_DATE commentDate
+		     , C.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              COMMENT_NO
+		            , MEMBER_NO
+		            , AUTHOR
+		            , REVIEW_NO
+		            , CONTENT
+		            , COMMENT_DATE
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     COMMENT_NO
+		                   , MEMBER_NO
+		                   , AUTHOR
+		                   , REVIEW_NO
+		                   , CONTENT
+		                   , COMMENT_DATE
+		                   , STATUS
+		                FROM
+		                     TB_COMMENT
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     COMMENT_DATE DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) C
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       C.COMMENT_DATE DESC
+	</select>
+	
+	<!-- 댓글 상세 조회 -->
+	<select id="selectCommentByNo" resultType="CommentListDTO">
+		SELECT
+		       COMMENT_NO commentNo
+		     , MEMBER_NO memberNo
+		     , AUTHOR author
+		     , REVIEW_NO reviewNo
+		     , CONTENT commentContent
+		     , COMMENT_DATE commentDate
+		     , STATUS status
+		  FROM
+		       TB_COMMENT
+		 WHERE
+		       COMMENT_NO = #{commentNo}
+		   AND STATUS = 'Y'
+	</select>
 
 </mapper>
