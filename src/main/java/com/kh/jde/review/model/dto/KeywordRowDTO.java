@@ -11,8 +11,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class KeywordDTO {
+public class KeywordRowDTO {
 
+	private Long reviewNo;
 	private Long keywordNo;
 	private String keywordName;
 }
