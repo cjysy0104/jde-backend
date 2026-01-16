@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.jde.admin.model.dao.AdminMapper;
 import com.kh.jde.admin.model.dto.CommentListDTO;
@@ -13,6 +14,8 @@ import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
+import com.kh.jde.file.FileRenamePolicy;
+import com.kh.jde.file.service.S3Service;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
 import com.kh.jde.report.model.dto.ReportPageResponse;
@@ -28,8 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminServiceImpl implements AdminService {
 	
 	private final AdminMapper adminMapper;
+	private final FileRenamePolicy fileRenamePolicy;
+	private final S3Service s3Service;
 	private static final int PAGE_LIMIT = 10; // 페이징바에 표시될 페이지 수
 	private static final int BOARD_LIMIT = 15; // 한 페이지에 표시될 게시글 수
+	
 	
 	@Override
 	public ReportPageResponse<CommentReportListDTO> getCommentReportList(int currentPage) {
@@ -233,5 +239,17 @@ public class AdminServiceImpl implements AdminService {
 			throw new IllegalStateException("댓글 삭제에 실패했습니다. 댓글 번호를 확인해주세요.");
 		}
 	}
+
+	@Override
+	@Transactional
+	public void createDefaultImage(String fileName, MultipartFile file) {
+		
+		String fileUrl = s3Service.fileSave(file, fileRenamePolicy.rename());
+		
+		
+		
+	}
+	
+	
 
 }

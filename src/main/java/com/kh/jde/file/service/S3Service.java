@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.file.FileRenamePolicy;
 
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -23,6 +24,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 public class S3Service {
 	
 	private final S3Client s3Client;
+	private final FileRenamePolicy fileRenamePolicy;
 	
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucketName;
@@ -31,14 +33,27 @@ public class S3Service {
 	private String region;
 	
 	// 업로드 메소드 
-	public String fileSave(MultipartFile file, String changeName) {
-
-		// String fileName = fileService.store(file);
+	public String fileSave(MultipartFile file, String S3DirectoryName) {
+		
+		// 이미지 파일이 png, jpg, jpeg가 아니면 예외발생
+		String contentType = file.getContentType();
+		if (contentType == null || !(contentType.equals("image/png")
+				|| contentType.equals("image/jpg")
+				|| contentType.equals("image/jpeg"))) {
+		    throw new IllegalArgumentException("허용되지 않은 파일 형식입니다. (png, jpg, jpeg만 가능)");
+		}
+		
+		// 서비스에서 넘겨준 폴더경로와 랜덤생성한 파일명 합치기
+		String key = new StringBuilder()
+		        .append(S3DirectoryName)
+		        .append("/")
+		        .append(fileRenamePolicy.rename())
+		        .toString();
 		
 		// S3에 업로드
 		PutObjectRequest request = PutObjectRequest.builder()
 												   .bucket(bucketName)
-												   .key(changeName)
+												   .key(key)
 												   .contentType(file.getContentType())
 												   .build();
 		

@@ -1,5 +1,7 @@
 package com.kh.jde.admin.model.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
@@ -54,5 +56,8 @@ public interface AdminService {
 	
 	// 댓글 삭제 (STATUS를 'N'으로 변경)
 	void deleteComment(Long commentNo);
+	
+	// 회원이 사용할 기본이미지 등록
+	void createDefaultImage(String fileName, MultipartFile file);
 	
 }
