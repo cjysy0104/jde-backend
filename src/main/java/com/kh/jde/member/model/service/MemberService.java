@@ -2,6 +2,8 @@ package com.kh.jde.member.model.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
 import com.kh.jde.member.model.dto.ChangeNicknameDTO;
@@ -21,4 +23,6 @@ public interface MemberService {
 	void changeName(ChangeNameDTO changeName);
 	void changeNickname(ChangeNicknameDTO changeNickname);
 	void changePhone(ChangePhoneDTO changePhone);
+	
+	String updateMyProfileImage(String plainPassword, MultipartFile file);
 }

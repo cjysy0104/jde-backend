@@ -1,9 +1,9 @@
-package com.kh.jde.commentLike.controller;
+package com.kh.jde.commentlike.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kh.jde.commentLike.model.service.CommentLikeService;
+import com.kh.jde.commentlike.model.service.CommentLikeService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

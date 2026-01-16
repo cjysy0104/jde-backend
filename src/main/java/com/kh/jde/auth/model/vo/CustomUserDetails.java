@@ -25,7 +25,7 @@ public class CustomUserDetails implements UserDetails {
 	private Date enrollDate;
 	private String status;
 	private String role;
-	
+	private String fileUrl;
 
 	
 	

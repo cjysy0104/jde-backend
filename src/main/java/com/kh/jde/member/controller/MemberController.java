@@ -2,15 +2,20 @@ package com.kh.jde.member.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
@@ -80,4 +85,14 @@ public class MemberController {
 	    memberService.changePhone(changePhone);
 	    return SuccessResponse.ok("전화번호가 변경되었습니다.");
 	}
+
+	@PatchMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<SuccessResponse<String>> updateProfileImage(
+	        @RequestPart("password") String password,
+	        @RequestPart("file") MultipartFile file
+	) {
+	    String url = memberService.updateMyProfileImage(password, file);
+	    return SuccessResponse.ok(url, "프로필 이미지가 변경되었습니다.");
+	}
+
 }
