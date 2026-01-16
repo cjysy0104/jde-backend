@@ -9,7 +9,7 @@ import com.kh.jde.review.model.dto.ReviewDTO;
 
 public interface ReviewService {
 
-	public List<ReviewDTO> findAll(QueryDTO req, CustomUserDetails principal);
+	public List<ReviewDTO> getReviewList(QueryDTO req, CustomUserDetails principal);
 	
-	public DetailReviewDTO findById(Long reviewNo, CustomUserDetails principal);
+	public DetailReviewDTO getDetailReview(Long reviewNo, CustomUserDetails principal);
 }

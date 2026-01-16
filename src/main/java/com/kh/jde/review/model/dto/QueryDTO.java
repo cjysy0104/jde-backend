@@ -9,15 +9,25 @@ import lombok.Setter;
 @NoArgsConstructor
 public class QueryDTO {
 
+	// 검색 / 필터
 	private String query;
 	private String keyword;
 	private Float minRating = (float) 0;
 	private Float maxRating = (float) 5;
 	
-	private Integer page;
-	private Integer size;
-	private String sort;
-	
+	// 로그인 사용자
 	private Long memberNo;
+	
+	// 스크롤
+	private Integer size;
+	private Integer sizePlusOne; // size + 1
+	private String sort;	// latest | oldest | rating | liked
+	
+	// 커서
+	private Long cursor;
+	
+	private Float cursorRating; // sort = rating일 때,
+	private Integer cursorLikedCount; // sort = liked일 때 혹은 다른 정렬기능 추가 시
+	
 	
 }

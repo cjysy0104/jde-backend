@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kh.jde.review.model.dto.DetailReviewDTO;
+import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewDTO;
 
@@ -13,10 +14,12 @@ import com.kh.jde.review.model.dto.ReviewDTO;
 public interface ReviewMapper {
 
 	// 전체 목록 조회
-	List<ReviewDTO> findAll(QueryDTO req);
+	List<ReviewDTO> getReviewList(QueryDTO req);
 	
 	// 리뷰 상세 조회
-	DetailReviewDTO findById(Map<String,Object> param);
+	DetailReviewDTO getDetailReview(Map<String,Object> param);
+	
+	List<KeywordRowDTO> getKeywordsByIds(List<Long> reviewNo);
 	
 	// 리뷰 작성
 	void save();
@@ -26,8 +29,6 @@ public interface ReviewMapper {
 	
 	// 리뷰 삭제(소프트)
 	void deleteById();
-
-	DetailReviewDTO getDetailReview(Map<String, Object> param);
 	
 	int existsReview(Long reviewNo);          // 리뷰 존재(정상) 여부
 	
