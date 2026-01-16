@@ -60,17 +60,21 @@
 	
 	<select id="loadUser" parameterType="MemberLoginDTO">
 		SELECT
-			   MEMBER_NO memberNo
-		     , PASSWORD 
-			 , MEMBER_NAME memberName
-			 , NICKNAME
-		     , PHONE
-		     , EMAIL
-		     , ROLE
-		     , ENROLL_DATE enrollDate
-		     , STATUS 
+			   m.MEMBER_NO memberNo
+		     , m.PASSWORD 
+			 , m.MEMBER_NAME memberName
+			 , m.NICKNAME
+		     , m.PHONE
+		     , m.EMAIL
+		     , m.ROLE
+		     , m.ENROLL_DATE enrollDate
+		     , m.STATUS
+		     , f.FILE_URL fileUrl
 		  FROM
-			   TB_MEMBER
+			   TB_MEMBER m
+		  LEFT
+		  JOIN
+		       TB_MEMBER_FILE f ON(m.MEMBER_NO = f.MEMBER_NO)
 		 WHERE
 			   EMAIL = #{email}
 	</select>

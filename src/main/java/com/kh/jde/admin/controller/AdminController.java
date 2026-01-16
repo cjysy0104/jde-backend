@@ -24,6 +24,7 @@ import com.kh.jde.report.model.dto.ReportPageResponse;
 import com.kh.jde.report.model.dto.ReviewReportListDTO;
 import com.kh.jde.report.model.dto.ReviewReportProcessDTO;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -121,8 +122,8 @@ public class AdminController {
 	
 
 	// 미식대장 랭킹 몇위까지 보여줄 것인지 변경 가능	
-	@PatchMapping("/captainRank/{topN}")
-	public ResponseEntity<SuccessResponse<String>> updateCaptainRankPolicy(@PathVariable(name="topN") int topN){
+	@PatchMapping("/captainRank/{topN:\\d+}")
+	public ResponseEntity<SuccessResponse<String>> updateCaptainRankPolicy(@PathVariable(name="topN") @Min(value=0, message="0이상의 정수만 입력해주세요.") int topN){
 		adminService.updateCaptainRankPolicy(topN);
 		
 		return SuccessResponse.ok("미식대장 랭킹 기준을 변경했습니다.");

@@ -56,7 +56,7 @@ public class ErrorResponse<T> {
 	
 	// 500 Internal Server Error 서버측의 문제
 	public static <T> ResponseEntity<ErrorResponse<T>> internalServerError(String message, String path){
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(404, false, message, path, LocalDateTime.now()));
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(500, false, message, path, LocalDateTime.now()));
 	}
 	
 
