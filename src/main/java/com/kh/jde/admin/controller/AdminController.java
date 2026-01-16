@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -178,9 +179,10 @@ public class AdminController {
 	
 	// 디폴트 프로필 이미지 등록하기
 	@PostMapping("/defaultImage")
-	public ResponseEntity<SuccessResponse<String>> createDefaultImage()
+	public ResponseEntity<SuccessResponse<String>> createDefaultImage(){
 	
 		return SuccessResponse.created("회원 기본 이미지 등록에 성공했습니다.");
+	}
 }
 
 
