@@ -206,4 +206,13 @@ public class AdminController {
 			
 		return SuccessResponse.ok(comment, "리뷰 상세 조회 성공");
 	}
+	
+	// 리뷰 삭제
+	@DeleteMapping("/reviews/{reviewNo}")
+	public ResponseEntity<SuccessResponse<String>> deleteReview(
+			@PathVariable(name="reviewNo") Long reviewNo){
+		adminService.deleteReview(reviewNo);
+		
+		return SuccessResponse.ok("리뷰가 삭제 되었습니다.");
+	}
 }

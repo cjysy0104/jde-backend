@@ -605,5 +605,16 @@
 		       REVIEW_NO = #{reviewNo}
 		   AND STATUS = 'Y'
 	</select>
+	
+	<!-- 리뷰 삭제 (STATUS를 'N'으로 변경) -->
+	<update id="deleteReview">
+		UPDATE
+		       TB_REVIEW
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       REVIEW_NO = #{reviewNo}
+		   AND STATUS = 'Y'
+	</update>
 
 </mapper>
