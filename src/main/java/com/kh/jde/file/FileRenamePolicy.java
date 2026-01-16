@@ -35,7 +35,7 @@ public class FileRenamePolicy {
         // 원본 파일명
         String originName = originFile.getName();
 
-        // 1. 원본파일의 확장자
+        // 1. 원본파일의 확장자 
         String ext = originName.substring(originName.lastIndexOf("."));
 
         // 2. 년월일시분초
