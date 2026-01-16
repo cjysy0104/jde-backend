@@ -11,7 +11,7 @@ public interface ReviewLikeMapper {
 	
     int existsLike(ReviewLikeVO reviewLike);  // 좋아요 존재 여부
 
-    int insertLike(ReviewLikeVO reviewLike);  // 좋아요 등록
+    int createLike(ReviewLikeVO reviewLike);  // 좋아요 등록
 
     int deleteLike(ReviewLikeVO reviewLike);  // 좋아요 취소(삭제)
 

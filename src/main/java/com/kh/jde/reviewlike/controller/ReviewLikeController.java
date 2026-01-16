@@ -26,18 +26,18 @@ public class ReviewLikeController {
     private final ReviewLikeService reviewLikeService;
 
     @PostMapping("/{reviewNo}")
-    public ResponseEntity<?> like(@AuthenticationPrincipal CustomUserDetails user,
+    public ResponseEntity<?> createLike(@AuthenticationPrincipal CustomUserDetails user,
                                   @PathVariable("reviewNo") Long reviewNo) {
 
-        ReviewLikeDTO dto = reviewLikeService.like(reviewNo, user.getMemberNo());
-        return SuccessResponse.created(dto, "리뷰에 좋아요를 눌렀습니다.");
+        ReviewLikeDTO reviewLike = reviewLikeService.createLike(reviewNo, user.getMemberNo());
+        return SuccessResponse.created(reviewLike, "리뷰에 좋아요를 눌렀습니다.");
     }
 
     @DeleteMapping("/{reviewNo}")
-    public ResponseEntity<?> unlike(@AuthenticationPrincipal CustomUserDetails user,
+    public ResponseEntity<?> deleteLike(@AuthenticationPrincipal CustomUserDetails user,
                                     @PathVariable("reviewNo") Long reviewNo) {
 
-        ReviewLikeDTO dto = reviewLikeService.unlike(reviewNo, user.getMemberNo());
-        return SuccessResponse.ok(dto, "리뷰 좋아요를 취소했습니다.");
+        ReviewLikeDTO reviewLike = reviewLikeService.deleteLike(reviewNo, user.getMemberNo());
+        return SuccessResponse.ok(reviewLike, "리뷰 좋아요를 취소했습니다.");
     }
 }

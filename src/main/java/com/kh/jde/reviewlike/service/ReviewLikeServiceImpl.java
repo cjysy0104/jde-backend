@@ -19,13 +19,13 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     @Override
     @Transactional
-    public ReviewLikeDTO like(Long reviewNo, Long memberNo) {
-        ReviewLikeVO vo = new ReviewLikeVO(reviewNo, memberNo);
+    public ReviewLikeDTO createLike(Long reviewNo, Long memberNo) {
+        ReviewLikeVO reviewLike = new ReviewLikeVO(reviewNo, memberNo);
 
         validateReviewExists(reviewNo);
-        validator.validateNotAlreadyLiked(isAlreadyLiked(vo), "이미 좋아요를 누른 리뷰입니다.");
+        validator.validateNotAlreadyLiked(isAlreadyLiked(reviewLike), "이미 좋아요를 누른 리뷰입니다.");
 
-        int inserted = reviewLikeMapper.insertLike(vo);
+        int inserted = reviewLikeMapper.createLike(reviewLike);
         validator.validateDbAffected(inserted, "좋아요 처리 중 서버 오류가 발생했습니다.");
 
         int likeCount = reviewLikeMapper.countLikes(reviewNo);
@@ -38,13 +38,13 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     @Override
     @Transactional
-    public ReviewLikeDTO unlike(Long reviewNo, Long memberNo) {
-        ReviewLikeVO vo = new ReviewLikeVO(reviewNo, memberNo);
+    public ReviewLikeDTO deleteLike(Long reviewNo, Long memberNo) {
+        ReviewLikeVO reviewLike = new ReviewLikeVO(reviewNo, memberNo);
 
         validateReviewExists(reviewNo);
-        validator.validateAlreadyLiked(isAlreadyLiked(vo), "좋아요를 누르지 않은 리뷰입니다.");
+        validator.validateAlreadyLiked(isAlreadyLiked(reviewLike), "좋아요를 누르지 않은 리뷰입니다.");
 
-        int deleted = reviewLikeMapper.deleteLike(vo);
+        int deleted = reviewLikeMapper.deleteLike(reviewLike);
         validator.validateDbAffected(deleted, "좋아요 취소 처리 중 서버 오류가 발생했습니다.");
 
         int likeCount = reviewLikeMapper.countLikes(reviewNo);
@@ -61,8 +61,8 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
         validator.validateTargetExists(exists, "요청한 리뷰를 찾을 수 없습니다.");
     }
 
-    private boolean isAlreadyLiked(ReviewLikeVO vo) {
-        return reviewLikeMapper.existsLike(vo) > 0;
+    private boolean isAlreadyLiked(ReviewLikeVO reviewLike) {
+        return reviewLikeMapper.existsLike(reviewLike) > 0;
     }
 }
 

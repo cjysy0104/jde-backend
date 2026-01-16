@@ -4,8 +4,8 @@ import com.kh.jde.reviewlike.dto.ReviewLikeDTO;
 
 public interface ReviewLikeService {
 	
-    ReviewLikeDTO like(Long reviewNo, Long memberNo);
+    ReviewLikeDTO createLike(Long reviewNo, Long memberNo);
     
-    ReviewLikeDTO unlike(Long reviewNo, Long memberNo);
+    ReviewLikeDTO deleteLike(Long reviewNo, Long memberNo);
     
 }

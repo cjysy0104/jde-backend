@@ -21,7 +21,7 @@
     </select>
 
     <!-- 좋아요 등록 -->
-    <insert id="insertLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO">
+    <insert id="createLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO">
         INSERT INTO TB_REVIEW_LIKE (MEMBER_NO, REVIEW_NO, REVIEW_LIKE_DATE)
         VALUES (#{memberNo}, #{reviewNo}, SYSDATE)
     </insert>
