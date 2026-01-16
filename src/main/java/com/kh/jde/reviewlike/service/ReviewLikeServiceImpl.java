@@ -3,6 +3,7 @@ package com.kh.jde.reviewlike.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kh.jde.review.model.dao.ReviewMapper;
 import com.kh.jde.reviewlike.dao.ReviewLikeMapper;
 import com.kh.jde.reviewlike.dto.ReviewLikeDTO;
 import com.kh.jde.reviewlike.validator.LikeValidationSupport;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     private final ReviewLikeMapper reviewLikeMapper;
+    private final ReviewMapper reviewMapper;
     private final LikeValidationSupport validator;
 
     @Override
@@ -57,7 +59,7 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     // ===== private validation helpers =====
     private void validateReviewExists(Long reviewNo) {
-        boolean exists = reviewLikeMapper.existsReview(reviewNo) > 0;
+        boolean exists = reviewMapper.existsReview(reviewNo) > 0;
         validator.validateTargetExists(exists, "요청한 리뷰를 찾을 수 없습니다.");
     }
 
