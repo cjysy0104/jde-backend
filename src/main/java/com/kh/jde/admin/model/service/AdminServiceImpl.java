@@ -250,4 +250,13 @@ public class AdminServiceImpl implements AdminService {
 		return new ReportPageResponse<>(reviewList, pageInfo);
 	}
 
+	@Override
+	public ReviewListDTO getReviewByNo(Long reviewNo) {
+		ReviewListDTO review = adminMapper.selectReviewByNo(reviewNo);
+		if (review == null) {
+			throw new IllegalArgumentException("댓글을 찾을 수 없습니다.");
+		}
+		return review;
+	}
+
 }

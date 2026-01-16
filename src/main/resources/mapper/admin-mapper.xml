@@ -583,5 +583,27 @@
 		 ORDER BY
 		       R.CREATED_AT DESC
 	</select>
+	
+	<!-- 리뷰 상세 조회 -->
+	<select id="selectReviewByNo" resultType="ReviewListDTO">
+		SELECT
+		       R.REVIEW_NO reviewNo
+		     , R.MEMBER_NO memberNo
+		     , R.RESTAURANT_NO restaurantNo
+		     , RE.NORMAL_NAME normalName
+		     , R.CONTENT reviewContent
+		     , R.CREATED_AT createdAt
+		     , R.STATUS status
+		  FROM
+		       TB_REVIEW R
+		  LEFT
+		  JOIN
+		  	   TB_RESTAURANT RE
+		  	ON
+		       R.RESTAURANT_NO = RE.RESTAURANT_NO
+		 WHERE
+		       REVIEW_NO = #{reviewNo}
+		   AND STATUS = 'Y'
+	</select>
 
 </mapper>
