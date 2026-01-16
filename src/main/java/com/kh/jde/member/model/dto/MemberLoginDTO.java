@@ -35,6 +35,7 @@ public class MemberLoginDTO {
 	private Date enrollDate;
 	private String status;
 	private String role;
+	private String fileUrl;
 	
 	
 }

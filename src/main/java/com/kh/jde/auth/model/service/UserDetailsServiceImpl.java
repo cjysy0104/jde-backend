@@ -41,6 +41,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 				  						  .enrollDate(user.getEnrollDate())
 				  						  .authorities(Collections.singletonList(new SimpleGrantedAuthority(user.getRole())))
 				  						  .status(user.getStatus())
+				  						  .role(user.getRole())
 				  						  .build();
 	}
 
