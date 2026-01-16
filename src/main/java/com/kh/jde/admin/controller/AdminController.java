@@ -196,4 +196,14 @@ public class AdminController {
 		
 		return SuccessResponse.ok(commentPageResponse, "리뷰 목록 조회 성공");
 	}
+	
+	// 댓글 상세 조회
+	@GetMapping("/reviews/{reviewNo}")
+	public ResponseEntity<SuccessResponse<ReviewListDTO>> getReviewsByNo(
+			@PathVariable(name="reviewNo") Long reviewNo){
+			
+		ReviewListDTO comment = adminService.getReviewByNo(reviewNo);
+			
+		return SuccessResponse.ok(comment, "리뷰 상세 조회 성공");
+	}
 }
