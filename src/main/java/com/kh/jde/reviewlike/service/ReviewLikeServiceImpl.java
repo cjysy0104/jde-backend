@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.jde.reviewlike.dao.ReviewLikeMapper;
+import com.kh.jde.reviewlike.dto.ReviewLikeDTO;
+import com.kh.jde.reviewlike.validator.LikeValidationSupport;
 import com.kh.jde.reviewlike.vo.ReviewLikeVO;
 
 import lombok.RequiredArgsConstructor;
@@ -13,28 +15,54 @@ import lombok.RequiredArgsConstructor;
 public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     private final ReviewLikeMapper reviewLikeMapper;
+    private final LikeValidationSupport validator;
 
     @Override
-    @Transactional(readOnly = true)
-    public boolean isReviewExists(Long reviewNo) {
-        return reviewLikeMapper.existsReview(reviewNo) > 0;
-    }
+    @Transactional
+    public ReviewLikeDTO like(Long reviewNo, Long memberNo) {
+        ReviewLikeVO vo = new ReviewLikeVO(reviewNo, memberNo);
 
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isAlreadyLiked(ReviewLikeVO reviewLike) {
-        return reviewLikeMapper.existsLike(reviewLike) > 0;
+        validateReviewExists(reviewNo);
+        validator.validateNotAlreadyLiked(isAlreadyLiked(vo), "이미 좋아요를 누른 리뷰입니다.");
+
+        int inserted = reviewLikeMapper.insertLike(vo);
+        validator.validateDbAffected(inserted, "좋아요 처리 중 서버 오류가 발생했습니다.");
+
+        int likeCount = reviewLikeMapper.countLikes(reviewNo);
+        return ReviewLikeDTO.builder()
+                .reviewNo(reviewNo)
+                .isLiked(true)
+                .likeCount(likeCount)
+                .build();
     }
 
     @Override
     @Transactional
-    public int like(ReviewLikeVO reviewLike) {
-        return reviewLikeMapper.insertLike(reviewLike);
+    public ReviewLikeDTO unlike(Long reviewNo, Long memberNo) {
+        ReviewLikeVO vo = new ReviewLikeVO(reviewNo, memberNo);
+
+        validateReviewExists(reviewNo);
+        validator.validateAlreadyLiked(isAlreadyLiked(vo), "좋아요를 누르지 않은 리뷰입니다.");
+
+        int deleted = reviewLikeMapper.deleteLike(vo);
+        validator.validateDbAffected(deleted, "좋아요 취소 처리 중 서버 오류가 발생했습니다.");
+
+        int likeCount = reviewLikeMapper.countLikes(reviewNo);
+        return ReviewLikeDTO.builder()
+                .reviewNo(reviewNo)
+                .isLiked(false)
+                .likeCount(likeCount)
+                .build();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public int getLikeCount(Long reviewNo) {
-        return reviewLikeMapper.countLikes(reviewNo);
+    // ===== private validation helpers =====
+    private void validateReviewExists(Long reviewNo) {
+        boolean exists = reviewLikeMapper.existsReview(reviewNo) > 0;
+        validator.validateTargetExists(exists, "요청한 리뷰를 찾을 수 없습니다.");
+    }
+
+    private boolean isAlreadyLiked(ReviewLikeVO vo) {
+        return reviewLikeMapper.existsLike(vo) > 0;
     }
 }
+

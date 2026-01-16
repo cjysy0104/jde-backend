@@ -1,14 +1,11 @@
 package com.kh.jde.reviewlike.service;
 
-import com.kh.jde.reviewlike.vo.ReviewLikeVO;
+import com.kh.jde.reviewlike.dto.ReviewLikeDTO;
 
 public interface ReviewLikeService {
-
-    boolean isReviewExists(Long reviewNo);
-
-    boolean isAlreadyLiked(ReviewLikeVO reviewLike);
-
-    int like(ReviewLikeVO reviewLike);
-
-    int getLikeCount(Long reviewNo);
+	
+    ReviewLikeDTO like(Long reviewNo, Long memberNo);
+    
+    ReviewLikeDTO unlike(Long reviewNo, Long memberNo);
+    
 }
