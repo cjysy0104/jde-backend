@@ -150,6 +150,26 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	@Override
+	public ReportPageResponse<MemberListDTO> getMemberListByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countMembersByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<MemberListDTO> memberList = adminMapper.selectMemberListByKeyword(params);
+		
+		return new ReportPageResponse<>(memberList, pageInfo);
+	}
+	
+	@Override
 	public ReportPageResponse<CommentReportListDTO> getCommentReportListByKeyword(SearchDTO dto) {
 		// 키워드 검색 전체 개수 조회
 		int listCount = adminMapper.countCommentReportsByKeyword(dto.getKeyword());
@@ -274,6 +294,26 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	@Override
+	public ReportPageResponse<CommentListDTO> getCommentByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countCommentsByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<CommentListDTO> commentList = adminMapper.selectCommentListByKeyword(params);
+		
+		return new ReportPageResponse<>(commentList, pageInfo);
+	}
+	
+	@Override
 	@Transactional
 	public void deleteComment(Long commentNo) {
 		// 댓글 삭제 (STATUS를 'N'으로 변경)
@@ -307,6 +347,26 @@ public class AdminServiceImpl implements AdminService {
 		return review;
 	}
 
+	@Override
+	public ReportPageResponse<ReviewListDTO> getReviewsByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countReviewsByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<ReviewListDTO> reviewList = adminMapper.selectReviewListByKeyword(params);
+		
+		return new ReportPageResponse<>(reviewList, pageInfo);
+	}
+	
 	@Override
 	public void deleteReview(Long reviewNo) {
 		// 리뷰 삭제 (STATUS를 'N'으로 변경)
@@ -378,6 +438,7 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	
+
 
 
 }

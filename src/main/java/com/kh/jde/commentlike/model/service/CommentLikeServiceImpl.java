@@ -61,7 +61,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
 
     // ===== private validation helpers =====
     private void validateCommentExists(Long commentNo) {
-        boolean exists = commentMapper.existsComment(commentNo) > 0;
+        boolean exists = commentMapper.existsComment(commentNo) != null;
         validator.validateTargetExists(exists, "요청한 댓글을 찾을 수 없습니다.");
     }
 

@@ -140,6 +140,18 @@ public class AdminController {
 		return SuccessResponse.ok(memberPageResponse, "회원 목록 조회 성공");
 	}
 	
+	// 회원 키워드 조회
+	@GetMapping("/members/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<MemberListDTO>>> getMemberListByKeyword(
+			@ModelAttribute SearchDTO dto){		
+
+		log.info("keyword : {}",  dto.getKeyword());
+
+		ReportPageResponse<MemberListDTO> memberPageResponse = adminService.getMemberListByKeyword(dto);
+		
+		return SuccessResponse.ok(memberPageResponse, "회원 키워드 조회 성공");
+	}
+	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	@GetMapping("/members/{memberNo}")
 	public ResponseEntity<SuccessResponse<MemberDetailDTO>> getMemberByNo(
@@ -205,6 +217,16 @@ public class AdminController {
 		return SuccessResponse.ok(comment, "댓글 상세 조회 성공");
 	}
 	
+	// 댓글 키워드 조회
+	@GetMapping("/comments/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentListDTO>>> getCommentByKeyword(
+			@ModelAttribute SearchDTO dto){
+		
+		ReportPageResponse<CommentListDTO> commentPageResponse = adminService.getCommentByKeyword(dto);
+		
+		return SuccessResponse.ok(commentPageResponse, "댓글 키워드 조회 성공");
+	}
+	
 
 	// 댓글 삭제
 	@DeleteMapping("/comments/{commentNo}")
@@ -234,6 +256,15 @@ public class AdminController {
 		ReviewListDTO comment = adminService.getReviewByNo(reviewNo);
 			
 		return SuccessResponse.ok(comment, "리뷰 상세 조회 성공");
+	}
+	
+	// 리뷰 키워드 조회
+	@GetMapping("/reviews/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewListDTO>>> getReviewsByKeyword(
+			@ModelAttribute SearchDTO dto){
+		ReportPageResponse<ReviewListDTO> reviewPageResponse = adminService.getReviewsByKeyword(dto);
+		System.out.println("keyword=[" + dto.getKeyword() + "]");
+		return SuccessResponse.ok(reviewPageResponse, "리뷰 키워드 조회 성공");
 	}
 	
 	// 리뷰 삭제

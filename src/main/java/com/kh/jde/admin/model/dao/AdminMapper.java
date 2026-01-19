@@ -63,6 +63,12 @@ public interface AdminMapper {
 	// 회원 페이징 조회
 	List<MemberListDTO> selectMemberList(PageInfo pageInfo);
 	
+	// 회원 키워드 검색 전체 개수 조회
+	int countMembersByKeyword(String keyword);
+	
+	// 회원 키워드 검색 페이징 조회
+	List<MemberListDTO> selectMemberListByKeyword(Map<String, Object> params);
+	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO selectMemberByNo(Long memberNo);
 	
@@ -81,6 +87,12 @@ public interface AdminMapper {
 	// 댓글 페이징 조회
 	List<CommentListDTO> selectCommentList(PageInfo pageInfo);
 	
+	// 댓글 키워드 검색 전체 개수 조회
+	int countCommentsByKeyword(String keyword);
+	
+	// 댓글 키워드 검색 페이징 조회
+	List<CommentListDTO> selectCommentListByKeyword(Map<String, Object> params);
+	
 	// 댓글 상세 조회
 	CommentListDTO selectCommentByNo(Long commentNo);
 	
@@ -89,6 +101,12 @@ public interface AdminMapper {
 	
 	// 리뷰 페이징 조회
 	List<ReviewListDTO> selectReviewList(PageInfo pageInfo);
+	
+	// 리뷰 키워드 검색 전체 개수 조회
+	int countReviewsByKeyword(String keyword);
+	
+	// 리뷰 키워드 검색 페이징 조회
+	List<ReviewListDTO> selectReviewListByKeyword(Map<String, Object> params);
 
 	// 리뷰 상세 조회
 	ReviewListDTO selectReviewByNo(Long reviewNo);
