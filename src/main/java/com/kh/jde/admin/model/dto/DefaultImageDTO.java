@@ -19,4 +19,5 @@ public class DefaultImageDTO {
 	private String fileName;
 	private String fileUrl;
 	private Date createdAt;
+	
 }

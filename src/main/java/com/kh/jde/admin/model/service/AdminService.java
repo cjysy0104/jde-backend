@@ -92,4 +92,7 @@ public interface AdminService {
 	// 회원이 사용할 기본이미지 조회
 	List<DefaultImageDTO> getDefaultImage();
 	
+	// 기본 프로필 이미지 삭제
+	void deleteDefaultImage(DefaultImageDTO defaultImage);
+	
 }
