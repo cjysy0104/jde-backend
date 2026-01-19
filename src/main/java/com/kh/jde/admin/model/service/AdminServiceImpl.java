@@ -1,7 +1,5 @@
 package com.kh.jde.admin.model.service;
 
-import java.sql.SQLException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.jde.admin.model.dao.AdminMapper;
 import com.kh.jde.admin.model.dto.CommentListDTO;
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
@@ -151,6 +150,26 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	@Override
+	public ReportPageResponse<MemberListDTO> getMemberListByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countMembersByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<MemberListDTO> memberList = adminMapper.selectMemberListByKeyword(params);
+		
+		return new ReportPageResponse<>(memberList, pageInfo);
+	}
+	
+	@Override
 	public ReportPageResponse<CommentReportListDTO> getCommentReportListByKeyword(SearchDTO dto) {
 		// 키워드 검색 전체 개수 조회
 		int listCount = adminMapper.countCommentReportsByKeyword(dto.getKeyword());
@@ -275,6 +294,26 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	@Override
+	public ReportPageResponse<CommentListDTO> getCommentByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countCommentsByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<CommentListDTO> commentList = adminMapper.selectCommentListByKeyword(params);
+		
+		return new ReportPageResponse<>(commentList, pageInfo);
+	}
+	
+	@Override
 	@Transactional
 	public void deleteComment(Long commentNo) {
 		// 댓글 삭제 (STATUS를 'N'으로 변경)
@@ -324,6 +363,7 @@ public class AdminServiceImpl implements AdminService {
 		fileNameDuplicateCheck(fileName);
 		
 		String fileUrl = s3Service.fileSave(file, "DefaultImage");
+		
 		DefaultImageVO defaultImage = DefaultImageVO.builder()
 				.fileName(fileName)
 				.fileUrl(fileUrl)
@@ -345,6 +385,21 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnexpectedSQLResponseException("동일한 이름의 프로필 이미지가 이미 존재합니다.");
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DefaultImageDTO> getDefaultImage() {
+		
+		List<DefaultImageDTO> defaultImages = adminMapper.getDefaultImage();
+		
+		if(defaultImages.isEmpty()) {
+			throw new UnexpectedSQLResponseException("등록된 기본 프로필 이미지가 없습니다.");
+		}
+		
+		return defaultImages;
+	}
+	
+	
 
 
 }

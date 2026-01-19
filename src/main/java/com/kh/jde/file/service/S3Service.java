@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.exception.S3ServiceFailureException;
 import com.kh.jde.file.FileRenamePolicy;
 
 import lombok.RequiredArgsConstructor;
@@ -60,13 +61,13 @@ public class S3Service {
 		try {
 			s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 		} catch (S3Exception e) {
-			e.printStackTrace(); // 예외들 다 throw해야함
+			throw new S3ServiceFailureException("S3 파일 등록 실패");
 		} catch (AwsServiceException e) {
-			e.printStackTrace();
+			throw new S3ServiceFailureException("S3 파일 등록 실패");
 		} catch (SdkClientException e) {
-			e.printStackTrace();
+			throw new S3ServiceFailureException("S3 파일 등록 실패");
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new S3ServiceFailureException("S3 파일 등록 실패");
 		}
 		
 		String filePath = "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + key;

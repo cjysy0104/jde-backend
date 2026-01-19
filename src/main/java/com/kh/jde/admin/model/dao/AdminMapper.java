@@ -6,13 +6,12 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kh.jde.admin.model.dto.CommentListDTO;
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
-
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.vo.DefaultImageVO;
-
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -64,6 +63,12 @@ public interface AdminMapper {
 	// 회원 페이징 조회
 	List<MemberListDTO> selectMemberList(PageInfo pageInfo);
 	
+	// 회원 키워드 검색 전체 개수 조회
+	int countMembersByKeyword(String keyword);
+	
+	// 회원 키워드 검색 페이징 조회
+	List<MemberListDTO> selectMemberListByKeyword(Map<String, Object> params);
+	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO selectMemberByNo(Long memberNo);
 	
@@ -81,6 +86,12 @@ public interface AdminMapper {
 	
 	// 댓글 페이징 조회
 	List<CommentListDTO> selectCommentList(PageInfo pageInfo);
+	
+	// 댓글 키워드 검색 전체 개수 조회
+	int countCommentsByKeyword(String keyword);
+	
+	// 댓글 키워드 검색 페이징 조회
+	List<CommentListDTO> selectCommentListByKeyword(Map<String, Object> params);
 	
 	// 댓글 상세 조회
 	CommentListDTO selectCommentByNo(Long commentNo);
@@ -108,5 +119,8 @@ public interface AdminMapper {
 	
 	// 회원 기본 프로필 이미지 등록
 	void createDefaultImage(DefaultImageVO defaultImage);
+	
+	// 회원 기본 이미지 조회
+	List<DefaultImageDTO> getDefaultImage();
 	
 }

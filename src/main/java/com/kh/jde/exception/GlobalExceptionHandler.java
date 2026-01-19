@@ -75,4 +75,8 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
 	}
 	
+	@ExceptionHandler(S3ServiceFailureException.class) 
+	public ResponseEntity<ErrorResponse<String>> handlePostNotFound(S3ServiceFailureException e, HttpServletRequest request){
+		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
+	}
 }

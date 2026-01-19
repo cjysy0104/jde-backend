@@ -1,9 +1,12 @@
 package com.kh.jde.admin.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.kh.jde.admin.model.dto.CommentListDTO;
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
-import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
+import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.service.AdminService;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
@@ -136,6 +139,18 @@ public class AdminController {
 		return SuccessResponse.ok(memberPageResponse, "회원 목록 조회 성공");
 	}
 	
+	// 회원 키워드 조회
+	@GetMapping("/members/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<MemberListDTO>>> getMemberListByKeyword(
+			@ModelAttribute SearchDTO dto){		
+
+		log.info("keyword : {}",  dto.getKeyword());
+
+		ReportPageResponse<MemberListDTO> memberPageResponse = adminService.getMemberListByKeyword(dto);
+		
+		return SuccessResponse.ok(memberPageResponse, "회원 키워드 조회 성공");
+	}
+	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	@GetMapping("/members/{memberNo}")
 	public ResponseEntity<SuccessResponse<MemberDetailDTO>> getMemberByNo(
@@ -201,6 +216,16 @@ public class AdminController {
 		return SuccessResponse.ok(comment, "댓글 상세 조회 성공");
 	}
 	
+	// 댓글 키워드 조회
+	@GetMapping("/comments/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentListDTO>>> getCommentByKeyword(
+			@ModelAttribute SearchDTO dto){
+		
+		ReportPageResponse<CommentListDTO> commentPageResponse = adminService.getCommentByKeyword(dto);
+		
+		return SuccessResponse.ok(commentPageResponse, "댓글 키워드 조회 성공");
+	}
+	
 
 	// 댓글 삭제
 	@DeleteMapping("/comments/{commentNo}")
@@ -241,11 +266,18 @@ public class AdminController {
 		return SuccessResponse.ok("리뷰가 삭제 되었습니다.");
 	}
 
-	// 디폴트 프로필 이미지 등록하기
+	// 기본 프로필 이미지 등록하기
 	@PostMapping("/defaultImage")
 	public ResponseEntity<SuccessResponse<String>> createDefaultImage(@RequestParam("fileName") String fileName, @RequestPart("file") MultipartFile file){
 		adminService.createDefaultImage(fileName, file);
 		return SuccessResponse.created("회원 기본 이미지 등록에 성공했습니다.");
+	}
+	
+	// 기본 프로필 이미지 조회
+	@GetMapping("/defaultImage")
+	public ResponseEntity<SuccessResponse<DefaultImageDTO>> GetDefaultImage(){
+		List<DefaultImageDTO> defaultImages = adminService.getDefaultImage();
+		return SuccessResponse.ok(defaultImages, "기본이미지 조회 성공");
 	}
 	
 }
