@@ -257,6 +257,15 @@ public class AdminController {
 		return SuccessResponse.ok(comment, "리뷰 상세 조회 성공");
 	}
 	
+	// 리뷰 키워드 조회
+	@GetMapping("/reviews/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewListDTO>>> getReviewsByKeyword(
+			@ModelAttribute SearchDTO dto){
+		ReportPageResponse<ReviewListDTO> reviewPageResponse = adminService.getReviewsByKeyword(dto);
+		System.out.println("keyword=[" + dto.getKeyword() + "]");
+		return SuccessResponse.ok(reviewPageResponse, "리뷰 키워드 조회 성공");
+	}
+	
 	// 리뷰 삭제
 	@DeleteMapping("/reviews/{reviewNo}")
 	public ResponseEntity<SuccessResponse<String>> deleteReview(

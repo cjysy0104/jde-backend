@@ -79,11 +79,15 @@ public interface AdminService {
 	// 리뷰 상세 조회
 	ReviewListDTO getReviewByNo(Long reviewNo);
 
+	// 리뷰 키워드 조회
+	ReportPageResponse<ReviewListDTO> getReviewsByKeyword(SearchDTO dto);
+	
 	// 리뷰 삭제 (STATUS를 'N'으로 변경)
 	void deleteReview(Long reviewNo);
 
 	// 회원이 사용할 기본이미지 등록
 	void createDefaultImage(String fileName, MultipartFile file);
+
 	
 	// 회원이 사용할 기본이미지 조회
 	List<DefaultImageDTO> getDefaultImage();
