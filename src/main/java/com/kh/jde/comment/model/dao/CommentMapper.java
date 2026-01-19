@@ -15,5 +15,7 @@ public interface CommentMapper {
 	List<CommentDTO> getCommentList(Long reviewNo);
 
 	int create(CommentVO comment);
+
+	int deleteById(Long commentNo);
 	
 }

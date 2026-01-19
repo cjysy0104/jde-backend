@@ -62,6 +62,19 @@ public class CommentServiceImpl implements CommentService {
 		}
 		return result; 
 	}
+
+	@Override
+	public int deleteById(Long commentNo) {
+		
+		// 1. 댓글 잇냐
+		if(commentMapper.existsComment(commentNo) == null) {
+			throw new PostNotFoundException("댓글이 존재하지 않습니다.");
+		}
+		// 2. 댓글 삭제
+		int result = commentMapper.deleteById(commentNo);
+		
+		return result;
+	}
 	
 	
 	
