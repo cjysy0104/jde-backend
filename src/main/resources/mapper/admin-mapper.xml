@@ -815,6 +815,78 @@
 	</select>
 
 	
+	<!-- 댓글 키워드 검색 전체 개수 조회 -->
+	<select id="countCommentsByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT C
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON C.MEMBER_NO = M.MEMBER_NO
+		 WHERE
+		       C.STATUS = 'Y'
+		   AND (
+		            C.CONTENT LIKE '%' || #{keyword} || '%'
+		         OR M.MEMBER_NAME LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 댓글 키워드 검색 페이징 조회 -->
+	<select id="selectCommentListByKeyword" parameterType="map" resultType="CommentListDTO">
+	    SELECT
+	           C.COMMENT_NO      AS commentNo
+	         , C.MEMBER_NO       AS memberNo
+	         , M.MEMBER_NAME     AS author
+	         , C.REVIEW_NO       AS reviewNo
+	         , C.CONTENT         AS commentContent
+	         , C.COMMENT_DATE    AS commentDate
+	         , C.STATUS          AS status
+	      FROM
+	           (
+	           SELECT
+	                  C2.COMMENT_NO
+	                , C2.MEMBER_NO
+	                , C2.REVIEW_NO
+	                , C2.CONTENT
+	                , C2.COMMENT_DATE
+	                , C2.STATUS
+	                , ROWNUM AS RNUM
+	             FROM
+	                  (
+	                  SELECT
+	                         C3.COMMENT_NO
+	                       , C3.MEMBER_NO
+	                       , C3.REVIEW_NO
+	                       , C3.CONTENT
+	                       , C3.COMMENT_DATE
+	                       , C3.STATUS
+	                    FROM
+	                         TB_COMMENT C3
+	                   INNER JOIN
+	                         TB_MEMBER M3
+	                      ON C3.MEMBER_NO = M3.MEMBER_NO
+	                   WHERE
+	                         C3.STATUS = 'Y'
+	                     AND (
+	                              C3.CONTENT LIKE '%' || #{keyword} || '%'
+	                           OR M3.MEMBER_NAME LIKE '%' || #{keyword} || '%'
+	                         )
+	                   ORDER BY
+	                         C3.COMMENT_DATE DESC
+	                  ) C2
+	            WHERE
+	                  ROWNUM &lt;= #{offset} + #{boardLimit}
+	           ) C
+	      INNER JOIN
+	           TB_MEMBER M
+	        ON C.MEMBER_NO = M.MEMBER_NO
+	     WHERE
+	           C.RNUM &gt; #{offset}
+	     ORDER BY
+	           C.COMMENT_DATE DESC
+	</select>
+	
 	<!-- 댓글 상세 조회 -->
 	<select id="selectCommentByNo" resultType="CommentListDTO">
 	    SELECT

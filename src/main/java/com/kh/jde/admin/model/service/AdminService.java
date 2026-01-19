@@ -65,6 +65,9 @@ public interface AdminService {
 	// 댓글 상세 조회
 	CommentListDTO getCommentByNo(Long commentNo);
 	
+	// 댓글 키워드 조회
+	ReportPageResponse<CommentListDTO> getCommentByKeyword(SearchDTO dto);
+	
 	// 댓글 삭제 (STATUS를 'N'으로 변경)
 	void deleteComment(Long commentNo);
 

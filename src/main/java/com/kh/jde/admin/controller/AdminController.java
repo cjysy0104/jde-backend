@@ -140,7 +140,7 @@ public class AdminController {
 	@GetMapping("/members/keyword")
 	public ResponseEntity<SuccessResponse<ReportPageResponse<MemberListDTO>>> getMemberListByKeyword(
 			@ModelAttribute SearchDTO dto){
-		log.info("keyword : {}",  dto.getKeyword());
+		
 		ReportPageResponse<MemberListDTO> memberPageResponse = adminService.getMemberListByKeyword(dto);
 		
 		return SuccessResponse.ok(memberPageResponse, "회원 키워드 조회 성공");
@@ -209,6 +209,16 @@ public class AdminController {
 		CommentListDTO comment = adminService.getCommentByNo(commentNo);
 		
 		return SuccessResponse.ok(comment, "댓글 상세 조회 성공");
+	}
+	
+	// 댓글 키워드 조회
+	@GetMapping("/comments/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentListDTO>>> getCommentByKeyword(
+			@ModelAttribute SearchDTO dto){
+		
+		ReportPageResponse<CommentListDTO> commentPageResponse = adminService.getCommentByKeyword(dto);
+		
+		return SuccessResponse.ok(commentPageResponse, "댓글 키워드 조회 성공");
 	}
 	
 
