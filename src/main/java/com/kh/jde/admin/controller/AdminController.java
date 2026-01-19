@@ -262,7 +262,7 @@ public class AdminController {
 	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewListDTO>>> getReviewsByKeyword(
 			@ModelAttribute SearchDTO dto){
 		ReportPageResponse<ReviewListDTO> reviewPageResponse = adminService.getReviewsByKeyword(dto);
-		
+		System.out.println("keyword=[" + dto.getKeyword() + "]");
 		return SuccessResponse.ok(reviewPageResponse, "리뷰 키워드 조회 성공");
 	}
 	
