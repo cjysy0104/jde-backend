@@ -85,7 +85,8 @@ public class MemberController {
 	    memberService.changePhone(changePhone);
 	    return SuccessResponse.ok("전화번호가 변경되었습니다.");
 	}
-
+	
+	// 자신의 이미지 업로드로 변경
 	@PatchMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<SuccessResponse<String>> updateProfileImage(
 	        @RequestPart("password") String password,
@@ -93,6 +94,16 @@ public class MemberController {
 	) {
 	    String url = memberService.updateMyProfileImage(password, file);
 	    return SuccessResponse.ok(url, "프로필 이미지가 변경되었습니다.");
+	}
+	
+	// 기본 이미지 선택(변경)
+	@PatchMapping(value = "/profile-image/default", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<SuccessResponse<String>> changeProfileToDefault(
+	        @RequestPart("password") String password,
+	        @RequestPart("fileNo") Long fileNo
+	) {
+	    String url = memberService.changeProfileToDefault(password, fileNo);
+	    return SuccessResponse.ok(url, "기본 프로필 이미지로 변경되었습니다.");
 	}
 
 }
