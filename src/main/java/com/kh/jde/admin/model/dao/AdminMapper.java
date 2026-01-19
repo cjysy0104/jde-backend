@@ -96,6 +96,12 @@ public interface AdminMapper {
 
 	// 리뷰 삭제 (STATUS = 'N'으로 변경)
 	int deleteReview(Long reviewNo);
+
+	// 리뷰 신고 키워드 검색 전체 개수 조회
+	int countReviewReportsByKeyword(String keyword);
+
+	// 리뷰 신고 키워드 검색 페이징 조회
+	List<ReviewReportListDTO> selectReviewReportListByKeyword(Map<String, Object> params);
 	
 	// 회원 기본 프로필 이미지이름 중복여부 체크
 	int countByFileName(DefaultImageVO duplicateCheck);

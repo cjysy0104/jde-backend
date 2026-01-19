@@ -108,7 +108,7 @@ public class AdminController {
 	}
 	
 	// 댓글 신고 키워드 조회
-	@GetMapping("/reports/comment/search")
+	@GetMapping("/reports/comment/keyword")
 	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentReportListDTO>>> getCommentReportByKeyword(
 			@ModelAttribute SearchDTO dto){
 		
@@ -117,7 +117,14 @@ public class AdminController {
 		return SuccessResponse.ok(reportPageResponse, "댓글 신고 키워드 조회 성공");
 	}
 	
-	// 리뷰 키워드 조회
+	// 리뷰 신고 키워드 조회
+	@GetMapping("/reports/review/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewReportListDTO>>> getReviewReportByKeyword(
+			@ModelAttribute SearchDTO dto){
+		ReportPageResponse<ReviewReportListDTO> reportPageResponse = adminService.getReviewReportListByKeyword(dto);
+		
+		return SuccessResponse.ok(reportPageResponse, "리뷰 신고 키워드 조회 성공");
+	}
 	
 	// 회원 페이징 조회
 	@GetMapping("/members")
