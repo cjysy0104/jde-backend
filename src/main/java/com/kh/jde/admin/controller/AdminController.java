@@ -241,11 +241,18 @@ public class AdminController {
 		return SuccessResponse.ok("리뷰가 삭제 되었습니다.");
 	}
 
-	// 디폴트 프로필 이미지 등록하기
+	// 기본 프로필 이미지 등록하기
 	@PostMapping("/defaultImage")
 	public ResponseEntity<SuccessResponse<String>> createDefaultImage(@RequestParam("fileName") String fileName, @RequestPart("file") MultipartFile file){
 		adminService.createDefaultImage(fileName, file);
 		return SuccessResponse.created("회원 기본 이미지 등록에 성공했습니다.");
+	}
+	
+	// 기본 프로필 이미지 조회
+	@GetMapping("/defaultImage")
+	public ResponseEntity<SuccessResponse<String>> GetDefaultImage(){
+		List<DefaultImageDTO> defaultImages = adminService.getDefaultImage();
+		return SuccessResponse.ok(defaultImages, "기본이미지 조회 성공");
 	}
 	
 }

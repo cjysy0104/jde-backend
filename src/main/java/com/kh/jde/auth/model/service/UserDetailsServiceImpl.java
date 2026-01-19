@@ -25,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		MemberLoginDTO user = mapper.loadUser(username);
-		// log.info("유저정보 조회결과 : {}", user);
+		
 		if(user == null) {
 			throw new UsernameNotFoundException("아이디가 존재하지 않습니다.");
 		} else if ("N".equals(user.getStatus())) {
