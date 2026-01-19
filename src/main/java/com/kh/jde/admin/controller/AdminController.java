@@ -139,8 +139,10 @@ public class AdminController {
 	// 회원 키워드 조회
 	@GetMapping("/members/keyword")
 	public ResponseEntity<SuccessResponse<ReportPageResponse<MemberListDTO>>> getMemberListByKeyword(
-			@ModelAttribute SearchDTO dto){
-		
+			@ModelAttribute SearchDTO dto){		
+
+		log.info("keyword : {}",  dto.getKeyword());
+
 		ReportPageResponse<MemberListDTO> memberPageResponse = adminService.getMemberListByKeyword(dto);
 		
 		return SuccessResponse.ok(memberPageResponse, "회원 키워드 조회 성공");

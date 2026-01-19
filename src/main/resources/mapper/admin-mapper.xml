@@ -812,6 +812,7 @@
 	           C.RNUM &gt; #{offset}
 	     ORDER BY
 	           C.COMMENT_DATE DESC
+
 	</select>
 
 	
@@ -886,6 +887,7 @@
 	     ORDER BY
 	           C.COMMENT_DATE DESC
 	</select>
+
 	
 	<!-- 댓글 상세 조회 -->
 	<select id="selectCommentByNo" resultType="CommentListDTO">
