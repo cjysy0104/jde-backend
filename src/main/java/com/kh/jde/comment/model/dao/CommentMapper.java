@@ -5,12 +5,15 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kh.jde.comment.model.dto.CommentDTO;
+import com.kh.jde.comment.model.vo.CommentVO;
 
 @Mapper
 public interface CommentMapper {
 	
-	int existsComment(Long commentNo);
+	CommentDTO existsComment(Long commentNo);
 
 	List<CommentDTO> getCommentList(Long reviewNo);
+
+	int create(CommentVO comment);
 	
 }

@@ -5,15 +5,21 @@
 <mapper namespace="com.kh.jde.comment.model.dao.CommentMapper">
 	
 	<!-- 리뷰 존재 확인 -->
-	<select id="existsComment" resultType="int">
-        SELECT 
-        		COUNT(1)
-        FROM 
-        		TB_COMMENT
-        WHERE 
-        		COMMENT_NO = #{commentNo}
-          AND 
-          		STATUS = 'Y'
+	<select id="existsComment" resultType="CommentDTO">
+		SELECT
+				  TC.COMMENT_NO commentNo
+				, TC.REVIEW_NO reviewNo
+				, TC.CONTENT content
+				, TC.COMMENT_DATE commentDate
+		        , (
+		            SELECT COUNT(*)
+		            FROM TB_COMMENT_LIKE TCL
+		            WHERE TCL.COMMENT_NO = TC.COMMENT_NO
+		          ) likeCount
+		    FROM
+		          TB_COMMENT TC
+		    WHERE
+		          TC.REVIEW_NO = #{reviewNo}
     </select>
     
     <select id="getCommentList"
@@ -23,7 +29,6 @@
 		SELECT
 				  TC.COMMENT_NO commentNo
 				, TC.REVIEW_NO reviewNo
-				, TC.AUTHOR author
 				, TC.CONTENT content
 				, TC.COMMENT_DATE commentDate
 		        , (
@@ -43,7 +48,29 @@
 	
 	</select>
 
-
+	<insert id="create"
+			parameterType="CommentVO">
+		INSERT
+		INTO
+				TB_COMMENT
+				(
+				  COMMENT_NO
+				, MEMBER_NO
+				, REVIEW_NO
+				, CONTENT
+				, COMMENT_DATE
+				, STATUS
+				)
+		VALUES
+				(
+				  SEQ_COMMENT.NEXTVAL
+				, #{memberNo}
+				, #{reviewNo}
+				, #{content}
+				, SYSDATE
+				, DEFAULT
+				)
+	</insert>
 
 
 
