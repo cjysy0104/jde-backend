@@ -103,8 +103,6 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public void deleteById(Long reviewNo, CustomUserDetails principal) {
 		
-		
-		
 		// 1. 게시글 상태 조회
 		if(reviewMapper.existsReview(reviewNo) == 0) {
 			log.info("NO???{}", reviewMapper.existsReview(reviewNo));
