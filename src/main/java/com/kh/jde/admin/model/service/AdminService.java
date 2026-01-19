@@ -2,6 +2,7 @@ package com.kh.jde.admin.model.service;
 
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
@@ -31,6 +32,9 @@ public interface AdminService {
 	// 리뷰 신고 처리
 	ReviewReportListDTO processReviewReport(ReviewReportProcessDTO dto);
 	
+	// 댓글 신고 키워드 조회
+	ReportPageResponse<CommentReportListDTO> getCommentReportListByKeyword(SearchDTO dto);
+	
 	// 회원 페이징 조회
 	ReportPageResponse<MemberListDTO> getMemberList(int currentPage);
 	
@@ -58,6 +62,12 @@ public interface AdminService {
 
 	// 리뷰 페이징 조회
 	ReportPageResponse<ReviewListDTO> getReviewList(int currentPage);
+
+	// 리뷰 상세 조회
+	ReviewListDTO getReviewByNo(Long reviewNo);
+
+	// 리뷰 삭제 (STATUS를 'N'으로 변경)
+	void deleteReview(Long reviewNo);
 
 	
 }

@@ -1,6 +1,7 @@
 package com.kh.jde.admin.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,6 +25,12 @@ public interface AdminMapper {
 	
 	// 댓글 신고 페이징 조회
 	List<CommentReportListDTO> selectCommentReportList(PageInfo pageInfo);
+	
+	// 댓글 신고 키워드 검색 전체 개수 조회
+	int countCommentReportsByKeyword(String keyword);
+	
+	// 댓글 신고 키워드 검색 페이징 조회
+	List<CommentReportListDTO> selectCommentReportListByKeyword(Map<String, Object> params);
 	
 	// 리뷰 신고 전체 개수 조회
 	int countAllReviewReports();
@@ -81,5 +88,11 @@ public interface AdminMapper {
 	
 	// 리뷰 페이징 조회
 	List<ReviewListDTO> selectReviewList(PageInfo pageInfo);
+
+	// 리뷰 상세 조회
+	ReviewListDTO selectReviewByNo(Long reviewNo);
+
+	// 리뷰 삭제 (STATUS = 'N'으로 변경)
+	int deleteReview(Long reviewNo);
 	
 }

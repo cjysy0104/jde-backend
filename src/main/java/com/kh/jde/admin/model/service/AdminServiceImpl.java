@@ -1,6 +1,8 @@
 package com.kh.jde.admin.model.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kh.jde.admin.model.dao.AdminMapper;
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
@@ -139,6 +142,26 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	@Override
+	public ReportPageResponse<CommentReportListDTO> getCommentReportListByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countCommentReportsByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<CommentReportListDTO> reportList = adminMapper.selectCommentReportListByKeyword(params);
+		
+		return new ReportPageResponse<>(reportList, pageInfo);
+	}
+	
+	@Override
 	public MemberDetailDTO getMemberByNo(Long memberNo) {
 		MemberDetailDTO member = adminMapper.selectMemberByNo(memberNo);
 		if (member == null) {
@@ -249,5 +272,24 @@ public class AdminServiceImpl implements AdminService {
 		
 		return new ReportPageResponse<>(reviewList, pageInfo);
 	}
+
+	@Override
+	public ReviewListDTO getReviewByNo(Long reviewNo) {
+		ReviewListDTO review = adminMapper.selectReviewByNo(reviewNo);
+		if (review == null) {
+			throw new IllegalArgumentException("댓글을 찾을 수 없습니다.");
+		}
+		return review;
+	}
+
+	@Override
+	public void deleteReview(Long reviewNo) {
+		// 리뷰 삭제 (STATUS를 'N'으로 변경)
+		int result = adminMapper.deleteReview(reviewNo);
+		if (result != 1) {
+			throw new IllegalStateException("댓글 삭제에 실패했습니다. 댓글 번호를 확인해주세요.");
+		}
+	}
+
 
 }
