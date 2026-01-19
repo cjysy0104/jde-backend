@@ -1013,6 +1013,78 @@
 		       R.CREATED_AT DESC
 	</select>
 	
+	<!-- 리뷰 키워드 검색 전체 개수 조회 -->
+	<select id="countReviewsByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_REVIEW R
+		 LEFT JOIN
+		       TB_RESTAURANT RE
+		    ON R.RESTAURANT_NO = RE.RESTAURANT_NO
+		 WHERE
+		       R.STATUS = 'Y'
+		   AND (
+		            R.CONTENT LIKE '%' || #{keyword} || '%'
+		         OR RE.NORMAL_NAME LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 리뷰 키워드 검색 페이징 조회 -->
+	<select id="selectReviewListByKeyword" parameterType="map" resultType="ReviewListDTO">
+		SELECT
+		       R.REVIEW_NO reviewNo
+		     , R.MEMBER_NO memberNo
+		     , R.RESTAURANT_NO restaurantNo
+		     , RE.NORMAL_NAME normalName
+		     , R.CONTENT reviewContent
+		     , R.CREATED_AT createdAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              REVIEW_NO
+		            , MEMBER_NO
+		            , RESTAURANT_NO
+		            , CONTENT
+		            , CREATED_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     R2.REVIEW_NO
+		                   , R2.MEMBER_NO
+		                   , R2.RESTAURANT_NO
+		                   , R2.CONTENT
+		                   , R2.CREATED_AT
+		                   , R2.STATUS
+		                FROM
+		                     TB_REVIEW R2
+		               LEFT JOIN
+		                     TB_RESTAURANT RE2
+		                  ON R2.RESTAURANT_NO = RE2.RESTAURANT_NO
+		               WHERE
+		                     R2.STATUS = 'Y'
+		                 AND (
+		                          R2.CONTENT LIKE '%' || #{keyword} || '%'
+		                       OR RE2.NORMAL_NAME LIKE '%' || #{keyword} || '%'
+		                     )
+		               ORDER BY
+		                     R2.CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) R
+		 LEFT JOIN
+		       TB_RESTAURANT RE
+		    ON R.RESTAURANT_NO = RE.RESTAURANT_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
+	
 	<!-- 리뷰 상세 조회 -->
 	<select id="selectReviewByNo" resultType="ReviewListDTO">
 		SELECT
