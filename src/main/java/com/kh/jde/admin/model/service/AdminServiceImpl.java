@@ -349,6 +349,26 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
+	public ReportPageResponse<ReviewListDTO> getReviewsByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countReviewsByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<ReviewListDTO> reviewList = adminMapper.selectReviewListByKeyword(params);
+		
+		return new ReportPageResponse<>(reviewList, pageInfo);
+	}
+	
+	@Override
 	public void deleteReview(Long reviewNo) {
 		// 리뷰 삭제 (STATUS를 'N'으로 변경)
 		int result = adminMapper.deleteReview(reviewNo);
@@ -385,6 +405,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnexpectedSQLResponseException("동일한 이름의 프로필 이미지가 이미 존재합니다.");
 		}
 	}
+
 
 
 }

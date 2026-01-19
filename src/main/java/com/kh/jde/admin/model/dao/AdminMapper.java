@@ -102,6 +102,12 @@ public interface AdminMapper {
 	
 	// 리뷰 페이징 조회
 	List<ReviewListDTO> selectReviewList(PageInfo pageInfo);
+	
+	// 리뷰 키워드 검색 전체 개수 조회
+	int countReviewsByKeyword(String keyword);
+	
+	// 리뷰 키워드 검색 페이징 조회
+	List<ReviewListDTO> selectReviewListByKeyword(Map<String, Object> params);
 
 	// 리뷰 상세 조회
 	ReviewListDTO selectReviewByNo(Long reviewNo);
