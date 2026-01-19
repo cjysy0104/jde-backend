@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
-import com.kh.jde.common.s3.S3Uploader;
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
+import com.kh.jde.file.service.S3Service;
 import com.kh.jde.member.model.dao.MemberMapper;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
@@ -37,7 +37,7 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final MemberInformationValidator miv;
 	private final TokenMapper tokenMapper;
-	private final S3Uploader s3Uploader;
+	private final S3Service s3Service;
 	
 	@Override
 	@Transactional

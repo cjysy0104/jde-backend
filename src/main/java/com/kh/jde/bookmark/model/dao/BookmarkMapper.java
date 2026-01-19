@@ -15,8 +15,7 @@ public interface BookmarkMapper {
 
     int countBookmark(BookmarkVO key);
 
-    int insertBookmarkIgnoreDuplicate(BookmarkVO key);
-    // ↑ 중복방지: MERGE 안 쓰고 "INSERT ... WHERE NOT EXISTS" 로 처리
+    int createBookmarkIgnoreDuplicate(BookmarkVO key);
 
     int deleteBookmark(BookmarkVO key);
 

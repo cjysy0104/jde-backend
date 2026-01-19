@@ -1,5 +1,7 @@
 package com.kh.jde.bookmark.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,21 +44,21 @@ public class BookmarkController {
 
     /** (옵션) 북마크 추가 - idempotent */
     @PostMapping("/{reviewNo}")
-    public ResponseEntity<SuccessResponse<Void>> add(
+    public ResponseEntity<SuccessResponse<Void>> create(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable("reviewNo") Long reviewNo) {
         Long memberNo = user.getMemberNo();
-        bookmarkService.add(memberNo, reviewNo);
+        bookmarkService.create(memberNo, reviewNo);
         return SuccessResponse.ok(null, "북마크 추가 성공!");
     }
 
     /** (옵션) 북마크 삭제 - idempotent */
     @DeleteMapping("/{reviewNo}")
-    public ResponseEntity<SuccessResponse<Void>> remove(
+    public ResponseEntity<SuccessResponse<Void>> delete(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable("reviewNo") Long reviewNo) {
         Long memberNo = user.getMemberNo();
-        bookmarkService.remove(memberNo, reviewNo);
+        bookmarkService.delete(memberNo, reviewNo);
         return SuccessResponse.ok(null, "북마크 삭제 성공!");
     }
 
@@ -65,7 +67,7 @@ public class BookmarkController {
      * 예) GET /api/bookmarks/me?page=0&size=20
      */
     @GetMapping("/me")
-    public ResponseEntity<SuccessResponse<BookmarkResponseDTO>> myBookmarks(
+    public ResponseEntity<SuccessResponse<List<BookmarkResponseDTO>>> myBookmarks(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {

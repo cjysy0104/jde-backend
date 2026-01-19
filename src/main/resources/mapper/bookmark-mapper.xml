@@ -15,7 +15,7 @@
     </select>
 
     <!-- 북마크 추가 (MERGE 없이 중복 방지: NOT EXISTS) -->
-    <insert id="insertBookmarkIgnoreDuplicate"
+    <insert id="createBookmarkIgnoreDuplicate"
             parameterType="com.kh.jde.bookmark.model.vo.BookmarkVO">
         INSERT INTO TB_BOOKMARK (MEMBER_NO, REVIEW_NO, ENROLL_DATE)
         SELECT #{memberNo}, #{reviewNo}, SYSDATE
