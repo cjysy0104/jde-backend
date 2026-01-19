@@ -48,7 +48,6 @@ public interface AdminService {
 	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO getMemberByNo(Long memberNo);
-	
 
 	// 미식대장 랭킹 제한 기준 변경
 	void updateCaptainRankPolicy(int topN);

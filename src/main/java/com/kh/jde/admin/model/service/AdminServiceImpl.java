@@ -1,7 +1,5 @@
 package com.kh.jde.admin.model.service;
 
-import java.sql.SQLException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -349,9 +347,16 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<DefaultImageDTO> getDefaultImage() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<DefaultImageDTO> defaultImages = adminMapper.getDefaultImage();
+		
+		if(defaultImages.isEmpty()) {
+			throw new UnexpectedSQLResponseException("등록된 기본 프로필 이미지가 없습니다.");
+		}
+		
+		return defaultImages;
 	}
 	
 	

@@ -788,6 +788,18 @@
 		       )
 	</insert>
 	
+	<select id="getDefaultImage" resultType="DefaultImageDTO">
+		SELECT
+               FILE_NO fileNo
+             , FILE_NAME fileName
+             , FILE_URL fileUrl
+             , CREATED_AT createdAt
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 ORDER
+		    BY
+		       CREATED_AT DESC
+	</select>
 	
 	<!-- 리뷰 페이징 조회 -->
 	<select id="selectReviewList" resultType="ReviewListDTO">
