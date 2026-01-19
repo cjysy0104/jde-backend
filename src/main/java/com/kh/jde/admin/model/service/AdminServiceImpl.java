@@ -376,10 +376,11 @@ public class AdminServiceImpl implements AdminService {
 		}
 	}
 
+	// 기본 프로필 이미지 등록
 	@Override
 	@Transactional
 	public void createDefaultImage(String fileName, MultipartFile file) {
-		
+
 		fileNameDuplicateCheck(fileName);
 		
 		String fileUrl = s3Service.fileSave(file, "DefaultImage");
@@ -405,7 +406,8 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnexpectedSQLResponseException("동일한 이름의 프로필 이미지가 이미 존재합니다.");
 		}
 	}
-
+	
+	// 기본 프로필 이미지 전체 조회
 	@Override
 	@Transactional(readOnly = true)
 	public List<DefaultImageDTO> getDefaultImage() {
@@ -417,6 +419,22 @@ public class AdminServiceImpl implements AdminService {
 		}
 		
 		return defaultImages;
+	}
+
+	// 기본 프로필 이미지 삭제
+	@Override
+	public void deleteDefaultImage(DefaultImageDTO defaultImage) {
+		int getResult = adminMapper.getDefaultImageByFileNo(defaultImage.getFileNo());
+		if(getResult == 0) {
+			throw new UnexpectedSQLResponseException("존재하지 않는 프로필 이미지입니다.");
+		}
+		
+		int deleteResult = adminMapper.deleteDefaultImageByFileNo(defaultImage.getFileNo());
+		if(deleteResult < 1) {
+			throw new UnexpectedSQLResponseException("기본 프로필 이미지 삭제에 실패했습니다.");
+		}
+		
+		s3Service.deleteFile(defaultImage.getFileUrl());
 	}
 	
 	

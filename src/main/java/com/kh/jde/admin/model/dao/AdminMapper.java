@@ -126,7 +126,13 @@ public interface AdminMapper {
 	// 회원 기본 프로필 이미지 등록
 	void createDefaultImage(DefaultImageVO defaultImage);
 	
-	// 회원 기본 이미지 조회
+	// 회원 기본 프로필 이미지 조회
 	List<DefaultImageDTO> getDefaultImage();
+	
+	// 회원 기본 프로필 이미지 존재여부 확인
+	int getDefaultImageByFileNo(Long fileNo);
+	
+	// 회원 기본 프로필 이미지 삭제
+	int deleteDefaultImageByFileNo(Long fileNo);
 	
 }

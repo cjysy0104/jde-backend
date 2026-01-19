@@ -1119,6 +1119,24 @@
 		   AND STATUS = 'Y'
 	</update>
 	
+	<!-- 회원 기본 프로필 이미지 존재여부 확인 -->
+	<select id="getDefaultImageByFileNo" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 WHERE
+		       FILE_NO = #{fileNo}
+	</select>
+	
+	<!-- 회원 기본 프로필 이미지 삭제 -->
+	<delete id="deleteDefaultImageByFileNo">
+		DELETE
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 WHERE
+		       FILE_NO = #{fileNo}
+	</delete>
 	
 
 </mapper>
