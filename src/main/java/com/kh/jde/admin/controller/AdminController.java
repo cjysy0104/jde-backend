@@ -35,6 +35,7 @@ import com.kh.jde.report.model.dto.ReviewReportListDTO;
 import com.kh.jde.report.model.dto.ReviewReportProcessDTO;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -246,7 +247,7 @@ public class AdminController {
 
 	// 기본 프로필 이미지 등록하기
 	@PostMapping("/defaultImage")
-	public ResponseEntity<SuccessResponse<String>> createDefaultImage(@RequestParam("fileName") String fileName, @RequestPart("file") MultipartFile file){
+	public ResponseEntity<SuccessResponse<String>> createDefaultImage(@RequestParam("fileName") @NotBlank(message = "파일 이름이 입력되지 않았습니다.") String fileName, @RequestPart("file") MultipartFile file){
 		adminService.createDefaultImage(fileName, file);
 		return SuccessResponse.created("회원 기본 이미지 등록에 성공했습니다.");
 	}
@@ -258,7 +259,20 @@ public class AdminController {
 		return SuccessResponse.ok(defaultImages, "기본이미지 조회 성공");
 	}
 	
+	
+	// 기본 프로필 이미지 삭제
+	@DeleteMapping("/defaultImage")
+	public ResponseEntity<SuccessResponse<String>> deleteDefaultImage(@RequestBody DefaultImageDTO defaultImage){
+		adminService.deleteDefaultImage(defaultImage);
+		return SuccessResponse.ok("회원 기본이미지 삭제 성공");
+	}
+	
+	
+	
+	
 }
+	
+
 
 
 
