@@ -21,4 +21,5 @@ public class CommentDTO {
 	private String content;
 	private int likeCount;
 	private Date commentDate;
+	private String status;
 }

@@ -73,9 +73,11 @@ public class CommentServiceImpl implements CommentService {
 		if(comment == null) {
 			throw new PostNotFoundException("댓글이 존재하지 않습니다.");
 		}
+		if("N".equals(comment.getStatus())) {
+			throw new IllegalArgumentException("이미 삭제된 댓글입니다.");
+		}
 		// 2. 자기꺼임?
 		if(!(comment.getMemberNo().equals(principal.getMemberNo()))) {
-			log.info("???????{}",comment);
 			throw new AccessDeniedException("댓글 삭제할 권한이 없습니다.");
 		}
 		// 3. 댓글 삭제

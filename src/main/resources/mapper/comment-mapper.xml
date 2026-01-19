@@ -19,6 +19,7 @@
 		            FROM TB_COMMENT_LIKE TCL
 		            WHERE TCL.COMMENT_NO = TC.COMMENT_NO
 		          ) likeCount
+		        , TC.STATUS status
 		    FROM
 		          TB_COMMENT TC
 		    WHERE
