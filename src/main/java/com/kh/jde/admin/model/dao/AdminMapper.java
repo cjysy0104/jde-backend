@@ -88,6 +88,12 @@ public interface AdminMapper {
 	// 댓글 페이징 조회
 	List<CommentListDTO> selectCommentList(PageInfo pageInfo);
 	
+	// 댓글 키워드 검색 전체 개수 조회
+	int countCommentsByKeyword(String keyword);
+	
+	// 댓글 키워드 검색 페이징 조회
+	List<CommentListDTO> selectCommentListByKeyword(Map<String, Object> params);
+	
 	// 댓글 상세 조회
 	CommentListDTO selectCommentByNo(Long commentNo);
 	
