@@ -36,7 +36,7 @@ public class BookmarkServiceImpl implements BookmarkService {
                     .build();
         } else {
             // 중복 방지(예: 동시에 2번 눌러도 안전)
-            bookmarkMapper.insertBookmarkIgnoreDuplicate(bookmark);
+            bookmarkMapper.createBookmarkIgnoreDuplicate(bookmark);
             return BookmarkToggleDTO.builder()
                     .bookmarked(true)
                     .action("ADDED")
@@ -51,7 +51,7 @@ public class BookmarkServiceImpl implements BookmarkService {
                 .memberNo(memberNo)
                 .reviewNo(reviewNo)
                 .build();
-        bookmarkMapper.insertBookmarkIgnoreDuplicate(bookmark);
+        bookmarkMapper.createBookmarkIgnoreDuplicate(bookmark);
     }
 
     @Override

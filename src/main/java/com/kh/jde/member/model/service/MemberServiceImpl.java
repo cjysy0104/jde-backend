@@ -175,19 +175,15 @@ public class MemberServiceImpl implements MemberService {
 
 	    Long memberNo = user.getMemberNo(); // 여기서 바로 사용 (DB 재조회 X)
 
-	    String fileUrl;
-	    try {
-	        fileUrl = s3Uploader.uploadProfileImage(file, memberNo);
-	    } catch (Exception e) {
-	        throw new RuntimeException("S3 업로드 실패", e);
-	    }
+	    String fileUrl = s3Service.fileSave(file, "profile");
+	   
 
-	    MemberFileVO vo = MemberFileVO.builder()
+	    MemberFileVO memberFile = MemberFileVO.builder()
 	            .memberNo(memberNo)
 	            .fileUrl(fileUrl)
 	            .build();
 
-	    int result = memberMapper.upsertProfileImage(vo);
+	    int result = memberMapper.upsertProfileImage(memberFile);
 	    if (result < 1) {
 	        throw new UnexpectedSQLResponseException("프로필 이미지 저장 실패");
 	    }

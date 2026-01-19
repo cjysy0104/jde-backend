@@ -31,6 +31,6 @@ public interface MemberMapper {
 	int updateNicknameByEmail(MemberVO member);
 	int updatePhoneByEmail(MemberVO member);
 
-    int upsertProfileImage(MemberFileVO vo);
+    int upsertProfileImage(MemberFileVO memberFile);
     
 }
