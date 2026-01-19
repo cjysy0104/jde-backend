@@ -1,7 +1,5 @@
 package com.kh.jde.admin.model.service;
 
-import java.sql.SQLException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.jde.admin.model.dao.AdminMapper;
 import com.kh.jde.admin.model.dto.CommentListDTO;
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
@@ -364,6 +363,7 @@ public class AdminServiceImpl implements AdminService {
 		fileNameDuplicateCheck(fileName);
 		
 		String fileUrl = s3Service.fileSave(file, "DefaultImage");
+		
 		DefaultImageVO defaultImage = DefaultImageVO.builder()
 				.fileName(fileName)
 				.fileUrl(fileUrl)
@@ -385,6 +385,21 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnexpectedSQLResponseException("동일한 이름의 프로필 이미지가 이미 존재합니다.");
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DefaultImageDTO> getDefaultImage() {
+		
+		List<DefaultImageDTO> defaultImages = adminMapper.getDefaultImage();
+		
+		if(defaultImages.isEmpty()) {
+			throw new UnexpectedSQLResponseException("등록된 기본 프로필 이미지가 없습니다.");
+		}
+		
+		return defaultImages;
+	}
+	
+	
 
 
 }

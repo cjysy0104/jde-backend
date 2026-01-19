@@ -6,13 +6,12 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kh.jde.admin.model.dto.CommentListDTO;
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
-
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.vo.DefaultImageVO;
-
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -120,5 +119,8 @@ public interface AdminMapper {
 	
 	// 회원 기본 프로필 이미지 등록
 	void createDefaultImage(DefaultImageVO defaultImage);
+	
+	// 회원 기본 이미지 조회
+	List<DefaultImageDTO> getDefaultImage();
 	
 }
