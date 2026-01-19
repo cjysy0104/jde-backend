@@ -1,5 +1,7 @@
 package com.kh.jde.admin.model.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
@@ -76,5 +78,8 @@ public interface AdminService {
 	void deleteReview(Long reviewNo);
 
 
+	
+	// 회원이 사용할 기본이미지 등록
+	void createDefaultImage(String fileName, MultipartFile file);
 	
 }

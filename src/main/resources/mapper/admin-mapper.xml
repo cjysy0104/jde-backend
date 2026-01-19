@@ -846,6 +846,37 @@
 		   AND STATUS = 'Y'
 	</update>
 	
+	<!-- 회원 프로필 이미지 이름 중복체크 -->
+	<select id="countByFileName" resultType="int">
+		SELECT
+		       COUNT(*) AS cnt
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 WHERE
+		       FILE_NAME = #{fileName}
+	</select>
+	
+	<!-- 회원 기본 프로필 이미지 등록 -->
+	<insert id="createDefaultImage">
+		INSERT
+		  INTO
+		       TB_DEFAULT_PROFILE
+		       (
+		       FILE_NO
+		     , FILE_NAME
+		     , FILE_URL
+		     , CREATED_AT
+		       )
+		VALUES
+		       (
+		       SEQ_DEFAULT_PROFILE.NEXTVAL
+		     , #{fileName}
+		     , #{fileUrl}
+		     , SYSDATE
+		       )
+	</insert>
+	
+	
 	<!-- 리뷰 페이징 조회 -->
 	<select id="selectReviewList" resultType="ReviewListDTO">
 		SELECT
@@ -929,5 +960,7 @@
 		       REVIEW_NO = #{reviewNo}
 		   AND STATUS = 'Y'
 	</update>
+	
+	
 
 </mapper>

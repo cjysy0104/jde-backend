@@ -21,6 +21,7 @@ public class FileService {
 	private final FileRenamePolicy fileRenamePolicy;
 	private final Path fileLocation;
 	
+	
 	public FileService(FileRenamePolicy fileRenamePolicy) {
 		this.fileRenamePolicy = fileRenamePolicy;
 		this.fileLocation = Paths.get("uploads").toAbsolutePath().normalize();
@@ -31,9 +32,11 @@ public class FileService {
 		}
 	}
 	
+	
 	/**
 	 * 파일을 저장 changeName 반환
 	 */
+	/*
 	public String store(MultipartFile file) {
 		
 		String originalFilename = file.getOriginalFilename();
@@ -54,5 +57,6 @@ public class FileService {
 			throw new RuntimeException("파일 저장 실패: " + e.getMessage());
 		}
 	}
+	*/
 	
 }
