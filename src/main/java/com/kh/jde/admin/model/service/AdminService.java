@@ -35,6 +35,9 @@ public interface AdminService {
 	// 댓글 신고 키워드 조회
 	ReportPageResponse<CommentReportListDTO> getCommentReportListByKeyword(SearchDTO dto);
 	
+	// 리뷰 신고 키워드 조회
+	ReportPageResponse<ReviewReportListDTO> getReviewReportListByKeyword(SearchDTO dto);
+	
 	// 회원 페이징 조회
 	ReportPageResponse<MemberListDTO> getMemberList(int currentPage);
 	
@@ -68,6 +71,7 @@ public interface AdminService {
 
 	// 리뷰 삭제 (STATUS를 'N'으로 변경)
 	void deleteReview(Long reviewNo);
+
 
 	
 }
