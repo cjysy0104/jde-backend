@@ -162,6 +162,23 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	@Override
+	public ReportPageResponse<ReviewReportListDTO> getReviewReportListByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countReviewReportsByKeyword(dto.getKeyword());
+		
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		List<ReviewReportListDTO> reportList = adminMapper.selectReviewReportListByKeyword(params);
+		
+		return new ReportPageResponse<>(reportList, pageInfo);
+	}
+	
+	@Override
 	public MemberDetailDTO getMemberByNo(Long memberNo) {
 		MemberDetailDTO member = adminMapper.selectMemberByNo(memberNo);
 		if (member == null) {
@@ -290,6 +307,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new IllegalStateException("댓글 삭제에 실패했습니다. 댓글 번호를 확인해주세요.");
 		}
 	}
+
 
 
 }
