@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
+import com.kh.jde.exception.AccessDeniedException;
+import com.kh.jde.exception.PostNotFoundException;
 import com.kh.jde.review.model.dao.ReviewMapper;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordDTO;
@@ -14,6 +16,7 @@ import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewDTO;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -94,5 +97,32 @@ public class ReviewServiceImpl implements ReviewService {
 				"memberNo", Long.valueOf(3));
 		
 		return reviewMapper.getDetailReview(param);
+	}
+
+	@Override
+	@Transactional
+	public void deleteById(Long reviewNo, CustomUserDetails principal) {
+		
+		
+		
+		// 1. 게시글 상태 조회
+		if(reviewMapper.existsReview(reviewNo) == 0) {
+			log.info("NO???{}", reviewMapper.existsReview(reviewNo));
+			throw new PostNotFoundException("조회된 게시글이 없습니다.");
+		}
+		
+		
+		// 2. 리뷰글 작성자 = 로그인 사용자?
+		if(reviewMapper.getWriterById(reviewNo) != principal.getMemberNo()) {
+			log.info("ID???{}", reviewMapper.getWriterById(reviewNo));
+			throw new AccessDeniedException("삭제 권한이 없습니다.");
+		}
+		
+		// 3. 삭제 진행
+		int result = reviewMapper.deleteById(reviewNo);
+		
+		if(result != 1) {
+			throw new IllegalStateException("리뷰 삭제에 실패했습니다. 리뷰 번호를 확인해주세요.");
+		}
 	}
 }

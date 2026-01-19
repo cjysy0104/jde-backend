@@ -340,12 +340,38 @@
 
 	<!-- 리뷰 존재 확인 -->
     <select id="existsReview" resultType="int">
-        SELECT COUNT(1)
-        FROM TB_REVIEW
-        WHERE REVIEW_NO = #{reviewNo}
-          AND STATUS = 'Y'
+        SELECT 
+        		COUNT(1)
+        FROM 
+        		TB_REVIEW
+        WHERE 
+        		REVIEW_NO = #{reviewNo}
+          AND 
+          		STATUS = 'Y'
     </select>
 
+	<!-- 리뷰 삭제(소프트)-->
+	<update id="deleteById"
+			parameterType="Long">
+		UPDATE
+				TB_REVIEW
+		SET
+				  STATUS = 'Y'
+				, DELETED_AT = SYSDATE
+		WHERE
+				REVIEW_NO = #{reviewNo}
+	</update>
+	
+	<select id="getWriterById"
+			parameterType="Long">
+		SELECT
+				MEMBER_NO
+		FROM
+				TB_REVIEW
+		WHERE
+				REVIEW_NO = #{reviewNo}
+	</select>
+	
 
 
 
