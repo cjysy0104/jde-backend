@@ -1,7 +1,5 @@
 package com.kh.jde.comment.model.vo;
 
-import java.sql.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -17,5 +17,7 @@ public interface CommentMapper {
 	int create(CommentVO comment);
 
 	int deleteById(Long commentNo);
+
+	int update(CommentDTO comment);
 	
 }
