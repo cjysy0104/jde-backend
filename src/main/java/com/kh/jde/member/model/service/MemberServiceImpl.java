@@ -195,7 +195,7 @@ public class MemberServiceImpl implements MemberService {
 	    return fileUrl;
 	}
 	
-	@Override // 리뷰로 좋아요 많이 받은 상위3명의 명단 보내기
+	@Override // 리뷰로 좋아요 많이 받은 상위 N명의 명단 가져오기
 	@Transactional(readOnly = true)
 	public List<CaptainDTO> getCaptainList() {
 		

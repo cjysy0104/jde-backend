@@ -36,9 +36,9 @@ public class S3Uploader {
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("이미지 파일만 업로드할 수 있습니다.");
         }
-        String changeName = fileRenamePolicy.rename();
-        String extensionName = getExtensionName(contentType);
-        String key = "profile/" + memberNo + "/" + changeName + "." + extensionName;
+        String changeName = fileRenamePolicy.newFileName(file);
+        // String extensionName = getExtensionName(contentType);
+        String key = "profile/" + memberNo + "/" + changeName;
 
         PutObjectRequest req = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -53,6 +53,7 @@ public class S3Uploader {
     }
 
     // contentType(MIME)로부터 확장자명을 가져오는 메서드 (이름 생략 없이)
+    /*
     private String getExtensionName(String contentType) {
         return switch (contentType) {
             case MediaType.IMAGE_PNG_VALUE -> "png";
@@ -61,4 +62,6 @@ public class S3Uploader {
             default -> "jpg";
         };
     }
+    */
+    
 }
