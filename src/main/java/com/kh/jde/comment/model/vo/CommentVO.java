@@ -1,23 +1,19 @@
-package com.kh.jde.comment.model.dto;
+package com.kh.jde.comment.model.vo;
 
 import java.sql.Date;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
+@Builder
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class CommentDTO {
+public class CommentVO {
 
-	private Long commentNo;
 	private Long reviewNo;
+	private Long memberNo;
 	private String content;
-	private int likeCount;
-	private Date commentDate;
 }
