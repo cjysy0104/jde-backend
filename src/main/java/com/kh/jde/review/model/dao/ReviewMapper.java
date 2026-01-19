@@ -21,6 +21,8 @@ public interface ReviewMapper {
 	
 	List<KeywordRowDTO> getKeywordsByIds(List<Long> reviewNo);
 	
+	Long getWriterById(Long reviewNo);
+	
 	// 리뷰 작성
 	void save();
 	
@@ -28,8 +30,9 @@ public interface ReviewMapper {
 	void update();
 	
 	// 리뷰 삭제(소프트)
-	void deleteById();
+	int deleteById(Long reviewNo);
 	
-	int existsReview(Long reviewNo);          // 리뷰 존재(정상) 여부
-	
+	int existsReview(Long reviewNo);	// 리뷰 존재(정상) 여부
+
+
 }

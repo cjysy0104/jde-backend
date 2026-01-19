@@ -4,9 +4,12 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,5 +45,13 @@ public class ReviewController {
 		
 		return SuccessResponse.ok(reviewService.getDetailReview(reviewNo, principal), "리뷰 상세 조회 성공");
 	}
+	
+	@PostMapping("/delete/{reviewNo}")
+	public ResponseEntity<SuccessResponse<Void>> deleteById(@PathVariable("reviewNo")Long reviewNo
+															, @AuthenticationPrincipal CustomUserDetails principal){
+		reviewService.deleteById(reviewNo, principal);
+		
+		return SuccessResponse.ok("삭제 성공");
+	} 
 	
 }
