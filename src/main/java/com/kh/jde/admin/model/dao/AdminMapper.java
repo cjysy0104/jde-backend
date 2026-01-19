@@ -3,12 +3,12 @@ package com.kh.jde.admin.model.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.vo.DefaultImageVO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -77,5 +77,8 @@ public interface AdminMapper {
 	
 	// 댓글 삭제 (STATUS = 'N'으로 변경)
 	int deleteComment(Long commentNo);
+	
+	// 회원 기본 프로플 이미지 등록
+	void createDefaultImage(DefaultImageVO defaultImage);
 	
 }

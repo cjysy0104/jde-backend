@@ -47,7 +47,7 @@ public class S3Service {
 		String key = new StringBuilder()
 		        .append(S3DirectoryName)
 		        .append("/")
-		        .append(fileRenamePolicy.rename())
+		        .append(fileRenamePolicy.newFileName(file))
 		        .toString();
 		
 		// S3에 업로드
@@ -69,11 +69,12 @@ public class S3Service {
 			e.printStackTrace();
 		}
 		
-		String filePath = "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + changeName;
+		String filePath = "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + key;
 		
 		return filePath;
 		
 	}
+	
 
 	public void deleteFile(String filePath) {
 		// 이미지파일 경로에서 마지막 /뒤의 파일명만 가져와야함

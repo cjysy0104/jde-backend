@@ -1,5 +1,6 @@
 package com.kh.jde.admin.model.service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.vo.DefaultImageVO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
@@ -244,10 +246,16 @@ public class AdminServiceImpl implements AdminService {
 	@Transactional
 	public void createDefaultImage(String fileName, MultipartFile file) {
 		
-		String fileUrl = s3Service.fileSave(file, fileRenamePolicy.rename());
-		
-		
-		
+		String fileUrl = s3Service.fileSave(file, "DefaultImage");
+		DefaultImageVO defaultImage = DefaultImageVO.builder()
+													.fileName(fileName)
+													.fileUrl(fileUrl)
+													.build();
+		try {
+			adminMapper.createDefaultImage(defaultImage);
+		} catch(RuntimeException e) {
+			throw new UnexpectedSQLResponseException("회원 기본 이미지 등록에 실패했습니다.");
+		}
 	}
 	
 	
