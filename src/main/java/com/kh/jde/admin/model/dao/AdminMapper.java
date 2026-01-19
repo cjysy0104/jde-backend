@@ -1,6 +1,7 @@
 package com.kh.jde.admin.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -8,7 +9,10 @@ import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+
+import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.vo.DefaultImageVO;
+
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -23,6 +27,12 @@ public interface AdminMapper {
 	
 	// 댓글 신고 페이징 조회
 	List<CommentReportListDTO> selectCommentReportList(PageInfo pageInfo);
+	
+	// 댓글 신고 키워드 검색 전체 개수 조회
+	int countCommentReportsByKeyword(String keyword);
+	
+	// 댓글 신고 키워드 검색 페이징 조회
+	List<CommentReportListDTO> selectCommentReportListByKeyword(Map<String, Object> params);
 	
 	// 리뷰 신고 전체 개수 조회
 	int countAllReviewReports();
@@ -77,6 +87,15 @@ public interface AdminMapper {
 	
 	// 댓글 삭제 (STATUS = 'N'으로 변경)
 	int deleteComment(Long commentNo);
+	
+	// 리뷰 페이징 조회
+	List<ReviewListDTO> selectReviewList(PageInfo pageInfo);
+
+	// 리뷰 상세 조회
+	ReviewListDTO selectReviewByNo(Long reviewNo);
+
+	// 리뷰 삭제 (STATUS = 'N'으로 변경)
+	int deleteReview(Long reviewNo);
 	
 	// 회원 기본 프로플 이미지 등록
 	void createDefaultImage(DefaultImageVO defaultImage);

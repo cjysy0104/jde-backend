@@ -3,8 +3,6 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.jde.reviewlike.dao.ReviewLikeMapper">
-	
-	
 
     <!-- 좋아요 존재 확인 -->
     <select id="existsLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO" resultType="int">

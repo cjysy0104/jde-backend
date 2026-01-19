@@ -14,11 +14,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.service.AdminService;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
@@ -103,6 +106,18 @@ public class AdminController {
 		
 		return SuccessResponse.ok(updatedReport, "리뷰 신고가 처리되었습니다.");
 	}
+	
+	// 댓글 신고 키워드 조회
+	@GetMapping("/reports/comment/search")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentReportListDTO>>> getCommentReportByKeyword(
+			@ModelAttribute SearchDTO dto){
+		
+		ReportPageResponse<CommentReportListDTO> reportPageResponse = adminService.getCommentReportListByKeyword(dto);
+		
+		return SuccessResponse.ok(reportPageResponse, "댓글 신고 키워드 조회 성공");
+	}
+	
+	// 리뷰 키워드 조회
 	
 	// 회원 페이징 조회
 	@GetMapping("/members")
@@ -190,14 +205,45 @@ public class AdminController {
 		return SuccessResponse.ok("댓글이 삭제 되었습니다.");
 	}
 
+	// 리뷰 페이징 조회
+	@GetMapping("/reviews")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewListDTO>>> getReviewList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<ReviewListDTO> commentPageResponse = adminService.getReviewList(page);
+		
+		return SuccessResponse.ok(commentPageResponse, "리뷰 목록 조회 성공");
+	}
+	
+	// 리뷰 상세 조회
+	@GetMapping("/reviews/{reviewNo}")
+	public ResponseEntity<SuccessResponse<ReviewListDTO>> getReviewsByNo(
+			@PathVariable(name="reviewNo") Long reviewNo){
+			
+		ReviewListDTO comment = adminService.getReviewByNo(reviewNo);
+			
+		return SuccessResponse.ok(comment, "리뷰 상세 조회 성공");
+	}
+	
+	// 리뷰 삭제
+	@DeleteMapping("/reviews/{reviewNo}")
+	public ResponseEntity<SuccessResponse<String>> deleteReview(
+			@PathVariable(name="reviewNo") Long reviewNo){
+		adminService.deleteReview(reviewNo);
+		
+		return SuccessResponse.ok("리뷰가 삭제 되었습니다.");
+	}
+
 	// 디폴트 프로필 이미지 등록하기
 	@PostMapping("/defaultImage")
 	public ResponseEntity<SuccessResponse<String>> createDefaultImage(@RequestParam("fileName") String fileName, @RequestPart("file") MultipartFile file){
 		adminService.createDefaultImage(fileName, file);
 		return SuccessResponse.created("회원 기본 이미지 등록에 성공했습니다.");
 	}
-
+	
 }
+
+
 
 
 

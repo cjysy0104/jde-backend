@@ -70,4 +70,9 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
 	}
 	
+	@ExceptionHandler(PostNotFoundException.class) 
+	public ResponseEntity<ErrorResponse<String>> handlePostNotFound(PostNotFoundException e, HttpServletRequest request){
+		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
+	}
+	
 }
