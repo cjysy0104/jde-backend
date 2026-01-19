@@ -119,7 +119,7 @@
 	</select>
 	
 	<!-- 댓글 신고 키워드 검색 페이징 조회 -->
-	<select id="selectCommentReportListByKeyword" resultType="CommentReportListDTO">
+	<select id="selectCommentReportListByKeyword" parameterType="map" resultType="CommentReportListDTO">
 		SELECT
 		       R.COMMENT_REPORT_NO commentReportNo
 		     , R.MEMBER_NO memberNo

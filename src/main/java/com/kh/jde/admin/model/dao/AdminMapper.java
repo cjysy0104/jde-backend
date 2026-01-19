@@ -1,6 +1,7 @@
 package com.kh.jde.admin.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -26,10 +27,10 @@ public interface AdminMapper {
 	List<CommentReportListDTO> selectCommentReportList(PageInfo pageInfo);
 	
 	// 댓글 신고 키워드 검색 전체 개수 조회
-	int countCommentReportsByKeyword(@Param("keyword") String keyword);
+	int countCommentReportsByKeyword(String keyword);
 	
 	// 댓글 신고 키워드 검색 페이징 조회
-	List<CommentReportListDTO> selectCommentReportListByKeyword(@Param("keyword") String keyword, PageInfo pageInfo);
+	List<CommentReportListDTO> selectCommentReportListByKeyword(Map<String, Object> params);
 	
 	// 리뷰 신고 전체 개수 조회
 	int countAllReviewReports();

@@ -1,6 +1,8 @@
 package com.kh.jde.admin.model.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -147,8 +149,14 @@ public class AdminServiceImpl implements AdminService {
 		// PageInfo 생성
 		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
 		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
 		// 키워드 검색 페이징 조회
-		List<CommentReportListDTO> reportList = adminMapper.selectCommentReportListByKeyword(dto.getKeyword(), pageInfo);
+		List<CommentReportListDTO> reportList = adminMapper.selectCommentReportListByKeyword(params);
 		
 		return new ReportPageResponse<>(reportList, pageInfo);
 	}
