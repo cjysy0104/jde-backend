@@ -653,6 +653,16 @@
 		   AND STATUS = 'Y'
 	</update>
 	
+	<!-- 회원 프로필 이미지 이름 중복체크 -->
+	<select id="countByFileName" resultType="int">
+		SELECT
+		       COUNT(*) AS cnt
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 WHERE
+		       FILE_NAME = #{fileName}
+	</select>
+	
 	<!-- 회원 기본 프로필 이미지 등록 -->
 	<insert id="createDefaultImage">
 		INSERT
@@ -757,5 +767,7 @@
 		       REVIEW_NO = #{reviewNo}
 		   AND STATUS = 'Y'
 	</update>
+	
+	
 
 </mapper>

@@ -303,6 +303,8 @@ public class AdminServiceImpl implements AdminService {
 	@Transactional
 	public void createDefaultImage(String fileName, MultipartFile file) {
 		
+		fileNameDuplicateCheck(fileName);
+		
 		String fileUrl = s3Service.fileSave(file, "DefaultImage");
 		DefaultImageVO defaultImage = DefaultImageVO.builder()
 				.fileName(fileName)
@@ -312,6 +314,17 @@ public class AdminServiceImpl implements AdminService {
 			adminMapper.createDefaultImage(defaultImage);
 		} catch(RuntimeException e) {
 			throw new UnexpectedSQLResponseException("회원 기본 이미지 등록에 실패했습니다.");
+		}
+	}
+	
+	private void fileNameDuplicateCheck(String fileName) {
+		DefaultImageVO duplicateCheck = DefaultImageVO.builder()
+				.fileName(fileName)
+				.build();
+		int result = adminMapper.countByFileName(duplicateCheck);
+		
+		if(result >= 1) {
+			throw new UnexpectedSQLResponseException("동일한 이름의 프로필 이미지가 이미 존재합니다.");
 		}
 	}
 

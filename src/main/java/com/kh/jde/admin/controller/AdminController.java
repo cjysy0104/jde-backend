@@ -237,6 +237,7 @@ public class AdminController {
 	// 디폴트 프로필 이미지 등록하기
 	@PostMapping("/defaultImage")
 	public ResponseEntity<SuccessResponse<String>> createDefaultImage(@RequestParam("fileName") String fileName, @RequestPart("file") MultipartFile file){
+		log.info("파일이름 넘어오나?:{}", fileName);
 		adminService.createDefaultImage(fileName, file);
 		return SuccessResponse.created("회원 기본 이미지 등록에 성공했습니다.");
 	}
