@@ -4,6 +4,19 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.jde.admin.model.dao.AdminMapper">
 	
+	<!-- 
+	
+	리스트 조회하는 기능들 흐름
+1단계 (가장 안쪽)
+- 조인 + 검색 + ORDER BY CREATED_AT DESC
+
+2단계
+- ROWNUM <= offset + boardLimit
+
+3단계 (바깥)
+- RNUM > offset
+	 -->
+	
 	<!-- 댓글 신고 전체 개수 조회 -->
 	<select id="countAllCommentReports" resultType="int">
 		SELECT
@@ -61,6 +74,112 @@
 		                     STATUS = 'Y'
 		               ORDER BY
 		                     CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
+	
+	<!-- 댓글 신고 키워드 검색 전체 개수 조회 -->
+	<select id="countCommentReportsByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.STATUS = 'Y'
+		   AND (
+		            R.REPORT_CONTENT LIKE '%' || #{keyword} || '%'
+		         OR C.CONTENT LIKE '%' || #{keyword} || '%'
+		         OR RC.REPORT_CATEGORY_TITLE LIKE '%' || #{keyword} || '%'
+		         OR M.NICKNAME LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 댓글 신고 키워드 검색 페이징 조회 -->
+	<select id="selectCommentReportListByKeyword" resultType="CommentReportListDTO">
+		SELECT
+		       R.COMMENT_REPORT_NO commentReportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.COMMENT_NO commentNo
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              COMMENT_REPORT_NO
+		            , MEMBER_NO
+		            , COMMENT_NO
+		            , REPORT_CATEGORY_NO
+		            , REPORT_CONTENT
+		            , REPORT_PROCESS
+		            , CREATED_AT
+		            , UPDATE_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     R2.COMMENT_REPORT_NO
+		                   , R2.MEMBER_NO
+		                   , R2.COMMENT_NO
+		                   , R2.REPORT_CATEGORY_NO
+		                   , R2.REPORT_CONTENT
+		                   , R2.REPORT_PROCESS
+		                   , R2.CREATED_AT
+		                   , R2.UPDATE_AT
+		                   , R2.STATUS
+		                FROM
+		                     TB_COMMENT_REPORT R2
+		               INNER JOIN
+		                     TB_COMMENT C2
+		                  ON R2.COMMENT_NO = C2.COMMENT_NO
+		               INNER JOIN
+		                     TB_REPORT_CATEGORY RC2
+		                  ON R2.REPORT_CATEGORY_NO = RC2.REPORT_CATEGORY_NO
+		               INNER JOIN
+		                     TB_MEMBER M2
+		                  ON R2.MEMBER_NO = M2.MEMBER_NO
+		               WHERE
+		                     R2.STATUS = 'Y'
+		                 AND (
+		                          R2.REPORT_CONTENT LIKE '%' || #{keyword} || '%'
+		                       OR C2.CONTENT LIKE '%' || #{keyword} || '%'
+		                       OR RC2.REPORT_CATEGORY_TITLE LIKE '%' || #{keyword} || '%'
+		                       OR M2.NICKNAME LIKE '%' || #{keyword} || '%'
+		                     )
+		               ORDER BY
+		                     R2.CREATED_AT DESC
 		              )
 		        WHERE
 		              ROWNUM &lt;= #{offset} + #{boardLimit}
@@ -611,7 +730,8 @@
 		UPDATE
 		       TB_REVIEW
 		   SET
-		       STATUS = 'N'
+		       DELETED_AT = SYSDATE
+		     , STATUS = 'N'
 		 WHERE
 		       REVIEW_NO = #{reviewNo}
 		   AND STATUS = 'Y'

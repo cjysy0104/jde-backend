@@ -25,6 +25,12 @@ public interface AdminMapper {
 	// 댓글 신고 페이징 조회
 	List<CommentReportListDTO> selectCommentReportList(PageInfo pageInfo);
 	
+	// 댓글 신고 키워드 검색 전체 개수 조회
+	int countCommentReportsByKeyword(@Param("keyword") String keyword);
+	
+	// 댓글 신고 키워드 검색 페이징 조회
+	List<CommentReportListDTO> selectCommentReportListByKeyword(@Param("keyword") String keyword, PageInfo pageInfo);
+	
 	// 리뷰 신고 전체 개수 조회
 	int countAllReviewReports();
 	

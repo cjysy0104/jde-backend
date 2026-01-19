@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
@@ -101,6 +103,18 @@ public class AdminController {
 		
 		return SuccessResponse.ok(updatedReport, "리뷰 신고가 처리되었습니다.");
 	}
+	
+	// 댓글 신고 키워드 조회
+	@GetMapping("/reports/comment/search")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentReportListDTO>>> getCommentReportByKeyword(
+			@ModelAttribute SearchDTO dto){
+		
+		ReportPageResponse<CommentReportListDTO> reportPageResponse = adminService.getCommentReportListByKeyword(dto);
+		
+		return SuccessResponse.ok(reportPageResponse, "댓글 신고 키워드 조회 성공");
+	}
+	
+	// 리뷰 키워드 조회
 	
 	// 회원 페이징 조회
 	@GetMapping("/members")

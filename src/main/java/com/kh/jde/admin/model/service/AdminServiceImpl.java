@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kh.jde.admin.model.dao.AdminMapper;
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
@@ -139,6 +140,20 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	@Override
+	public ReportPageResponse<CommentReportListDTO> getCommentReportListByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countCommentReportsByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// 키워드 검색 페이징 조회
+		List<CommentReportListDTO> reportList = adminMapper.selectCommentReportListByKeyword(dto.getKeyword(), pageInfo);
+		
+		return new ReportPageResponse<>(reportList, pageInfo);
+	}
+	
+	@Override
 	public MemberDetailDTO getMemberByNo(Long memberNo) {
 		MemberDetailDTO member = adminMapper.selectMemberByNo(memberNo);
 		if (member == null) {
@@ -267,5 +282,6 @@ public class AdminServiceImpl implements AdminService {
 			throw new IllegalStateException("댓글 삭제에 실패했습니다. 댓글 번호를 확인해주세요.");
 		}
 	}
+
 
 }
