@@ -99,6 +99,9 @@ public interface AdminMapper {
 	// 댓글 삭제 (STATUS = 'N'으로 변경)
 	int deleteComment(Long commentNo);
 	
+	// 리뷰 전체 개수 조회
+	int countAllReviews();
+	
 	// 리뷰 페이징 조회
 	List<ReviewListDTO> selectReviewList(PageInfo pageInfo);
 	
