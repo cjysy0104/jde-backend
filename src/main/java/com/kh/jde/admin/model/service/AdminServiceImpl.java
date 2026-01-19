@@ -151,6 +151,26 @@ public class AdminServiceImpl implements AdminService {
 	}
 	
 	@Override
+	public ReportPageResponse<MemberListDTO> getMemberListByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countMembersByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<MemberListDTO> memberList = adminMapper.selectMemberListByKeyword(params);
+		
+		return new ReportPageResponse<>(memberList, pageInfo);
+	}
+	
+	@Override
 	public ReportPageResponse<CommentReportListDTO> getCommentReportListByKeyword(SearchDTO dto) {
 		// 키워드 검색 전체 개수 조회
 		int listCount = adminMapper.countCommentReportsByKeyword(dto.getKeyword());
