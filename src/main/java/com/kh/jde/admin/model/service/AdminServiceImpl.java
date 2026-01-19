@@ -283,7 +283,8 @@ public class AdminServiceImpl implements AdminService {
 			throw new IllegalStateException("댓글 삭제에 실패했습니다. 댓글 번호를 확인해주세요.");
 		}
 	}
-
+	
+	@Override
 	public ReportPageResponse<ReviewListDTO> getReviewList(int currentPage) {
 
 		// 전체 개수 조회

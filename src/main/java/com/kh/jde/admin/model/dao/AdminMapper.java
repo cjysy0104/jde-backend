@@ -106,7 +106,7 @@ public interface AdminMapper {
 	// 회원 기본 프로필 이미지이름 중복여부 체크
 	int countByFileName(DefaultImageVO duplicateCheck);
 	
-	// 회원 기본 프로플 이미지 등록
+	// 회원 기본 프로필 이미지 등록
 	void createDefaultImage(DefaultImageVO defaultImage);
 	
 }
