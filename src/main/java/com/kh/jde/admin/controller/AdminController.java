@@ -133,6 +133,16 @@ public class AdminController {
 		return SuccessResponse.ok(memberPageResponse, "회원 목록 조회 성공");
 	}
 	
+	// 회원 키워드 조회
+	@GetMapping("/members/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<MemberListDTO>>> getMemberListByKeyword(
+			@ModelAttribute SearchDTO dto){
+		log.info("keyword : {}",  dto.getKeyword());
+		ReportPageResponse<MemberListDTO> memberPageResponse = adminService.getMemberListByKeyword(dto);
+		
+		return SuccessResponse.ok(memberPageResponse, "회원 키워드 조회 성공");
+	}
+	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	@GetMapping("/members/{memberNo}")
 	public ResponseEntity<SuccessResponse<MemberDetailDTO>> getMemberByNo(

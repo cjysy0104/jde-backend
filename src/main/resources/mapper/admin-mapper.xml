@@ -612,6 +612,89 @@
 		       ENROLL_DATE DESC
 	</select>
 	
+	<!-- 회원 키워드 검색 전체 개수 조회 -->
+	<select id="countMembersByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+		   AND (
+		            EMAIL LIKE '%' || #{keyword} || '%'
+		         OR MEMBER_NAME LIKE '%' || #{keyword} || '%'
+		         OR NICKNAME LIKE '%' || #{keyword} || '%'
+		         OR PHONE LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 회원 키워드 검색 페이징 조회 (개인정보 마스킹) -->
+	<select id="selectMemberListByKeyword" parameterType="map" resultType="MemberListDTO">
+		SELECT
+		       MEMBER_NO memberNo
+		     , CASE 
+		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
+		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
+		       END email
+		     , CASE 
+		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
+		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
+		            ELSE SUBSTR(MEMBER_NAME, 1, FLOOR(LENGTH(MEMBER_NAME)/2)) || '*' || SUBSTR(MEMBER_NAME, FLOOR(LENGTH(MEMBER_NAME)/2) + 2)
+		       END memberName
+		     , NICKNAME nickname
+		     , CASE 
+		            WHEN INSTR(PHONE, '-') = 0 THEN PHONE
+		            ELSE SUBSTR(PHONE, 1, 3) || '-****-' || SUBSTR(PHONE, -4)
+		       END phone
+		     , ENROLL_DATE enrollDate
+		     , STATUS status
+		     , ROLE role
+		  FROM
+		       (
+		       SELECT
+		              MEMBER_NO
+		            , EMAIL
+		            , MEMBER_NAME
+		            , NICKNAME
+		            , PHONE
+		            , ENROLL_DATE
+		            , STATUS
+		            , ROLE
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     MEMBER_NO
+		                   , EMAIL
+		                   , MEMBER_NAME
+		                   , NICKNAME
+		                   , PHONE
+		                   , ENROLL_DATE
+		                   , STATUS
+		                   , ROLE
+		                FROM
+		                     TB_MEMBER
+		               WHERE
+		                     STATUS = 'Y'
+		                 AND (
+		                          EMAIL LIKE '%' || #{keyword} || '%'
+		                       OR MEMBER_NAME LIKE '%' || #{keyword} || '%'
+		                       OR NICKNAME LIKE '%' || #{keyword} || '%'
+		                       OR PHONE LIKE '%' || #{keyword} || '%'
+		                     )
+		               ORDER BY
+		                     ENROLL_DATE DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       )
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       ENROLL_DATE DESC
+	</select>
+	
 	<!-- 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹) -->
 	<select id="selectMemberByNo" resultType="MemberDetailDTO">
 		SELECT
@@ -685,66 +768,71 @@
 	
 	<!-- 댓글 페이징 조회 -->
 	<select id="selectCommentList" resultType="CommentListDTO">
-		SELECT
-		       C.COMMENT_NO commentNo
-		     , C.MEMBER_NO memberNo
-		     , C.AUTHOR author
-		     , C.REVIEW_NO reviewNo
-		     , C.CONTENT commentContent
-		     , C.COMMENT_DATE commentDate
-		     , C.STATUS status
-		  FROM
-		       (
-		       SELECT
-		              COMMENT_NO
-		            , MEMBER_NO
-		            , AUTHOR
-		            , REVIEW_NO
-		            , CONTENT
-		            , COMMENT_DATE
-		            , STATUS
-		            , ROWNUM RNUM
-		         FROM
-		              (
-		              SELECT
-		                     COMMENT_NO
-		                   , MEMBER_NO
-		                   , AUTHOR
-		                   , REVIEW_NO
-		                   , CONTENT
-		                   , COMMENT_DATE
-		                   , STATUS
-		                FROM
-		                     TB_COMMENT
-		               WHERE
-		                     STATUS = 'Y'
-		               ORDER BY
-		                     COMMENT_DATE DESC
-		              )
-		        WHERE
-		              ROWNUM &lt;= #{offset} + #{boardLimit}
-		       ) C
-		 WHERE
-		       RNUM &gt; #{offset}
-		 ORDER BY
-		       C.COMMENT_DATE DESC
+	    SELECT
+	           C.COMMENT_NO      AS commentNo
+	         , C.MEMBER_NO       AS memberNo
+	         , M.MEMBER_NAME     AS author
+	         , C.REVIEW_NO       AS reviewNo
+	         , C.CONTENT         AS commentContent
+	         , C.COMMENT_DATE    AS commentDate
+	         , C.STATUS          AS status
+	      FROM
+	           (
+	           SELECT
+	                  C2.COMMENT_NO
+	                , C2.MEMBER_NO
+	                , C2.REVIEW_NO
+	                , C2.CONTENT
+	                , C2.COMMENT_DATE
+	                , C2.STATUS
+	                , ROWNUM AS RNUM
+	             FROM
+	                  (
+	                  SELECT
+	                         COMMENT_NO
+	                       , MEMBER_NO
+	                       , REVIEW_NO
+	                       , CONTENT
+	                       , COMMENT_DATE
+	                       , STATUS
+	                    FROM
+	                         TB_COMMENT
+	                   WHERE
+	                         STATUS = 'Y'
+	                   ORDER BY
+	                         COMMENT_DATE DESC
+	                  ) C2
+	            WHERE
+	                  ROWNUM &lt;= #{offset} + #{boardLimit}
+	           ) C
+	      INNER JOIN
+	           TB_MEMBER M
+	        ON C.MEMBER_NO = M.MEMBER_NO
+	     WHERE
+	           C.RNUM &gt; #{offset}
+	     ORDER BY
+	           C.COMMENT_DATE DESC
 	</select>
+
 	
 	<!-- 댓글 상세 조회 -->
 	<select id="selectCommentByNo" resultType="CommentListDTO">
-		SELECT
-		       COMMENT_NO commentNo
-		     , MEMBER_NO memberNo
-		     , AUTHOR author
-		     , REVIEW_NO reviewNo
-		     , CONTENT commentContent
-		     , COMMENT_DATE commentDate
-		     , STATUS status
-		  FROM
-		       TB_COMMENT
-		 WHERE
-		       COMMENT_NO = #{commentNo}
-		   AND STATUS = 'Y'
+	    SELECT
+	           C.COMMENT_NO      AS commentNo
+	         , C.MEMBER_NO       AS memberNo
+	         , M.MEMBER_NAME     AS author
+	         , C.REVIEW_NO       AS reviewNo
+	         , C.CONTENT         AS commentContent
+	         , C.COMMENT_DATE    AS commentDate
+	         , C.STATUS          AS status
+	      FROM
+	           TB_COMMENT C
+	      INNER JOIN
+	           TB_MEMBER M
+	        ON C.MEMBER_NO = M.MEMBER_NO
+	     WHERE
+	           C.COMMENT_NO = #{commentNo}
+	       AND C.STATUS = 'Y'
 	</select>
 	
 	<!-- 댓글 삭제 (STATUS를 'N'으로 변경) -->

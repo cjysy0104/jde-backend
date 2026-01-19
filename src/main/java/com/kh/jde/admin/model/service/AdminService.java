@@ -41,6 +41,9 @@ public interface AdminService {
 	// 회원 페이징 조회
 	ReportPageResponse<MemberListDTO> getMemberList(int currentPage);
 	
+	// 회원 키워드 조회
+	ReportPageResponse<MemberListDTO> getMemberListByKeyword(SearchDTO dto);
+	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO getMemberByNo(Long memberNo);
 	
