@@ -5,10 +5,13 @@
 <mapper namespace="com.kh.jde.comment.model.dao.CommentMapper">
 	
 	<!-- 리뷰 존재 확인 -->
-	<select id="existsComment" resultType="CommentDTO">
+	<select id="existsComment" 
+			parameterType="Long"
+			resultType="CommentDTO">
 		SELECT
 				  TC.COMMENT_NO commentNo
 				, TC.REVIEW_NO reviewNo
+				, TC.MEMBER_NO memberNo
 				, TC.CONTENT content
 				, TC.COMMENT_DATE commentDate
 		        , (
@@ -16,10 +19,11 @@
 		            FROM TB_COMMENT_LIKE TCL
 		            WHERE TCL.COMMENT_NO = TC.COMMENT_NO
 		          ) likeCount
+		        , TC.STATUS status
 		    FROM
 		          TB_COMMENT TC
 		    WHERE
-		          TC.REVIEW_NO = #{reviewNo}
+		          TC.COMMENT_NO = #{commentNo}
     </select>
     
     <select id="getCommentList"
@@ -73,7 +77,15 @@
 	</insert>
 
 
-	<update id=""></update>
+	<update id="deleteById"
+			parameterType="Long">
+		UPDATE
+				TB_COMMENT
+		SET
+				STATUS='N'
+		WHERE
+				COMMENT_NO = #{commentNo}
+	</update>
 
 
 
