@@ -1,11 +1,14 @@
 package com.kh.jde.admin.model.service;
 
+import java.sql.SQLException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.jde.admin.model.dao.AdminMapper;
 import com.kh.jde.admin.model.dto.CommentListDTO;
@@ -13,10 +16,13 @@ import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.vo.DefaultImageVO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
+import com.kh.jde.file.FileRenamePolicy;
+import com.kh.jde.file.service.S3Service;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
 import com.kh.jde.report.model.dto.ReportPageResponse;
@@ -32,8 +38,11 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminServiceImpl implements AdminService {
 	
 	private final AdminMapper adminMapper;
+	private final FileRenamePolicy fileRenamePolicy;
+	private final S3Service s3Service;
 	private static final int PAGE_LIMIT = 10; // 페이징바에 표시될 페이지 수
 	private static final int BOARD_LIMIT = 15; // 한 페이지에 표시될 게시글 수
+	
 	
 	@Override
 	public ReportPageResponse<CommentReportListDTO> getCommentReportList(int currentPage) {
@@ -137,6 +146,26 @@ public class AdminServiceImpl implements AdminService {
 		
 		// 페이징 조회 (DB에서 마스킹된 데이터 조회)
 		List<MemberListDTO> memberList = adminMapper.selectMemberList(pageInfo);
+		
+		return new ReportPageResponse<>(memberList, pageInfo);
+	}
+	
+	@Override
+	public ReportPageResponse<MemberListDTO> getMemberListByKeyword(SearchDTO dto) {
+		// 키워드 검색 전체 개수 조회
+		int listCount = adminMapper.countMembersByKeyword(dto.getKeyword());
+		
+		// PageInfo 생성
+		PageInfo pageInfo = Pagination.getPageInfo(listCount, dto.getCurrentPage(), PAGE_LIMIT, BOARD_LIMIT);
+		
+		// Map으로 파라미터 묶기
+		Map<String, Object> params = new HashMap<>();
+		params.put("keyword", dto.getKeyword());
+		params.put("offset", pageInfo.getOffset());
+		params.put("boardLimit", pageInfo.getBoardLimit());
+		
+		// 키워드 검색 페이징 조회
+		List<MemberListDTO> memberList = adminMapper.selectMemberListByKeyword(params);
 		
 		return new ReportPageResponse<>(memberList, pageInfo);
 	}
@@ -274,7 +303,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new IllegalStateException("댓글 삭제에 실패했습니다. 댓글 번호를 확인해주세요.");
 		}
 	}
-
+	
 	@Override
 	public ReportPageResponse<ReviewListDTO> getReviewList(int currentPage) {
 
@@ -308,6 +337,34 @@ public class AdminServiceImpl implements AdminService {
 		}
 	}
 
+	@Override
+	@Transactional
+	public void createDefaultImage(String fileName, MultipartFile file) {
+		
+		fileNameDuplicateCheck(fileName);
+		
+		String fileUrl = s3Service.fileSave(file, "DefaultImage");
+		DefaultImageVO defaultImage = DefaultImageVO.builder()
+				.fileName(fileName)
+				.fileUrl(fileUrl)
+				.build();
+		try {
+			adminMapper.createDefaultImage(defaultImage);
+		} catch(RuntimeException e) {
+			throw new UnexpectedSQLResponseException("회원 기본 이미지 등록에 실패했습니다.");
+		}
+	}
+	
+	private void fileNameDuplicateCheck(String fileName) {
+		DefaultImageVO duplicateCheck = DefaultImageVO.builder()
+				.fileName(fileName)
+				.build();
+		int result = adminMapper.countByFileName(duplicateCheck);
+		
+		if(result >= 1) {
+			throw new UnexpectedSQLResponseException("동일한 이름의 프로필 이미지가 이미 존재합니다.");
+		}
+	}
 
 
 }

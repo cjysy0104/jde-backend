@@ -1,5 +1,7 @@
 package com.kh.jde.admin.model.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.kh.jde.admin.model.dto.CommentListDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
@@ -41,6 +43,9 @@ public interface AdminService {
 	// 회원 페이징 조회
 	ReportPageResponse<MemberListDTO> getMemberList(int currentPage);
 	
+	// 회원 키워드 조회
+	ReportPageResponse<MemberListDTO> getMemberListByKeyword(SearchDTO dto);
+	
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO getMemberByNo(Long memberNo);
 	
@@ -73,5 +78,8 @@ public interface AdminService {
 	void deleteReview(Long reviewNo);
 
 
+	
+	// 회원이 사용할 기본이미지 등록
+	void createDefaultImage(String fileName, MultipartFile file);
 	
 }

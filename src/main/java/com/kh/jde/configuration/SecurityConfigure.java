@@ -43,6 +43,7 @@ public class SecurityConfigure {
 						   .csrf(AbstractHttpConfigurer::disable)
 						   .cors(Customizer.withDefaults())
 						   .authorizeHttpRequests(requests -> {
+							   // requests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
 							   requests.requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/members", "/api/auth/refresh").permitAll(); // 누구나 허용할 기능 (신고 등록)
 							   requests.requestMatchers(HttpMethod.GET, "/api/reviews/**", "/api/comments/**", "/api/uploads/**", "/api/members").permitAll(); // 게시글 전체조회 및 상세조회는 아무나
 							   

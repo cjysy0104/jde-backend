@@ -43,10 +43,21 @@ public class JwtFilter extends OncePerRequestFilter {
 		// log.info("요청 어케 옴? : {}", uri); // => /auth/login
 		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 		// 로그인 요청일때는 다음 필터체인으로 바로 넘어가게 처리
+		/*
 		if (authorization == null || uri.equals("/api/auth/login") || uri.equals("/api/auth/refresh")) {
 		    filterChain.doFilter(request, response);
 		    return;
 		}
+		*/
+		if (uri.equals("/api/auth/login") || uri.equals("/api/auth/refresh")) {
+		    filterChain.doFilter(request, response);
+		    return;
+		}
+		if (authorization == null || !authorization.startsWith("Bearer ")) {
+		    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		    return;
+		}
+
 		
 		
 		// 토큰 검증
