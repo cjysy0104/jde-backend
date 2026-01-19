@@ -170,11 +170,17 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public String updateMyProfileImage(String plainPassword, MultipartFile file) {
-	    // 현재 비밀번호 재검증 + principal 반환
+		
+		// 현재 비밀번호 재검증 + principal 반환
 	    CustomUserDetails user = validatePassword(plainPassword);
 
 	    Long memberNo = user.getMemberNo(); // 여기서 바로 사용 (DB 재조회 X)
-
+	    // DB에서 프로필 이미지 가져오기
+	    
+	    
+	    // S3Service에서 삭제하기
+	    
+	    
 	    String fileUrl = s3Service.fileSave(file, "profile");
 	   
 

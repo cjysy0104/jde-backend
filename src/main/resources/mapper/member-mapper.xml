@@ -205,6 +205,30 @@
 	           EMAIL = #{email}
 	       AND STATUS = 'Y'
 	</update>
+	
+	<!-- 기본 프로필 이미지 단건 조회 -->
+	<select id="selectDefaultImageByNo" parameterType="long" resultType="com.kh.jde.admin.model.dto.DefaultImageDTO">
+	    SELECT
+	           FILE_NO    AS fileNo
+	         , FILE_NAME  AS fileName
+	         , FILE_URL   AS fileUrl
+	         , CREATED_AT AS createdAt
+	      FROM
+	           TB_DEFAULT_PROFILE
+	     WHERE
+	           FILE_NO = #{fileNo}
+	</select>
+	
+	<!-- 프로필URL 가져오기 -->	
+	<select id="selectProfileImageUrl" parameterType="com.kh.jde.member.model.vo.MemberFileVO">
+	    SELECT
+		       FILE_URL
+		  FROM
+		       TB_MEMBER_FILE
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+	</select>
+	
 	<!-- 프로필 이미지 변경 -->	
 	<update id="upsertProfileImage" parameterType="com.kh.jde.member.model.vo.MemberFileVO">
 	    UPDATE
