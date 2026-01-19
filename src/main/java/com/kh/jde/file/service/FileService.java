@@ -1,17 +1,18 @@
 package com.kh.jde.file.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.jde.file.FileRenamePolicy;
+import com.kh.jde.file.dao.FileMapper;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -20,9 +21,10 @@ public class FileService {
 	
 	private final FileRenamePolicy fileRenamePolicy;
 	private final Path fileLocation;
+	private final FileMapper fileMapper;
 	
 	
-	public FileService(FileRenamePolicy fileRenamePolicy) {
+	public FileService(FileRenamePolicy fileRenamePolicy, FileMapper fileMapper) {
 		this.fileRenamePolicy = fileRenamePolicy;
 		this.fileLocation = Paths.get("uploads").toAbsolutePath().normalize();
 		try {
@@ -30,6 +32,18 @@ public class FileService {
 		} catch (IOException e) {
 			throw new RuntimeException("파일 저장소 생성 실패", e);
 		}
+		this.fileMapper = fileMapper;
+	}
+	
+	public String getDefaultImage() {
+	    List<String> urls = fileMapper.getDefaultImage();
+
+	    if (urls.isEmpty()) {
+	        throw new IllegalStateException("기본 프로필 이미지가 없습니다.");
+	    }
+
+	    int randomIndex = ThreadLocalRandom.current().nextInt(urls.size());
+	    return urls.get(randomIndex);
 	}
 	
 	

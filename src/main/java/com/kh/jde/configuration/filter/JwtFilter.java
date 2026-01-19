@@ -38,18 +38,14 @@ public class JwtFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		// log.info("진짜로 요청이 들어올 때마다 요친구가 호출되는지 확인");
 		
-
 		String uri = request.getRequestURI();
-		// log.info("요청 어케 옴? : {}", uri); // => /auth/login
 		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-		// 로그인 요청일때는 다음 필터체인으로 바로 넘어가게 처리
-		/*
-		if (authorization == null || uri.equals("/api/auth/login") || uri.equals("/api/auth/refresh")) {
-		    filterChain.doFilter(request, response);
-		    return;
-		}
-		*/
-		if (uri.equals("/api/auth/login") || uri.equals("/api/auth/refresh")) {
+
+		// 아래 요청은 다 통과
+		if (uri.equals("/api/auth/login") // 로그인
+			    || uri.equals("/api/auth/refresh") // 로그인연장
+			    || (uri.equals("/api/members") && request.getMethod().equals("POST")) // 회원가입
+			) {
 		    filterChain.doFilter(request, response);
 		    return;
 		}

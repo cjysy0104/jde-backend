@@ -33,4 +33,6 @@ public interface MemberMapper {
 
     int upsertProfileImage(MemberFileVO vo);
     
+    int createProfileImage(MemberFileVO memberFile);
+    
 }

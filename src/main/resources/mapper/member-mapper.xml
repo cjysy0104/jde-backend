@@ -216,6 +216,25 @@
 	          INSERT (FILE_NO, MEMBER_NO, FILE_URL, CREATED_AT)
 	          VALUES (SEQ_MEMBER_FILE_NO.NEXTVAL, s.MEMBER_NO, s.FILE_URL, SYSDATE)
 	</update>
+	
+	<insert id="createProfileImage">
+		INSERT
+		  INTO
+		       TB_MEMBER_FILE
+		       (
+		       FILE_NO
+		     , MEMBER_NO
+		     , FILE_URL
+		     , CREATED_AT
+		       )
+		VALUES
+		       (
+		       SEQ_MEMBER_FILE_NO.NEXTVAL
+		     , #{memberNo}
+		     , #{fileUrl}
+		     , SYSDATE
+		       )
+	</insert>
 
 	
 </mapper>
