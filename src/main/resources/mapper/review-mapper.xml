@@ -5,7 +5,7 @@
 <mapper namespace="com.kh.jde.review.model.dao.ReviewMapper">
 
 <!-- 리뷰 전체조회-->	
-	<resultMap id="reviewListMap" type="reviewDTO">
+	<resultMap id="reviewListMap" type="ReviewListResponseDTO">
 		<id property="reviewNo" column="REVIEW_NO"/>
 
 		<result property="thumbnailUrl" column="THUMBNAIL_URL"/>
@@ -356,14 +356,17 @@
 		UPDATE
 				TB_REVIEW
 		SET
-				  STATUS = 'Y'
+				  STATUS = 'N'
 				, DELETED_AT = SYSDATE
 		WHERE
 				REVIEW_NO = #{reviewNo}
+		AND
+				STATUS = 'Y'
 	</update>
 	
 	<select id="getWriterById"
-			parameterType="Long">
+			parameterType="Long"
+			resultType="Long">
 		SELECT
 				MEMBER_NO
 		FROM
@@ -372,6 +375,24 @@
 				REVIEW_NO = #{reviewNo}
 	</select>
 	
+	<select id="getExistsReview"
+			parameterType="Long"
+			resultType="ReviewDTO">
+		SELECT
+				  REVIEW_NO reviewNo
+				, MEMBER_NO memberNo
+				, RESTAURANT_NO restaurantNo
+				, CONTENT content
+				, RATING rating
+				, STATUS status
+				, CREATED_AT createdAt
+				, UPDATED_AT updatedAt
+				, VIEW_COUNT viewCount
+		FROM
+				TB_REVIEW
+		WHERE
+				REVIEW_NO = #{reviewNo}
+	</select>
 
 
 

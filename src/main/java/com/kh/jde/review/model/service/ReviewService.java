@@ -5,11 +5,11 @@ import java.util.List;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
-import com.kh.jde.review.model.dto.ReviewDTO;
+import com.kh.jde.review.model.dto.ReviewListResponseDTO;
 
 public interface ReviewService {
 
-	public List<ReviewDTO> getReviewList(QueryDTO req, CustomUserDetails principal);
+	public List<ReviewListResponseDTO> getReviewList(QueryDTO req, CustomUserDetails principal);
 	
 	public DetailReviewDTO getDetailReview(Long reviewNo, CustomUserDetails principal);
 
