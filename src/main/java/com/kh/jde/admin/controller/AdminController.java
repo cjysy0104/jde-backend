@@ -114,7 +114,7 @@ public class AdminController {
 		return SuccessResponse.ok(reportPageResponse, "댓글 신고 키워드 조회 성공");
 	}
 	
-	// 리뷰 키워드 조회
+	// 리뷰 신고  키워드 조회
 	@GetMapping("/reports/review/search")
 	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewReportListDTO>>> getReviewReportByKeyword(
 			@ModelAttribute SearchDTO dto){
