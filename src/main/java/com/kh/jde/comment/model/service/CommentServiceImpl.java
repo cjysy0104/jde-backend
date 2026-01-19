@@ -8,6 +8,7 @@ import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.comment.model.dao.CommentMapper;
 import com.kh.jde.comment.model.dto.CommentDTO;
 import com.kh.jde.comment.model.vo.CommentVO;
+import com.kh.jde.exception.AccessDeniedException;
 import com.kh.jde.exception.PostNotFoundException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.review.model.dao.ReviewMapper;
@@ -64,14 +65,24 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public int deleteById(Long commentNo) {
+	@Transactional
+	public int deleteById(Long commentNo, CustomUserDetails principal) {
 		
 		// 1. 댓글 잇냐
-		if(commentMapper.existsComment(commentNo) == null) {
+		CommentDTO comment = commentMapper.existsComment(commentNo);
+		if(comment == null) {
 			throw new PostNotFoundException("댓글이 존재하지 않습니다.");
 		}
-		// 2. 댓글 삭제
+		// 2. 자기꺼임?
+		if(!(comment.getMemberNo().equals(principal.getMemberNo()))) {
+			log.info("???????{}",comment);
+			throw new AccessDeniedException("댓글 삭제할 권한이 없습니다.");
+		}
+		// 3. 댓글 삭제
 		int result = commentMapper.deleteById(commentNo);
+		if(result != 1) {
+			throw new IllegalArgumentException("삭제 실패했습니다.");
+		}
 		
 		return result;
 	}

@@ -17,6 +17,7 @@ public class CommentDTO {
 
 	private Long commentNo;
 	private Long reviewNo;
+	private Long memberNo;
 	private String content;
 	private int likeCount;
 	private Date commentDate;
