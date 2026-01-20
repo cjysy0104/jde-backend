@@ -1,6 +1,6 @@
-package com.kh.jde.reviewlike.service;
+package com.kh.jde.reviewlike.model.service;
 
-import com.kh.jde.reviewlike.dto.ReviewLikeDTO;
+import com.kh.jde.reviewlike.model.dto.ReviewLikeDTO;
 
 public interface ReviewLikeService {
 	
