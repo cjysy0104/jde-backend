@@ -113,18 +113,4 @@
 				STATUS='Y'
 	</update>
 
-
-	<update id="update"
-			parameterType="CommentDTO">
-		UPDATE
-				TB_COMMENT
-		SET
-				CONTENT=#{content}
-		WHERE
-				COMMENT_NO = #{commentNo}
-	</update>
-
-
-
-
 </mapper>
