@@ -17,6 +17,6 @@ import lombok.ToString;
 @ToString
 public class ReportPageResponse<T> {
 	
-	private List<T> reportList;
+	private List<T> list;
 	private PageInfo pageInfo;
 }

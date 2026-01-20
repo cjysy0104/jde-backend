@@ -19,6 +19,7 @@ public class ReviewListDTO {
 	private Long memberNo; // 신고자 번호
 	private String restaurantNo; // 식당 번호
 	private String normalName; // 식당 이름
+	private String address; // 식당 주소
 	private String reviewContent; // 리뷰 내용
 	private Date createdAt; // 리뷰 작성일
 	private String status;
