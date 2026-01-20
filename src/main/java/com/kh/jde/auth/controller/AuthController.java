@@ -45,5 +45,4 @@ public class AuthController {
 		return SuccessResponse.ok(accessToken, "로그인 연장 성공");
 	}
 	
-
 }
