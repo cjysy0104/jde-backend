@@ -1,10 +1,12 @@
 package com.kh.jde.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import com.kh.jde.common.responseData.ErrorResponse;
 
@@ -83,6 +85,16 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(AlreadyDeletedException.class) 
 	public ResponseEntity<ErrorResponse<String>> handleAlreadyDeleted(AlreadyDeletedException e, HttpServletRequest request){
 		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
+	}
+	
+	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+	public ResponseEntity<ErrorResponse<String>> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException e, HttpServletRequest request) {
+	    return ErrorResponse.badRequest("요청 형식(Content-Type)이 올바르지 않습니다. JSON 또는 form-data 설정을 확인하세요.", request.getRequestURI());
+	}
+	
+	@ExceptionHandler(MissingServletRequestPartException.class)
+	public ResponseEntity<ErrorResponse<String>> handleMissingRequestPart(MissingServletRequestPartException e, HttpServletRequest request) {
+	    return ErrorResponse.badRequest("필수 파트가 누락되었습니다: " + e.getRequestPartName(), request.getRequestURI());
 	}
 	
 }
