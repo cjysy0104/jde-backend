@@ -21,22 +21,22 @@ public class BookmarkServiceImpl implements BookmarkService {
     @Override
     @Transactional
     public BookmarkToggleDTO toggle(Long memberNo, Long reviewNo) {
-        BookmarkVO key = BookmarkVO.builder()
+        BookmarkVO bookmark = BookmarkVO.builder()
                 .memberNo(memberNo)
                 .reviewNo(reviewNo)
                 .build();
 
-        int exists = bookmarkMapper.countBookmark(key);
+        int exists = bookmarkMapper.countBookmark(bookmark);
 
         if (exists > 0) {
-            bookmarkMapper.deleteBookmark(key);
+            bookmarkMapper.deleteBookmark(bookmark);
             return BookmarkToggleDTO.builder()
                     .bookmarked(false)
                     .action("REMOVED")
                     .build();
         } else {
             // 중복 방지(예: 동시에 2번 눌러도 안전)
-            bookmarkMapper.insertBookmarkIgnoreDuplicate(key);
+            bookmarkMapper.createBookmarkIgnoreDuplicate(bookmark);
             return BookmarkToggleDTO.builder()
                     .bookmarked(true)
                     .action("ADDED")
@@ -46,22 +46,22 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     @Transactional
-    public void add(Long memberNo, Long reviewNo) {
-        BookmarkVO key = BookmarkVO.builder()
+    public void create(Long memberNo, Long reviewNo) {
+        BookmarkVO bookmark = BookmarkVO.builder()
                 .memberNo(memberNo)
                 .reviewNo(reviewNo)
                 .build();
-        bookmarkMapper.insertBookmarkIgnoreDuplicate(key);
+        bookmarkMapper.createBookmarkIgnoreDuplicate(bookmark);
     }
 
     @Override
     @Transactional
-    public void remove(Long memberNo, Long reviewNo) {
-        BookmarkVO key = BookmarkVO.builder()
+    public void delete(Long memberNo, Long reviewNo) {
+        BookmarkVO bookmark = BookmarkVO.builder()
                 .memberNo(memberNo)
                 .reviewNo(reviewNo)
                 .build();
-        bookmarkMapper.deleteBookmark(key);
+        bookmarkMapper.deleteBookmark(bookmark);
     }
 
     @Override
@@ -69,12 +69,12 @@ public class BookmarkServiceImpl implements BookmarkService {
     public List<BookmarkResponseDTO> getMyBookmarks(Long memberNo, int page, int size) {
         int offset = page * size;
 
-        BookmarkVO vo = BookmarkVO.builder()
+        BookmarkVO bookmark = BookmarkVO.builder()
                 .memberNo(memberNo)
                 .offset(offset)
                 .size(size)
                 .build();
 
-        return bookmarkMapper.selectMyBookmarks(vo);
+        return bookmarkMapper.selectMyBookmarks(bookmark);
     }
 }

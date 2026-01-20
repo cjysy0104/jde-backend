@@ -6,30 +6,53 @@
 
     <!-- 좋아요 존재 확인 -->
     <select id="existsLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO" resultType="int">
-        SELECT COUNT(1)
-        FROM TB_REVIEW_LIKE
-        WHERE REVIEW_NO = #{reviewNo}
-          AND MEMBER_NO = #{memberNo}
+        SELECT 
+               COUNT(1)
+          FROM 
+               TB_REVIEW_LIKE
+         WHERE 
+               REVIEW_NO = #{reviewNo}
+           AND 
+               MEMBER_NO = #{memberNo}
     </select>
 
     <!-- 좋아요 등록 -->
     <insert id="createLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO">
-        INSERT INTO TB_REVIEW_LIKE (MEMBER_NO, REVIEW_NO, REVIEW_LIKE_DATE)
-        VALUES (#{memberNo}, #{reviewNo}, SYSDATE)
+        INSERT 
+          INTO 
+               TB_REVIEW_LIKE 
+               (
+               MEMBER_NO
+             , REVIEW_NO
+             , REVIEW_LIKE_DATE
+             )
+        VALUES 
+               (
+               #{memberNo}
+             , #{reviewNo}
+             , SYSDATE
+               )
     </insert>
 
 	<!-- 좋아요 취소 -->
 	<delete id="deleteLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO">
-        DELETE FROM TB_REVIEW_LIKE
-        WHERE MEMBER_NO = #{memberNo}
-          AND REVIEW_NO = #{reviewNo}
+        DELETE 
+          FROM 
+               TB_REVIEW_LIKE
+         WHERE 
+               MEMBER_NO = #{memberNo}
+           AND 
+               REVIEW_NO = #{reviewNo}
     </delete>
     
     <!-- 좋아요 수 -->
     <select id="countLikes" resultType="int">
-        SELECT COUNT(1)
-        FROM TB_REVIEW_LIKE
-        WHERE REVIEW_NO = #{reviewNo}
+        SELECT 
+               COUNT(1)
+          FROM 
+               TB_REVIEW_LIKE
+         WHERE 
+               REVIEW_NO = #{reviewNo}
     </select>
 
 </mapper>

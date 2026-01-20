@@ -1,13 +1,13 @@
-package com.kh.jde.reviewlike.service;
+package com.kh.jde.reviewlike.model.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.jde.review.model.dao.ReviewMapper;
-import com.kh.jde.reviewlike.dao.ReviewLikeMapper;
-import com.kh.jde.reviewlike.dto.ReviewLikeDTO;
+import com.kh.jde.reviewlike.model.dao.ReviewLikeMapper;
+import com.kh.jde.reviewlike.model.dto.ReviewLikeDTO;
+import com.kh.jde.reviewlike.model.vo.ReviewLikeVO;
 import com.kh.jde.reviewlike.validator.LikeValidationSupport;
-import com.kh.jde.reviewlike.vo.ReviewLikeVO;
 
 import lombok.RequiredArgsConstructor;
 

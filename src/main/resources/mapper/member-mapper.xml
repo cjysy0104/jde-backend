@@ -170,7 +170,8 @@
 	           PASSWORD = #{password}
 	     WHERE
 	           EMAIL = #{email}
-	       AND STATUS = 'Y'
+	       AND 
+	           STATUS = 'Y'
 	</update>
 
 	<!-- 이름 변경 -->
@@ -181,7 +182,8 @@
 	           MEMBER_NAME = #{memberName}
 	     WHERE
 	           EMAIL = #{email}
-	       AND STATUS = 'Y'
+	       AND 
+	           STATUS = 'Y'
 	</update>
 
 	<!-- 닉네임 변경 -->
@@ -192,7 +194,8 @@
 	           NICKNAME = #{nickname}
 	     WHERE
 	           EMAIL = #{email}
-	       AND STATUS = 'Y'
+	       AND 
+	           STATUS = 'Y'
 	</update>
 
 	<!-- 전화번호 변경 -->
@@ -205,16 +208,40 @@
 	           EMAIL = #{email}
 	       AND STATUS = 'Y'
 	</update>
+	
+	<!-- 기본 프로필 이미지 단건 조회 -->
+	<select id="selectDefaultProfileByNo" parameterType="long"
+	        resultType="com.kh.jde.admin.model.dto.DefaultImageDTO">
+	    SELECT
+	           FILE_NO    AS fileNo
+	         , FILE_NAME  AS fileName
+	         , FILE_URL   AS fileUrl
+	         , CREATED_AT AS createdAt
+	      FROM
+	           TB_DEFAULT_PROFILE
+	     WHERE
+	           FILE_NO = #{fileNo}
+	</select>
+	
+	<!-- 프로필URL 가져오기 -->
+	<select id="selectProfileImageUrl" parameterType="long" resultType="string">
+	    SELECT
+	           FILE_URL
+	      FROM
+	           TB_MEMBER_FILE
+	     WHERE
+	           MEMBER_NO = #{memberNo}
+	</select>
+	
 	<!-- 프로필 이미지 변경 -->	
 	<update id="upsertProfileImage" parameterType="com.kh.jde.member.model.vo.MemberFileVO">
-	    MERGE INTO TB_MEMBER_FILE t
-	    USING (SELECT #{memberNo} AS MEMBER_NO, #{fileUrl} AS FILE_URL FROM dual) s
-	       ON (t.MEMBER_NO = s.MEMBER_NO)
-	     WHEN MATCHED THEN
-	          UPDATE SET t.FILE_URL = s.FILE_URL
-	     WHEN NOT MATCHED THEN
-	          INSERT (FILE_NO, MEMBER_NO, FILE_URL, CREATED_AT)
-	          VALUES (SEQ_MEMBER_FILE_NO.NEXTVAL, s.MEMBER_NO, s.FILE_URL, SYSDATE)
+	    UPDATE
+	    	   TB_MEMBER_FILE
+	       SET
+	    	   FILE_URL = #{fileUrl}
+	    	 , CREATED_AT = SYSDATE
+	     WHERE	   
+	    	   MEMBER_NO = #{memberNo}
 	</update>
 
 	

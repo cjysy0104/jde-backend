@@ -10,8 +10,8 @@ public interface BookmarkService {
 	BookmarkToggleDTO toggle(Long memberNo, Long reviewNo);
 
     // 필요하면 프론트에서 "추가/삭제"를 따로 호출할 수도 있어서 열어둠
-    void add(Long memberNo, Long reviewNo);
-    void remove(Long memberNo, Long reviewNo);
+    void create(Long memberNo, Long reviewNo);
+    void delete(Long memberNo, Long reviewNo);
 
     List<BookmarkResponseDTO> getMyBookmarks(Long memberNo, int page, int size);
 }

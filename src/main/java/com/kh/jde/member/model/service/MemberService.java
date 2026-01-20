@@ -25,4 +25,7 @@ public interface MemberService {
 	void changePhone(ChangePhoneDTO changePhone);
 	
 	String updateMyProfileImage(String plainPassword, MultipartFile file);
+	
+	String changeProfileToDefault(String plainPassword, Long fileNo);
+	
 }

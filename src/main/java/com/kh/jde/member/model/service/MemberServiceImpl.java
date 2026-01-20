@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
-import com.kh.jde.common.s3.S3Uploader;
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
+import com.kh.jde.file.service.S3Service;
 import com.kh.jde.member.model.dao.MemberMapper;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
@@ -37,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final MemberInformationValidator miv;
 	private final TokenMapper tokenMapper;
-	private final S3Uploader s3Uploader;
+	private final S3Service s3Service;
 	
 	@Override
 	@Transactional
@@ -166,39 +167,83 @@ public class MemberServiceImpl implements MemberService {
 	        throw new UnexpectedSQLResponseException("전화번호 변경 실패");
 	    }
 	}
-
+	// 자신의 이미지 업로드로 변경
 	@Override
 	@Transactional
 	public String updateMyProfileImage(String plainPassword, MultipartFile file) {
-	    // 현재 비밀번호 재검증 + principal 반환
+		
+		// 현재 비밀번호 재검증 + principal 반환
 	    CustomUserDetails user = validatePassword(plainPassword);
-
 	    Long memberNo = user.getMemberNo(); // 여기서 바로 사용 (DB 재조회 X)
+	    
+	    // 1) 기존 URL 조회	
+	    String oldUrl = memberMapper.selectProfileImageUrl(memberNo);
+	    
+	    // 2) 기존이 업로드(/profile/)면 삭제
+	    boolean hasOld = oldUrl != null && !oldUrl.isBlank();
+	    boolean isOldUserUpload = hasOld && oldUrl.contains("/Profile/");
 
-	    String fileUrl;
-	    try {
-	        fileUrl = s3Uploader.uploadProfileImage(file, memberNo);
-	    } catch (Exception e) {
-	        throw new RuntimeException("S3 업로드 실패", e);
+	    if (isOldUserUpload) {
+	        s3Service.deleteFile(oldUrl);
 	    }
-
-	    MemberFileVO vo = MemberFileVO.builder()
+	    
+	    // 3) 새 업로드는 profile 폴더
+	    String newUrl = s3Service.fileSave(file, "profile");
+	   
+	    // 4) DB 업데이트
+	    MemberFileVO memberFile = MemberFileVO.builder()
 	            .memberNo(memberNo)
-	            .fileUrl(fileUrl)
+	            .fileUrl(newUrl )
 	            .build();
 
-	    int result = memberMapper.upsertProfileImage(vo);
+	    int result = memberMapper.upsertProfileImage(memberFile);
 	    if (result < 1) {
 	        throw new UnexpectedSQLResponseException("프로필 이미지 저장 실패");
 	    }
 
-	    return fileUrl;
+	    return newUrl;
+	}
+	
+	// 기본 이미지 선택(변경)
+	@Override
+	@Transactional
+	public String changeProfileToDefault(String plainPassword, Long fileNo) {
+
+	    CustomUserDetails user = validatePassword(plainPassword);
+	    Long memberNo = user.getMemberNo();
+
+	    // 1) 기본 이미지 단건 조회로 유효성 검증
+	    DefaultImageDTO selected = memberMapper.selectDefaultProfileByNo(fileNo);
+	    if (selected == null) {
+	        throw new IllegalArgumentException("선택한 기본 프로필 이미지를 찾을 수 없습니다.");
+	    }
+
+	    // 2) 기존 프로필이 업로드
+	    String oldUrl = memberMapper.selectProfileImageUrl(memberNo);
+	    boolean hasOld = oldUrl != null && !oldUrl.isBlank();
+	    boolean isOldUserUpload = hasOld && oldUrl.contains("/Profile/");      // 삭제 대상
+
+	    if (isOldUserUpload) {
+	        s3Service.deleteFile(oldUrl);
+	    }
+
+	    // 3) DB에는 기본이미지 URL 저장
+	    MemberFileVO memberFile = MemberFileVO.builder()
+	            .memberNo(memberNo)
+	            .fileUrl(selected.getFileUrl())
+	            .build();
+
+	    int result = memberMapper.upsertProfileImage(memberFile);
+	    if (result < 1) {
+	        throw new UnexpectedSQLResponseException("기본 프로필 이미지 변경 실패");
+	    }
+
+	    return selected.getFileUrl();
 	}
 	
 	@Override // 리뷰로 좋아요 많이 받은 상위 N명의 명단 가져오기
 	@Transactional(readOnly = true)
 	public List<CaptainDTO> getCaptainList() {
-		
 		
 		List<CaptainDTO> captains = memberMapper.getCaptainList();
 		
