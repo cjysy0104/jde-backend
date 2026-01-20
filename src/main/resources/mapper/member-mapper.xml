@@ -170,7 +170,8 @@
 	           PASSWORD = #{password}
 	     WHERE
 	           EMAIL = #{email}
-	       AND STATUS = 'Y'
+	       AND 
+	           STATUS = 'Y'
 	</update>
 
 	<!-- 이름 변경 -->
@@ -181,7 +182,8 @@
 	           MEMBER_NAME = #{memberName}
 	     WHERE
 	           EMAIL = #{email}
-	       AND STATUS = 'Y'
+	       AND 
+	           STATUS = 'Y'
 	</update>
 
 	<!-- 닉네임 변경 -->
@@ -192,7 +194,8 @@
 	           NICKNAME = #{nickname}
 	     WHERE
 	           EMAIL = #{email}
-	       AND STATUS = 'Y'
+	       AND 
+	           STATUS = 'Y'
 	</update>
 
 	<!-- 전화번호 변경 -->

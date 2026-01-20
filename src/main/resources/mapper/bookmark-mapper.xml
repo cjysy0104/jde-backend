@@ -8,32 +8,56 @@
     <select id="countBookmark"
             parameterType="com.kh.jde.bookmark.model.vo.BookmarkVO"
             resultType="int">
-        SELECT COUNT(*)
-        FROM TB_BOOKMARK
-        WHERE MEMBER_NO = #{memberNo}
-          AND REVIEW_NO = #{reviewNo}
+        SELECT 
+               COUNT(*)
+          FROM 
+               TB_BOOKMARK
+         WHERE 
+               MEMBER_NO = #{memberNo}
+           AND 
+               REVIEW_NO = #{reviewNo}
     </select>
 
-    <!-- 북마크 추가 (MERGE 없이 중복 방지: NOT EXISTS) -->
+    <!-- 북마크 추가 (중복 방지: NOT EXISTS) -->
     <insert id="createBookmarkIgnoreDuplicate"
             parameterType="com.kh.jde.bookmark.model.vo.BookmarkVO">
-        INSERT INTO TB_BOOKMARK (MEMBER_NO, REVIEW_NO, ENROLL_DATE)
-        SELECT #{memberNo}, #{reviewNo}, SYSDATE
-        FROM dual
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM TB_BOOKMARK
-            WHERE MEMBER_NO = #{memberNo}
-              AND REVIEW_NO = #{reviewNo}
-        )
+        INSERT 
+          INTO 
+               TB_BOOKMARK 
+               (
+               MEMBER_NO
+             , REVIEW_NO
+             , ENROLL_DATE
+               )
+        SELECT 
+               #{memberNo}
+             , #{reviewNo}
+             , SYSDATE
+          FROM 
+               dual
+         WHERE 
+          NOT EXISTS (
+            		 SELECT 
+            		        1
+            		   FROM 
+            		        TB_BOOKMARK
+            		  WHERE 
+            		        MEMBER_NO = #{memberNo}
+              			AND 
+              			    REVIEW_NO = #{reviewNo}
+        			  )
     </insert>
 
     <!-- 북마크 삭제 -->
     <delete id="deleteBookmark"
             parameterType="com.kh.jde.bookmark.model.vo.BookmarkVO">
-        DELETE FROM TB_BOOKMARK
-        WHERE MEMBER_NO = #{memberNo}
-          AND REVIEW_NO = #{reviewNo}
+        DELETE 
+          FROM 
+               TB_BOOKMARK
+         WHERE 
+               MEMBER_NO = #{memberNo}
+           AND 
+               REVIEW_NO = #{reviewNo}
     </delete>
 
     <!-- 내 북마크 목록 조회 (좋아요 수/댓글 수/썸네일 1장 포함) -->
@@ -42,67 +66,93 @@
 	        resultType="com.kh.jde.bookmark.model.dto.BookmarkResponseDTO">
 	
 	    SELECT
-	        reviewNo,
-	        bookmarkEnrollDate,
-	        content,
-	        rating,
-	        reviewCreatedAt,
-	        writerMemberNo,
-	        writerNickname,
-	        likeCount,
-	        commentCount,
-	        thumbnailUrl
-	    FROM (
-	        SELECT
-	            t.reviewNo,
-	            t.bookmarkEnrollDate,
-	            t.content,
-	            t.rating,
-	            t.reviewCreatedAt,
-	            t.writerMemberNo,
-	            t.writerNickname,
-	            t.likeCount,
-	            t.commentCount,
-	            t.thumbnailUrl,
-	            ROWNUM rn
-	        FROM (
-	            SELECT
-	                b.REVIEW_NO   AS reviewNo,
-	                b.ENROLL_DATE AS bookmarkEnrollDate,
-	
-	                r.CONTENT     AS content,
-	                r.RATING      AS rating,
-	                r.CREATED_AT  AS reviewCreatedAt,
-	
-	                r.MEMBER_NO   AS writerMemberNo,     -- (리뷰 작성자 컬럼명이 MEMBER_NO 라고 가정)
-	                m.NICKNAME    AS writerNickname,
-	
-	                (SELECT COUNT(*)
-	                   FROM TB_REVIEW_LIKE rl
-	                  WHERE rl.REVIEW_NO = r.REVIEW_NO) AS likeCount,
-	
-	                (SELECT COUNT(*)
-	                   FROM TB_COMMENT c
-	                  WHERE c.REVIEW_NO = r.REVIEW_NO
-	                    AND c.STATUS = 'Y') AS commentCount,
-	
-	                (SELECT rf.FILE_URL
-					   FROM TB_REVIEW_FILE rf
-					  WHERE rf.REVIEW_NO = r.REVIEW_NO
-					    AND rf.IS_THUMNAIL = 'Y'
-					  ORDER BY rf.SORT_ORDER ASC, rf.FILE_NO ASC
-					  FETCH FIRST 1 ROWS ONLY) AS thumbnailUrl
-	
-	            FROM TB_BOOKMARK b
-	            JOIN TB_REVIEW r ON r.REVIEW_NO = b.REVIEW_NO
-	            JOIN TB_MEMBER m ON m.MEMBER_NO = r.MEMBER_NO
-	            WHERE b.MEMBER_NO = #{memberNo}
-	              AND r.STATUS = 'Y'
-	            ORDER BY b.ENROLL_DATE DESC, b.REVIEW_NO DESC
-	        ) t
-	        WHERE ROWNUM &lt;= (#{offset} + #{size})
-	    )
-	    WHERE rn > #{offset}
+	           reviewNo
+	         , bookmarkEnrollDate
+	         , content
+	         , rating
+	         , reviewCreatedAt
+	         , writerMemberNo
+	         , writerNickname
+	         , likeCount
+	         , commentCount
+	         , thumbnailUrl
+	      FROM (
+	           SELECT
+	            	  t.reviewNo
+	            	, t.bookmarkEnrollDate
+	            	, t.content
+	            	, t.rating
+	            	, t.reviewCreatedAt
+	            	, t.writerMemberNo
+	            	, t.writerNickname
+	            	, t.likeCount
+	            	, t.commentCount
+	            	, t.thumbnailUrl
+	            	, ROWNUM rn
+	             FROM 
+	                  (
+	            	  SELECT
+	               			 b.REVIEW_NO   AS reviewNo
+	               		   , b.ENROLL_DATE AS bookmarkEnrollDate
+	               		   , r.CONTENT     AS content
+	               		   
+	               		   , r.RATING      AS rating
+	               		   , r.CREATED_AT  AS reviewCreatedAt
+	               		   , r.MEMBER_NO   AS writerMemberNo
+	               		   , m.NICKNAME    AS writerNickname
+	               		   , (
+	               		     SELECT 
+	               		            COUNT(*)
+	                   		   FROM 
+	                   		        TB_REVIEW_LIKE rl
+	                 		  WHERE 
+	                 		        rl.REVIEW_NO = r.REVIEW_NO
+	                 		  ) AS likeCount
+	                 		, (
+	                 		  SELECT 
+	                 		         COUNT(*)
+	                   			FROM 
+	                   			     TB_COMMENT c
+	                  		   WHERE 
+	                  		         c.REVIEW_NO = r.REVIEW_NO
+	                   			 AND 
+	                   			     c.STATUS = 'Y'
+	                   		  ) AS commentCount
+	                   		, (
+	                   		  SELECT 
+	                   		         rf.FILE_URL
+					   			FROM 
+					   			     TB_REVIEW_FILE rf
+					  		   WHERE 
+					  		         rf.REVIEW_NO = r.REVIEW_NO
+					    		 AND 
+					    		     rf.IS_THUMNAIL = 'Y'
+					  		   ORDER 
+					  		      BY 
+					  		         rf.SORT_ORDER ASC
+					  		       , rf.FILE_NO ASC
+					  		   FETCH FIRST 1 ROWS ONLY
+					  		  ) AS thumbnailUrl
+	            		 FROM 
+	            		      TB_BOOKMARK b
+	            		 JOIN 
+	            		      TB_REVIEW r ON r.REVIEW_NO = b.REVIEW_NO
+	            		 JOIN 
+	            		      TB_MEMBER m ON m.MEMBER_NO = r.MEMBER_NO
+	            		WHERE 
+	            		      b.MEMBER_NO = #{memberNo}
+	              		  AND 
+	              		      r.STATUS = 'Y'
+	            		ORDER 
+	            		   BY 
+	            		      b.ENROLL_DATE DESC
+	            		    , b.REVIEW_NO DESC
+	        		   ) t
+	        	 WHERE 
+	        	       ROWNUM &lt;= (#{offset} + #{size})
+	    		)
+	      WHERE 
+	            rn > #{offset}
 	
 	</select>
 
