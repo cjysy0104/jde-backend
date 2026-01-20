@@ -963,6 +963,16 @@
 		       CREATED_AT DESC
 	</select>
 	
+	<!-- 리뷰 전체 개수 조회 -->
+	<select id="countAllReviews" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_REVIEW
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
 	<!-- 리뷰 페이징 조회 -->
 	<select id="selectReviewList" resultType="ReviewListDTO">
 		SELECT

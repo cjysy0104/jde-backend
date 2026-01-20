@@ -8,6 +8,7 @@ import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.comment.model.dao.CommentMapper;
 import com.kh.jde.comment.model.dto.CommentDTO;
 import com.kh.jde.comment.model.vo.CommentVO;
+import com.kh.jde.exception.AccessDeniedException;
 import com.kh.jde.exception.PostNotFoundException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.review.model.dao.ReviewMapper;
@@ -64,15 +65,52 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public int deleteById(Long commentNo) {
+	@Transactional
+	public int deleteById(Long commentNo, CustomUserDetails principal) {
 		
 		// 1. 댓글 잇냐
-		if(commentMapper.existsComment(commentNo) == null) {
+		CommentDTO comment = commentMapper.existsComment(commentNo);
+		if(comment == null) {
 			throw new PostNotFoundException("댓글이 존재하지 않습니다.");
 		}
-		// 2. 댓글 삭제
+		if("N".equals(comment.getStatus())) {
+			throw new IllegalArgumentException("이미 삭제된 댓글입니다.");
+		}
+		// 2. 자기꺼임?
+		if(!(comment.getMemberNo().equals(principal.getMemberNo()))) {
+			throw new AccessDeniedException("댓글 삭제할 권한이 없습니다.");
+		}
+		// 3. 댓글 삭제
 		int result = commentMapper.deleteById(commentNo);
+		if(result != 1) {
+			throw new IllegalArgumentException("삭제 실패했습니다.");
+		}
 		
+		return result;
+	}
+
+	@Override
+	public int update(Long commentNo, CustomUserDetails principal, CommentDTO request) {
+
+		// 1. 댓글 잇냐
+		CommentDTO comment = commentMapper.existsComment(commentNo);
+		if(comment == null) {
+			throw new PostNotFoundException("댓글이 존재하지 않습니다.");
+		}
+		if("N".equals(comment.getStatus())) {
+			throw new IllegalArgumentException("이미 삭제된 댓글입니다.");
+		}
+		// 2. 니꺼냐?
+		if(!(comment.getMemberNo().equals(principal.getMemberNo()))) {
+			throw new AccessDeniedException("댓글 삭제할 권한이 없습니다.");
+		}
+		// 3. 댓글 수정
+		comment.setContent(request.getContent());
+		
+		int result = commentMapper.update(comment);
+		if(result != 1) {
+			throw new IllegalArgumentException("수정 실패했습니다.");
+		}
 		return result;
 	}
 	
