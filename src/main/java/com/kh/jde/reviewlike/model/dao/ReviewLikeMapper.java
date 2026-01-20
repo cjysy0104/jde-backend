@@ -1,8 +1,8 @@
-package com.kh.jde.reviewlike.dao;
+package com.kh.jde.reviewlike.model.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.kh.jde.reviewlike.vo.ReviewLikeVO;
+import com.kh.jde.reviewlike.model.vo.ReviewLikeVO;
 
 @Mapper
 public interface ReviewLikeMapper {

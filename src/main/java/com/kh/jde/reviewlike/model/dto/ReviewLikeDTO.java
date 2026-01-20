@@ -1,4 +1,4 @@
-package com.kh.jde.reviewlike.dto;
+package com.kh.jde.reviewlike.model.dto;
 
 import lombok.Builder;
 import lombok.Getter;
