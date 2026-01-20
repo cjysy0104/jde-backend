@@ -2,10 +2,10 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.kh.jde.reviewlike.dao.ReviewLikeMapper">
+<mapper namespace="com.kh.jde.reviewlike.model.vo.ReviewLikeMapper">
 
     <!-- 좋아요 존재 확인 -->
-    <select id="existsLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO" resultType="int">
+    <select id="existsLike" parameterType="com.kh.jde.reviewlike.model.vo.ReviewLikeVO" resultType="int">
         SELECT 
                COUNT(1)
           FROM 
@@ -17,7 +17,7 @@
     </select>
 
     <!-- 좋아요 등록 -->
-    <insert id="createLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO">
+    <insert id="createLike" parameterType="com.kh.jde.reviewlike.model.vo.ReviewLikeVO">
         INSERT 
           INTO 
                TB_REVIEW_LIKE 
@@ -35,7 +35,7 @@
     </insert>
 
 	<!-- 좋아요 취소 -->
-	<delete id="deleteLike" parameterType="com.kh.jde.reviewlike.vo.ReviewLikeVO">
+	<delete id="deleteLike" parameterType="com.kh.jde.reviewlike.model.vo.ReviewLikeVO">
         DELETE 
           FROM 
                TB_REVIEW_LIKE
