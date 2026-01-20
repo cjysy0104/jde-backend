@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.jde.auth.model.dto.AccessTokenResponseDTO;
 import com.kh.jde.auth.model.dto.LoginResponseDTO;
+import com.kh.jde.auth.model.dto.RefreshTokenRequestDTO;
 import com.kh.jde.auth.model.service.AuthService;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.MemberLoginDTO;
@@ -36,5 +38,12 @@ public class AuthController {
 		authService.logout(member);
 		return SuccessResponse.ok("로그아웃 되었습니다.");
 	}
+	
+	@PostMapping("refresh")
+	public ResponseEntity<SuccessResponse<AccessTokenResponseDTO>> reissueAccessToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO){
+		AccessTokenResponseDTO accessToken = authService.reissueAccessToken(refreshTokenDTO.getRefreshToken());
+		return SuccessResponse.ok(accessToken, "로그인 연장 성공");
+	}
+	
 
 }
