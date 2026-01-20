@@ -1,6 +1,7 @@
 package com.kh.jde.comment.validator;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.comment.model.dto.CommentDTO;
@@ -55,4 +56,5 @@ public class CommentValidator {
 			throw new AccessDeniedException("로그인 정보가 없습니다.");
 		}
 	}
+
 }
