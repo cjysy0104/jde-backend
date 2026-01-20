@@ -79,4 +79,10 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse<String>> handlePostNotFound(S3ServiceFailureException e, HttpServletRequest request){
 		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
 	}
+	
+	@ExceptionHandler(AlreadyDeletedException.class) 
+	public ResponseEntity<ErrorResponse<String>> handleAlreadyDeleted(AlreadyDeletedException e, HttpServletRequest request){
+		return ErrorResponse.badRequest(e.getMessage(), request.getRequestURI());
+	}
+	
 }

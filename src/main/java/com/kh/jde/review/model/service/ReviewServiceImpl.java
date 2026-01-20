@@ -14,7 +14,7 @@ import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordDTO;
 import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
-import com.kh.jde.review.model.dto.ReviewDTO;
+import com.kh.jde.review.model.dto.ReviewListResponseDTO;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +28,13 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewMapper reviewMapper;
 
 	@Override
-	public List<ReviewDTO> getReviewList(QueryDTO req, CustomUserDetails principal) {
+	public List<ReviewListResponseDTO> getReviewList(QueryDTO req, CustomUserDetails principal) {
 		
 		// 쿼리DTO 가공
 		QueryDTO normalized = nomarizedRequest(req, principal);
 		
 		// 목록 조회
-		List<ReviewDTO> reviews = reviewMapper.getReviewList(normalized);
+		List<ReviewListResponseDTO> reviews = reviewMapper.getReviewList(normalized);
 		
 		// 조회한애들 No 뽑아서 키워드 조회하고 주입해
 		attachKeyword(reviews);
@@ -42,11 +42,11 @@ public class ReviewServiceImpl implements ReviewService {
 		return reviews;
 	}
 
-	private void attachKeyword(List<ReviewDTO> reviews) {
+	private void attachKeyword(List<ReviewListResponseDTO> reviews) {
 		
 		// 0. reviewNo빼내서 리스트화
 		List<Long> reviewNos = reviews.stream()
-        .map(ReviewDTO::getReviewNo)
+        .map(ReviewListResponseDTO::getReviewNo)
         .distinct()
         .toList();
 		
@@ -60,7 +60,7 @@ public class ReviewServiceImpl implements ReviewService {
 						Collectors.toList())));
 		
 		// 3. 주입
-		for (ReviewDTO review : reviews) {
+		for (ReviewListResponseDTO review : reviews) {
 		    review.setKeywords(
 		        keywordMap.getOrDefault(review.getReviewNo(), List.of()));
 		}
@@ -77,8 +77,7 @@ public class ReviewServiceImpl implements ReviewService {
 		if(principal != null) {
 			req.setMemberNo(principal.getMemberNo());
 		} else {
-//			req.setMemberNo(null);
-			req.setMemberNo(Long.valueOf(3)); // test용
+			req.setMemberNo(null);
 		}
 		
 		// 2. scroll 만들자
@@ -94,7 +93,7 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		Map<String, Object> param = Map.of(
 				"reviewNo", reviewNo,
-				"memberNo", Long.valueOf(3));
+				"memberNo", principal.getMemberNo());
 		
 		return reviewMapper.getDetailReview(param);
 	}
@@ -105,14 +104,12 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		// 1. 게시글 상태 조회
 		if(reviewMapper.existsReview(reviewNo) == 0) {
-			log.info("NO???{}", reviewMapper.existsReview(reviewNo));
 			throw new PostNotFoundException("조회된 게시글이 없습니다.");
 		}
 		
 		
 		// 2. 리뷰글 작성자 = 로그인 사용자?
-		if(reviewMapper.getWriterById(reviewNo) != principal.getMemberNo()) {
-			log.info("ID???{}", reviewMapper.getWriterById(reviewNo));
+		if(reviewMapper.getWriterById(reviewNo).equals(principal.getMemberNo())) {
 			throw new AccessDeniedException("삭제 권한이 없습니다.");
 		}
 		
