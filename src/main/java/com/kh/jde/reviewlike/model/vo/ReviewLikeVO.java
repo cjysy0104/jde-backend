@@ -1,4 +1,4 @@
-package com.kh.jde.reviewlike.vo;
+package com.kh.jde.reviewlike.model.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

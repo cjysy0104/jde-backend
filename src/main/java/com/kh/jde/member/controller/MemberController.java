@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.CaptainDTO;
+import com.kh.jde.member.model.dto.ChangeDefaultProfileDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
 import com.kh.jde.member.model.dto.ChangeNicknameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
@@ -85,7 +86,8 @@ public class MemberController {
 	    memberService.changePhone(changePhone);
 	    return SuccessResponse.ok("전화번호가 변경되었습니다.");
 	}
-
+	
+	// 자신의 이미지 업로드로 변경
 	@PatchMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<SuccessResponse<String>> updateProfileImage(
 	        @RequestPart("password") String password,
@@ -93,6 +95,15 @@ public class MemberController {
 	) {
 	    String url = memberService.updateMyProfileImage(password, file);
 	    return SuccessResponse.ok(url, "프로필 이미지가 변경되었습니다.");
+	}
+	
+	// 기본 이미지 선택(변경)
+	@PatchMapping(value = "/profile-image/default", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<SuccessResponse<String>> changeProfileToDefault(
+			@RequestBody ChangeDefaultProfileDTO defaultProfile
+	) {
+	    String url = memberService.changeProfileToDefault(defaultProfile.getPassword(), defaultProfile.getFileNo());
+	    return SuccessResponse.ok(url, "기본 프로필 이미지로 변경되었습니다.");
 	}
 
 }

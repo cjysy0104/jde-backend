@@ -1,17 +1,16 @@
-package com.kh.jde.comment.model.vo;
+package com.kh.jde.comment.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentVO {
+public class CommentUpdateDTO {
 
-	private Long reviewNo;
-	private Long memberNo;
+	private Long commentNo;
 	private String content;
 }

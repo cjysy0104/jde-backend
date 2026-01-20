@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.MemberLoginDTO;
 import com.kh.jde.member.model.vo.MemberFileVO;
@@ -30,8 +31,13 @@ public interface MemberMapper {
 	int updateNameByEmail(MemberVO member);
 	int updateNicknameByEmail(MemberVO member);
 	int updatePhoneByEmail(MemberVO member);
-
-    int upsertProfileImage(MemberFileVO vo);
+	
+	// 기본 이미지 단건 조회
+	DefaultImageDTO selectDefaultProfileByNo(Long fileNo);
+	
+	// 내 프로필 URL 조회/저장
+	String selectProfileImageUrl(Long memberNo);
+    int upsertProfileImage(MemberFileVO memberFile);
     
     int createProfileImage(MemberFileVO memberFile);
     

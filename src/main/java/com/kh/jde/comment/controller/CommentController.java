@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.comment.model.dto.CommentDTO;
+import com.kh.jde.comment.model.dto.CommentRequestDTO;
 import com.kh.jde.comment.model.service.CommentService;
 import com.kh.jde.common.responseData.SuccessResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/comments")
 @RequiredArgsConstructor
@@ -36,17 +37,32 @@ public class CommentController {
 	
 	@PostMapping("/{reviewNo}")
 	public ResponseEntity<SuccessResponse<Void>> create(@PathVariable("reviewNo")Long reviewNo
-															, @AuthenticationPrincipal CustomUserDetails principal
-															, @RequestBody CommentDTO request){
+														, @AuthenticationPrincipal CustomUserDetails principal
+														, @RequestBody @Valid CommentRequestDTO request){
 		
-		int result = commentService.create(reviewNo, principal, request);
+		commentService.create(reviewNo, principal, request);
 		
 		return SuccessResponse.created("댓글 등록이 완료되었습니다.");
 	}
 	
 	@DeleteMapping("/{commentNo}")
-	public ResponseEntity<SuccessResponse<Void>> deleteById(@PathVariable("commentNo")Long commentNo){
+	public ResponseEntity<SuccessResponse<Void>> deleteById(@PathVariable("commentNo")Long commentNo
+														  , @AuthenticationPrincipal CustomUserDetails principal){
+		
+		commentService.deleteById(commentNo, principal);
 		
 		return SuccessResponse.ok("댓글 삭제가 완료되었습니다.");
 	}
+	
+	@PatchMapping("/{commentNo}")
+	public ResponseEntity<SuccessResponse<Void>> update(@PathVariable("commentNo")Long commentNo
+														, @AuthenticationPrincipal CustomUserDetails principal
+														, @RequestBody @Valid CommentRequestDTO request){
+		
+		commentService.update(commentNo, principal, request);
+		
+		return SuccessResponse.ok("댓글 수정이 완료되었습니다.");
+	}
+	
+	
 }

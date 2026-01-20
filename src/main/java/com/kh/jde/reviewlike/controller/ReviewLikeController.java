@@ -9,14 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
-import com.kh.jde.commentlike.model.dto.CommentLikeDTO;
-import com.kh.jde.common.responseData.ErrorResponse;
 import com.kh.jde.common.responseData.SuccessResponse;
-import com.kh.jde.reviewlike.dto.ReviewLikeDTO;
-import com.kh.jde.reviewlike.service.ReviewLikeService;
-import com.kh.jde.reviewlike.vo.ReviewLikeVO;
+import com.kh.jde.reviewlike.model.dto.ReviewLikeDTO;
+import com.kh.jde.reviewlike.model.service.ReviewLikeService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController

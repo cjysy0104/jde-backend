@@ -327,7 +327,7 @@ public class AdminServiceImpl implements AdminService {
 	public ReportPageResponse<ReviewListDTO> getReviewList(int currentPage) {
 
 		// 전체 개수 조회
-		int listCount = adminMapper.countAllComments();
+		int listCount = adminMapper.countAllReviews();
 				
 		// PageInfo 생성
 		PageInfo pageInfo = Pagination.getPageInfo(listCount, currentPage, PAGE_LIMIT, BOARD_LIMIT);
@@ -342,7 +342,7 @@ public class AdminServiceImpl implements AdminService {
 	public ReviewListDTO getReviewByNo(Long reviewNo) {
 		ReviewListDTO review = adminMapper.selectReviewByNo(reviewNo);
 		if (review == null) {
-			throw new IllegalArgumentException("댓글을 찾을 수 없습니다.");
+			throw new IllegalArgumentException("리뷰를 찾을 수 없습니다.");
 		}
 		return review;
 	}
@@ -372,7 +372,7 @@ public class AdminServiceImpl implements AdminService {
 		// 리뷰 삭제 (STATUS를 'N'으로 변경)
 		int result = adminMapper.deleteReview(reviewNo);
 		if (result != 1) {
-			throw new IllegalStateException("댓글 삭제에 실패했습니다. 댓글 번호를 확인해주세요.");
+			throw new IllegalStateException("리뷰 삭제에 실패했습니다. 리뷰 번호를 확인해주세요.");
 		}
 	}
 

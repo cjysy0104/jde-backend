@@ -1,17 +1,15 @@
-package com.kh.jde.comment.model.vo;
+package com.kh.jde.comment.model.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentVO {
+public class CommentRequestDTO {
 
-	private Long reviewNo;
-	private Long memberNo;
+	@NotBlank
 	private String content;
 }
