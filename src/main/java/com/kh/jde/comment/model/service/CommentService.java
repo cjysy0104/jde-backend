@@ -12,6 +12,8 @@ public interface CommentService {
 	int create(Long reviewNo, CustomUserDetails principal, CommentDTO request);
 	
 	int deleteById(Long commentNo, CustomUserDetails principal);
+
+	int update(Long commentNo, CustomUserDetails principal, CommentDTO request);
 	
 	
 
