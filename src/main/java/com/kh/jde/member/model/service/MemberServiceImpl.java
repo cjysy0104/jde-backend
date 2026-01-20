@@ -176,7 +176,7 @@ public class MemberServiceImpl implements MemberService {
 	    CustomUserDetails user = validatePassword(plainPassword);
 	    Long memberNo = user.getMemberNo(); // 여기서 바로 사용 (DB 재조회 X)
 	    
-	    // 1) 기존 URL 조회
+	    // 1) 기존 URL 조회	
 	    String oldUrl = memberMapper.selectProfileImageUrl(memberNo);
 	    
 	    // 2) 기존이 업로드(/profile/)면 삭제
@@ -244,7 +244,6 @@ public class MemberServiceImpl implements MemberService {
 	@Override // 리뷰로 좋아요 많이 받은 상위 N명의 명단 가져오기
 	@Transactional(readOnly = true)
 	public List<CaptainDTO> getCaptainList() {
-		
 		
 		List<CaptainDTO> captains = memberMapper.getCaptainList();
 		

@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.CaptainDTO;
+import com.kh.jde.member.model.dto.ChangeDefaultProfileDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
 import com.kh.jde.member.model.dto.ChangeNicknameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
@@ -97,12 +98,11 @@ public class MemberController {
 	}
 	
 	// 기본 이미지 선택(변경)
-	@PatchMapping(value = "/profile-image/default", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PatchMapping(value = "/profile-image/default", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SuccessResponse<String>> changeProfileToDefault(
-	        @RequestPart("password") String password,
-	        @RequestPart("fileNo") Long fileNo
+			@RequestBody ChangeDefaultProfileDTO defaultProfile
 	) {
-	    String url = memberService.changeProfileToDefault(password, fileNo);
+	    String url = memberService.changeProfileToDefault(defaultProfile.getPassword(), defaultProfile.getFileNo());
 	    return SuccessResponse.ok(url, "기본 프로필 이미지로 변경되었습니다.");
 	}
 
