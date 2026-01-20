@@ -16,4 +16,6 @@ public interface TokenMapper {
 	
 	int deleteTokenForLogout(MemberLogoutDTO member);
 	
+	int deleteTokenByRefreshToken(String refreshToken);
+	
 }

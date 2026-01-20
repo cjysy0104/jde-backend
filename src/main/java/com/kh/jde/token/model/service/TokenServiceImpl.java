@@ -11,6 +11,7 @@ import com.kh.jde.token.model.vo.RefreshToken;
 import com.kh.jde.token.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +24,6 @@ public class TokenServiceImpl implements TokenService {
 	private final TokenMapper tokenMapper;
 
 	public Map<String, String> generateToken(String username) {
-
 		
 		Map<String, String> tokens = createTokens(username);
 
@@ -33,6 +33,7 @@ public class TokenServiceImpl implements TokenService {
 		return tokens;
 	}
 	
+	// AccessToken, RefreshToken 둘 다 만들기
 	private Map<String, String> createTokens(String username){
 		String accessToken = tokenUtil.getAccessToken(username);
 		String refreshToken = tokenUtil.getRefreshToken(username);
@@ -45,23 +46,42 @@ public class TokenServiceImpl implements TokenService {
 	
 	private void saveToken(String refreshToken, String username) {
 		RefreshToken token = RefreshToken.builder()
-												   .token(refreshToken)
-										           .username(username)
-				   								   .expiration(System.currentTimeMillis() + 3600000L * 72)
-				   								   .build();
-
+										 .token(refreshToken)
+										 .username(username)
+				   						 .expiration(System.currentTimeMillis() + 3600000L * 72)
+				   						 .build();
 		tokenMapper.saveToken(token);
 	}
 	
-	public Map<String, String> validateToken(String refreshToken) {
+	public String validateToken(String refreshToken) {
 		RefreshToken token = tokenMapper.findByToken(refreshToken);
-		if(token == null || token.getExpiration() < System.currentTimeMillis()) {
-			throw new CustomAuthenticationException("유효하지 않은 요청입니다.");
+		// DB에서 토큰 조회해서 검증하기
+		if(token == null) {
+			throw new CustomAuthenticationException("존재하지 않은 토큰입니다.");
 		}
-		Claims claims = tokenUtil.parseJwt(refreshToken); 
+		if(token.getExpiration() < System.currentTimeMillis()) {
+			tokenMapper.deleteTokenByRefreshToken(refreshToken); // 유효기간 지난 토큰은 삭제하기
+			throw new CustomAuthenticationException("유효기간이 지난 토큰입니다. 재 로그인 하세요.");
+		}
+		
+		// 토큰 파싱해서 서버에서 만든 토큰인지 확인
+		Claims claims = null;
+		try {
+			claims = tokenUtil.parseJwt(refreshToken); 
+		} catch(JwtException e) {
+			throw new CustomAuthenticationException("서버에서 만들어진 토큰이 아닙니다.");
+		}
+		
 		String username = claims.getSubject();
-		return createTokens(username);
+		String accessToken = createAccessToken(username);
+		return accessToken;
 	}
-	
+
+	// AccessToken만 만들기
+	private String createAccessToken(String username){
+		String accessToken = tokenUtil.getAccessToken(username);
+		
+		return accessToken;
+	}
 
 }

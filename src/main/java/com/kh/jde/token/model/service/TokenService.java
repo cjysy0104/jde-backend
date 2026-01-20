@@ -6,6 +6,6 @@ public interface TokenService {
 	
 	Map<String, String> generateToken(String username);
 	
-	Map<String, String> validateToken(String refreshToken);
+	String validateToken(String refreshToken);
 
 }

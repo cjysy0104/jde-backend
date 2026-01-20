@@ -9,6 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kh.jde.auth.model.dto.AccessTokenResponseDTO;
 import com.kh.jde.auth.model.dto.LoginResponseDTO;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.CustomAuthenticationException;
@@ -72,6 +73,16 @@ public class AuthServiceImpl implements AuthService {
 		} else {
 			throw new LogoutFailureException("로그아웃 오류 발생, 관리자에게 문의해주세요.");
 		}
+	}
+
+
+	@Override
+	public AccessTokenResponseDTO reissueAccessToken(String refreshToken) {
+		String newAccessToken = tokenService.validateToken(refreshToken);
+		AccessTokenResponseDTO accessToken = AccessTokenResponseDTO.builder()
+																	  .accessToken(newAccessToken)
+																	  .build();
+		return accessToken;
 	}
 	
 

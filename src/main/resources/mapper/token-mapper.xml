@@ -4,6 +4,19 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.jde.token.model.dao.TokenMapper">
 	
+	<resultMap id="refreshTokenMap" type="com.kh.jde.token.model.vo.RefreshToken">
+		<id property="token" column="TOKEN"/>
+    	<result property="username" column="USERNAME"/>
+    	<result property="expiration" column="EXPIRATION"/>
+	</resultMap>
+	
+	<sql id="sqlForDeleteToken">
+		DELETE
+		  FROM
+		       TB_TOKEN
+		 WHERE
+	</sql>
+	
 	<insert id="saveToken" parameterType="RefreshToken">
 		INSERT
 		  INTO
@@ -18,28 +31,27 @@
 	</insert>
 	
 	<delete id="deleteToken" parameterType="string">
-		DELETE
-		  FROM
-		       TB_TOKEN
-		 WHERE
+		<include refid="sqlForDeleteToken" />
 		       EMAIL = #{email}
 	</delete>
 	
 	<delete id="deleteTokenForLogout" parameterType="MemberLogoutDTO" >
-		DELETE
-		  FROM
-		       TB_TOKEN
-		 WHERE
+		<include refid="sqlForDeleteToken" />
 		       EMAIL = #{email}
 		   AND
 		       TOKEN = #{refreshToken}
 	</delete>
 	
-	<select id="findByToken" parameterType="string" resultType="RefreshToken">
+	<delete id="deleteTokenByRefreshToken" parameterType="string">
+		<include refid="sqlForDeleteToken" />
+		       TOKEN = #{refreshToken}
+	</delete>
+	
+	<select id="findByToken" parameterType="string" resultMap="refreshTokenMap">
 		SELECT
 		       TOKEN
-		     , EMAIL username
-		     , EXPIRATION
+		     , EMAIL USERNAME
+		     , EXPIRATION_DATE EXPIRATION
 		  FROM
 		       TB_TOKEN
 		 WHERE

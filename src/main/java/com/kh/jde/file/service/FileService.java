@@ -35,6 +35,7 @@ public class FileService {
 		this.fileMapper = fileMapper;
 	}
 	
+	// 기본 프로필 이미지 url 가져오는 기능
 	public String getDefaultImage() {
 	    List<String> urls = fileMapper.getDefaultImage();
 
