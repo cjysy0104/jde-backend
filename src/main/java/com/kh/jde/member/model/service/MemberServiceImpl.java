@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.CustomAuthenticationException;
+import com.kh.jde.exception.PostNotFoundException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
 
 import com.kh.jde.file.service.FileService;
@@ -200,7 +201,7 @@ public class MemberServiceImpl implements MemberService {
 	    
 	    // 2) 기존이 업로드(/profile/)면 삭제
 	    boolean hasOld = oldUrl != null && !oldUrl.isBlank();
-	    boolean isOldUserUpload = hasOld && oldUrl.contains("/Profile/");
+	    boolean isOldUserUpload = hasOld && oldUrl.contains("/profile/");
 
 	    if (isOldUserUpload) {
 	        s3Service.deleteFile(oldUrl);
@@ -231,16 +232,20 @@ public class MemberServiceImpl implements MemberService {
 	    CustomUserDetails user = validatePassword(plainPassword);
 	    Long memberNo = user.getMemberNo();
 
+	    if (fileNo == null) {
+	    	throw new IllegalArgumentException("fileNo는 필수입니다.");
+	    }
+	    
 	    // 1) 기본 이미지 단건 조회로 유효성 검증
 	    DefaultImageDTO selected = memberMapper.selectDefaultProfileByNo(fileNo);
 	    if (selected == null) {
-	        throw new IllegalArgumentException("선택한 기본 프로필 이미지를 찾을 수 없습니다.");
+	        throw new PostNotFoundException("선택한 기본 프로필 이미지를 찾을 수 없습니다.");
 	    }
 
 	    // 2) 기존 프로필이 업로드
 	    String oldUrl = memberMapper.selectProfileImageUrl(memberNo);
 	    boolean hasOld = oldUrl != null && !oldUrl.isBlank();
-	    boolean isOldUserUpload = hasOld && oldUrl.contains("/Profile/");      // 삭제 대상
+	    boolean isOldUserUpload = hasOld && oldUrl.contains("/profile/");      // 삭제 대상
 
 	    if (isOldUserUpload) {
 	        s3Service.deleteFile(oldUrl);
