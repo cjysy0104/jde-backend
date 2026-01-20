@@ -980,6 +980,7 @@
 		     , R.MEMBER_NO memberNo
 		     , R.RESTAURANT_NO restaurantNo
 		     , RE.NORMAL_NAME normalName
+		     , RE.ADDRESS address
 		     , R.CONTENT reviewContent
 		     , R.CREATED_AT createdAt
 		     , R.STATUS status
@@ -1047,6 +1048,7 @@
 		     , R.MEMBER_NO memberNo
 		     , R.RESTAURANT_NO restaurantNo
 		     , RE.NORMAL_NAME normalName
+		     , RE.ADDRESS address
 		     , R.CONTENT reviewContent
 		     , R.CREATED_AT createdAt
 		     , R.STATUS status
@@ -1102,6 +1104,7 @@
 		     , R.MEMBER_NO memberNo
 		     , R.RESTAURANT_NO restaurantNo
 		     , RE.NORMAL_NAME normalName
+		     , RE.ADDRESS address
 		     , R.CONTENT reviewContent
 		     , R.CREATED_AT createdAt
 		     , R.STATUS status
