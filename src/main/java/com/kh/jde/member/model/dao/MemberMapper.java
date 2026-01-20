@@ -39,4 +39,6 @@ public interface MemberMapper {
 	String selectProfileImageUrl(Long memberNo);
     int upsertProfileImage(MemberFileVO memberFile);
     
+    int createProfileImage(MemberFileVO memberFile);
+    
 }

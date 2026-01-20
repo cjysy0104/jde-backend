@@ -14,13 +14,18 @@ import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.PostNotFoundException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
+
+import com.kh.jde.file.service.FileService;
+
 import com.kh.jde.file.service.S3Service;
+
 import com.kh.jde.member.model.dao.MemberMapper;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
 import com.kh.jde.member.model.dto.ChangeNicknameDTO;
 import com.kh.jde.member.model.dto.ChangePasswordDTO;
 import com.kh.jde.member.model.dto.ChangePhoneDTO;
+import com.kh.jde.member.model.dto.MemberLoginDTO;
 import com.kh.jde.member.model.dto.MemberSignUpDTO;
 import com.kh.jde.member.model.vo.MemberFileVO;
 import com.kh.jde.member.model.vo.MemberVO;
@@ -39,7 +44,9 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final MemberInformationValidator miv;
 	private final TokenMapper tokenMapper;
+	private final FileService fileService;
 	private final S3Service s3Service;
+
 	
 	@Override
 	@Transactional
@@ -51,9 +58,6 @@ public class MemberServiceImpl implements MemberService {
 		// String encodedPwd = passwordEncoder.encode(member.getPassword());
 		Password password = Password.toEncoded(member.getPassword(), passwordEncoder);
 		
-		// 현재 시간을 sql.Date로 변환
-        // Date currentDate = new Date(System.currentTimeMillis());
-		
 		MemberVO signUpMember = MemberVO.builder()
 										 .email(member.getEmail())
 										 .nickname(member.getNickname())
@@ -61,8 +65,23 @@ public class MemberServiceImpl implements MemberService {
 				                         .memberName(member.getMemberName())
 				                         .phone(member.getPhone())
 				                         .build();
+		
 		// 회원 가입 SQL문
 		memberMapper.signUp(signUpMember);
+		
+		// 회원 이미지 저장을 위해선 회원번호가 필요해서 추출
+		MemberLoginDTO user = memberMapper.loadUser(member.getEmail());
+		
+		// 회원번호+파일명으로 회원의 기본 이미지를 저장
+		String defaultImage = fileService.getDefaultImage();
+		MemberFileVO memberFile = MemberFileVO.builder()
+											  .memberNo(user.getMemberNo())
+											  .fileUrl(defaultImage)
+											  .build();
+		
+		int result = memberMapper.createProfileImage(memberFile);
+		
+		
 	}
 
 	@Override
