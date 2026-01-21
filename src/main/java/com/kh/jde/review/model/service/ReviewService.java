@@ -7,6 +7,9 @@ import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
+import com.kh.jde.review.model.dto.ReviewUpdateRequest;
+
+import jakarta.validation.Valid;
 
 public interface ReviewService {
 
@@ -19,5 +22,7 @@ public interface ReviewService {
 	public void create(ReviewCreateRequest review, CustomUserDetails principal);
 	
 	List<ReviewListResponseDTO> getMyReviewList(QueryDTO req, CustomUserDetails principal);
+
+	public void update(Long reviewNo, ReviewUpdateRequest review, CustomUserDetails principal);
 
 }

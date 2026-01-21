@@ -16,6 +16,7 @@ import com.kh.jde.review.model.dto.ReviewListResponseDTO;
 import com.kh.jde.review.model.vo.RestaurantCreateVO;
 import com.kh.jde.review.model.vo.ReviewCreateVO;
 import com.kh.jde.review.model.vo.ReviewFileCreateVO;
+import com.kh.jde.review.model.vo.ReviewUpdateVo;
 
 @Mapper
 public interface ReviewMapper {
@@ -31,10 +32,17 @@ public interface ReviewMapper {
 	Long getWriterById(Long reviewNo);
 	
 	// 리뷰 작성
-	void save();
+	void createReview(ReviewCreateVO requestReview);
+	
+	void createReviewKeywordMap(@Param("reviewNo") Long reviewNo,
+			@Param("keywordNos") List<Long> keywordNos);
+	
+	void createRestaurant(RestaurantCreateVO createRestaurant);
+	
+	void createReviewFile(ReviewFileCreateVO reviewFileCreateVO);
 	
 	// 리뷰 수정
-	void update();
+	void update(ReviewUpdateVo requestReview);
 	
 	// 리뷰 삭제(소프트)
 	int deleteById(Long reviewNo);
@@ -45,15 +53,13 @@ public interface ReviewMapper {
 	
 	RestaurantResponseDTO getRestaurantByName(RestaurantRequestDTO request);
 	
-	void createReview(ReviewCreateVO requestReview);
-	
-	void createReviewKeywordMap(@Param("reviewNo") Long reviewNo,
-			@Param("keywordNos") List<Long> keywordNos);
-	
-	void createRestaurant(RestaurantCreateVO createRestaurant);
-	
-	void createReviewFile(ReviewFileCreateVO reviewFileCreateVO);
 
 	List<ReviewListResponseDTO> getMyReviewList(QueryDTO req);
+
+	void deleteKeywordsById(Long reviewNo);
+
+	void deleteFilesById(Long reviewNo);
+
+	List<String> getUrlById(Long reviewNo);
 
 }
