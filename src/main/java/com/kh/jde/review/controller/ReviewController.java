@@ -60,7 +60,7 @@ public class ReviewController {
 	        @ModelAttribute QueryDTO req,
 	        @AuthenticationPrincipal CustomUserDetails principal
 	) {
-	    // 로그인 필수
+		// 로그인 필수
 	    if (principal == null) throw new com.kh.jde.exception.AccessDeniedException("로그인이 필요합니다.");
 
 	    List<ReviewListResponseDTO> result = reviewService.getMyReviewList(req, principal);

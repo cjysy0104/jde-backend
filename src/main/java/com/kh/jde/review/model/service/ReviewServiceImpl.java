@@ -123,13 +123,18 @@ public class ReviewServiceImpl implements ReviewService {
 	
 	@Override
 	public List<ReviewListResponseDTO> getMyReviewList(QueryDTO req, CustomUserDetails principal) {
+	    // 1. 로그인 사용자 정보 및 기본값 세팅
+	    req.setMemberNo(principal.getMemberNo());
+	    if (req.getSize() == null || req.getSize() <= 0) req.setSize(10);
+	    if (req.getCursor() == null || req.getCursor() <= 0) req.setCursor(1L); // cursor를 page 번호로 사용
 
-	    QueryDTO normalized = nomarizedRequest(req, principal);
+	    // 2. 목록 조회
+	    List<ReviewListResponseDTO> reviews = reviewMapper.getMyReviewList(req);
 
-	    // 내 리뷰만 조회
-	    List<ReviewListResponseDTO> reviews = reviewMapper.getMyReviewList(normalized);
-
-	    attachKeyword(reviews);
+	    // 3. 키워드 연결 (결과가 있을 때만 실행하여 SQL 에러 방지)
+	    if (reviews != null && !reviews.isEmpty()) {
+	        attachKeyword(reviews);
+	    }
 
 	    return reviews;
 	}
