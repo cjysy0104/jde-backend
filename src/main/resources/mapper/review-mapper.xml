@@ -395,8 +395,125 @@
 	</select>
 
 
+	<select id="getRestaurantByName"
+			parameterType="RestaurantRequestDTO"
+			resultType="RestaurantResponseDTO">
+		SELECT
+				  RESTAURANT_NO restaurantNo
+				, NORMAL_NAME normalName
+				, ADDRESS address
+				, LATITUDE latitude
+				, LONGITUDE longitude
+		FROM
+				TB_RESTAURANT
+		WHERE
+				NORMAL_NAME = #{normalName}
+		AND
+				ADDRESS = #{address}
+	</select>
+	
+	<insert id="createRestaurant"
+			parameterType="RestaurantCreateVO">
+		<selectKey keyProperty="restaurantNo" resultType="Long" order="BEFORE">
+			SELECT SEQ_RESTAURANT_NO.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT
+		INTO
+				TB_RESTAURANT
+				(
+				  RESTAURANT_NO
+				, NORMAL_NAME
+				, ADDRESS
+				, LATITUDE
+				, LONGITUDE
+				)
+		VALUES
+				(
+				  #{restaurantNo}
+				, #{normalName}
+				, #{address}
+				, #{latitude}
+				, #{longitude}
+				)
+	</insert>
+	
+	<insert id="createReview"
+			parameterType="ReviewCreateVO">
+		<selectKey keyProperty="reviewNo" resultType="Long" order="BEFORE">
+			SELECT SEQ_REVIEW_NO.NEXTVAL FROM DUAL
+		</selectKey>	
+		INSERT
+		INTO
+				TB_REVIEW
+				(
+				  REVIEW_NO
+				, MEMBER_NO
+				, RESTAURANT_NO
+				, CONTENT
+				, RATING
+				, STATUS
+				, CREATED_AT
+				, UPDATED_AT
+				, VIEW_COUNT
+				)
+		VALUES
+				(
+				  #{reviewNo}
+				, #{memberNo}
+				, #{restaurantNo}
+				, #{content}
+				, #{rating}
+				, 'Y'
+				, SYSDATE
+				, SYSDATE
+				, 0
+				)
+	</insert>
 
-
+	<insert id="createReviewKeywordMap">
+		INSERT
+		ALL
+			<foreach collection="keywordNos" item="keywordNo">
+				INTO 
+						TB_REVIEW_KEYWORD_MAP
+						(
+						REVIEW_NO
+						, KEYWORD_NO
+						)
+				VALUES
+						(
+						  #{reviewNo}
+						, #{keywordNo}
+						)
+			</foreach>
+			SELECT 1 
+			FROM DUAL
+	</insert>
+	
+	<insert id="createReviewFile"
+			parameterType="ReviewFileCreateVO">
+		INSERT
+		INTO	
+				TB_REVIEW_FILE
+				(
+				  FILE_NO
+				, REVIEW_NO
+				, FILE_URL
+				, SORT_ORDER
+				, IS_THUMNAIL
+				, CREATED_AT
+				)
+		VALUES
+				(
+				  SEQ_FILE_NO.NEXTVAL 
+				, #{reviewNo}
+				, #{fileUrl}
+				, #{sortOrder}
+				, #{isThumbnail}
+				, SYSDATE
+				)
+	</insert>
 
 
 
