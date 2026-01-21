@@ -14,4 +14,7 @@ public interface ReviewService {
 	public DetailReviewDTO getDetailReview(Long reviewNo, CustomUserDetails principal);
 
 	public void deleteById(Long reviewNo, CustomUserDetails principal);
+	
+	List<ReviewListResponseDTO> getMyReviewList(QueryDTO req, CustomUserDetails principal);
+
 }

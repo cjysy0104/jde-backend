@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,5 +65,15 @@ public class CommentController {
 		return SuccessResponse.ok("댓글 수정이 완료되었습니다.");
 	}
 	
+	@GetMapping("/me")
+	public ResponseEntity<SuccessResponse<List<CommentDTO>>> getMyComments(
+	        @ModelAttribute com.kh.jde.review.model.dto.QueryDTO req,
+	        @AuthenticationPrincipal CustomUserDetails principal
+	) {
+	    if (principal == null) throw new com.kh.jde.exception.AccessDeniedException("로그인이 필요합니다.");
+
+	    return SuccessResponse.ok(commentService.getMyComments(req, principal), "내 댓글 조회 성공");
+	}
+
 	
 }

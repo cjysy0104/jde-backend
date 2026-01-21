@@ -394,6 +394,114 @@
 				REVIEW_NO = #{reviewNo}
 	</select>
 
+	<select id="getMyReviewList"
+	        parameterType="QueryDTO"
+	        resultMap="reviewListMap">
+	    SELECT
+	          RV.REVIEW_NO
+	        , (
+	            SELECT RVF.FILE_URL
+	            FROM TB_REVIEW_FILE RVF
+	            WHERE RV.REVIEW_NO = RVF.REVIEW_NO
+	              AND RVF.IS_THUMNAIL = 'Y'
+	          ) THUMBNAIL_URL
+	        , RT.NORMAL_NAME NORMAL_NAME
+	        , M.NICKNAME
+	        , RV.CONTENT
+	        , RV.RATING
+	        , RV.UPDATED_AT
+	        , RV.VIEW_COUNT
+	        , NVL(LC.LIKE_COUNT, 0) LIKE_COUNT
+	        , NVL(CC.COMMENT_COUNT, 0) COMMENT_COUNT
+	
+	        , CASE WHEN EXISTS (
+	              SELECT 1
+	              FROM TB_REVIEW_LIKE RVL
+	              WHERE RVL.REVIEW_NO = RV.REVIEW_NO
+	                AND RVL.MEMBER_NO = #{memberNo}
+	          ) THEN 'Y' ELSE 'N'
+	          END IS_LIKED
+	        , CASE WHEN EXISTS (
+	              SELECT 1
+	              FROM TB_BOOKMARK B
+	              WHERE B.REVIEW_NO = RV.REVIEW_NO
+	                AND B.MEMBER_NO = #{memberNo}
+	          ) THEN 'Y' ELSE 'N'
+	          END IS_MARKED
+	    FROM
+	        TB_REVIEW RV
+	    JOIN TB_MEMBER M ON (RV.MEMBER_NO = M.MEMBER_NO)
+	    JOIN TB_RESTAURANT RT ON (RV.RESTAURANT_NO = RT.RESTAURANT_NO)
+	    LEFT JOIN (
+	        SELECT REVIEW_NO, COUNT(*) LIKE_COUNT
+	        FROM TB_REVIEW_LIKE
+	        GROUP BY REVIEW_NO
+	    ) LC ON (LC.REVIEW_NO = RV.REVIEW_NO)
+	    LEFT JOIN (
+	        SELECT REVIEW_NO, COUNT(*) COMMENT_COUNT
+	        FROM TB_COMMENT
+	        WHERE STATUS = 'Y'
+	        GROUP BY REVIEW_NO
+	    ) CC ON (CC.REVIEW_NO = RV.REVIEW_NO)
+	    WHERE
+	        RV.STATUS = 'Y'
+	      AND
+	        RV.MEMBER_NO = #{memberNo}
+	
+	    <if test="query != null and query != ''">
+	      AND (
+	            RV.CONTENT LIKE '%' || #{query} || '%'
+	         OR RT.NORMAL_NAME LIKE '%' || #{query} || '%'
+	      )
+	    </if>
+	
+	    <!-- cursor/sort 로직은 기존 getReviewList 그대로 복붙 -->
+	    <choose>
+	      <when test="sort == null or sort == 'latest'">
+	        <if test="cursor != null">
+	          AND RV.REVIEW_NO &lt; #{cursor}
+	        </if>
+	      </when>
+	      <when test="sort == 'oldest'">
+	        <if test="cursor != null">
+	          AND RV.REVIEW_NO &gt; #{cursor}
+	        </if>
+	      </when>
+	      <when test="sort == 'rating'">
+	        <if test="cursorRating != null and cursor != null">
+	          AND (
+	                RV.RATING &lt; #{cursorRating}
+	             OR (RV.RATING = #{cursorRating} AND RV.REVIEW_NO &lt; #{cursor})
+	          )
+	        </if>
+	      </when>
+	      <when test="sort == 'liked'">
+	        <if test="cursorLikeCount != null and cursor != null">
+	          AND (
+	                NVL(LC.LIKE_COUNT,0) &lt; #{cursorLikeCount}
+	             OR (NVL(LC.LIKE_COUNT,0) = #{cursorLikeCount} AND RV.REVIEW_NO &lt; #{cursor})
+	          )
+	        </if>
+	      </when>
+	    </choose>
+	
+	    <choose>
+	      <when test="sort == 'oldest'">
+	        ORDER BY RV.REVIEW_NO ASC
+	      </when>
+	      <when test="sort == 'rating'">
+	        ORDER BY RV.RATING DESC, RV.REVIEW_NO DESC
+	      </when>
+	      <when test="sort == 'liked'">
+	        ORDER BY NVL(LC.LIKE_COUNT,0) DESC, RV.REVIEW_NO DESC
+	      </when>
+	      <otherwise>
+	        ORDER BY RV.REVIEW_NO DESC
+	      </otherwise>
+	    </choose>
+	
+	    FETCH FIRST #{sizePlusOne} ROWS ONLY
+	</select>
 
 
 

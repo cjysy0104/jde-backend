@@ -100,5 +100,23 @@ public class CommentServiceImpl implements CommentService {
 		
 		commentValidator.validateResult("댓글 수정", commentMapper.update(param));
 	}
+	
+	@Override
+	public List<CommentDTO> getMyComments(com.kh.jde.review.model.dto.QueryDTO req, CustomUserDetails principal) {
+
+	    commentValidator.validateAuthenticated(principal);
+
+	    if (req == null) req = new com.kh.jde.review.model.dto.QueryDTO();
+
+	    // 커서/사이즈 기본값
+	    int size = req.getSize() == null ? 10 : req.getSize();
+	    req.setSize(size);
+	    req.setSizePlusOne(size + 1);
+
+	    // 내 memberNo 세팅
+	    req.setMemberNo(principal.getMemberNo());
+
+	    return commentMapper.getMyComments(req);
+	}
 
 }

@@ -36,4 +36,7 @@ public interface ReviewMapper {
 	int existsReview(Long reviewNo);	// 리뷰 존재(정상) 여부
 
 	ReviewDTO getExistsReview(Long reviewNo);
+	
+	List<ReviewListResponseDTO> getMyReviewList(QueryDTO req);
+
 }

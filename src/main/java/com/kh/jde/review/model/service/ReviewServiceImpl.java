@@ -120,4 +120,18 @@ public class ReviewServiceImpl implements ReviewService {
 			throw new IllegalStateException("리뷰 삭제에 실패했습니다. 리뷰 번호를 확인해주세요.");
 		}
 	}
+	
+	@Override
+	public List<ReviewListResponseDTO> getMyReviewList(QueryDTO req, CustomUserDetails principal) {
+
+	    QueryDTO normalized = nomarizedRequest(req, principal);
+
+	    // 내 리뷰만 조회
+	    List<ReviewListResponseDTO> reviews = reviewMapper.getMyReviewList(normalized);
+
+	    attachKeyword(reviews);
+
+	    return reviews;
+	}
+
 }

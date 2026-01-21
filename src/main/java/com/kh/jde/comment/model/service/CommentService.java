@@ -16,6 +16,6 @@ public interface CommentService {
 
 	void update(Long commentNo, CustomUserDetails principal, CommentRequestDTO request);
 	
-	
+	List<CommentDTO> getMyComments(com.kh.jde.review.model.dto.QueryDTO req, CustomUserDetails principal);
 
 }

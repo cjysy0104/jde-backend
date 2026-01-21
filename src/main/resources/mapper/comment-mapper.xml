@@ -112,5 +112,42 @@
 		AND
 				STATUS='Y'
 	</update>
+	
+	<select id="getMyComments"
+	        parameterType="com.kh.jde.review.model.dto.QueryDTO"
+	        resultType="CommentDTO">
+	    SELECT
+	          TC.COMMENT_NO commentNo
+	        , TC.REVIEW_NO  reviewNo
+	        , M.NICKNAME    nickname
+	        , TC.CONTENT    content
+	        , TC.COMMENT_DATE commentDate
+	        , NVL(CNT.LIKE_COUNT, 0) likeCount
+	        , RT.NORMAL_NAME restaurantName
+	        , SUBSTR(RV.CONTENT, 1, 40) reviewContentPreview
+	    FROM
+	        TB_COMMENT TC
+	    JOIN TB_MEMBER M ON M.MEMBER_NO = TC.MEMBER_NO
+	    JOIN TB_REVIEW RV ON RV.REVIEW_NO = TC.REVIEW_NO
+	    JOIN TB_RESTAURANT RT ON RT.RESTAURANT_NO = RV.RESTAURANT_NO
+	    LEFT JOIN (
+	        SELECT COMMENT_NO, COUNT(*) LIKE_COUNT
+	        FROM TB_COMMENT_LIKE
+	        GROUP BY COMMENT_NO
+	    ) CNT ON CNT.COMMENT_NO = TC.COMMENT_NO
+	    WHERE
+	        TC.STATUS = 'Y'
+	      AND TC.MEMBER_NO = #{memberNo}
+	      AND RV.STATUS = 'Y'
+	
+	    <!-- 최신순 커서 페이징 (댓글번호 기준) -->
+	    <if test="cursor != null">
+	      AND TC.COMMENT_NO &lt; #{cursor}
+	    </if>
+	
+	    ORDER BY TC.COMMENT_NO DESC
+	    FETCH FIRST #{sizePlusOne} ROWS ONLY
+	</select>
+
 
 </mapper>
