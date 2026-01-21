@@ -21,11 +21,15 @@ import com.kh.jde.review.model.dto.RestaurantRequestDTO;
 import com.kh.jde.review.model.dto.RestaurantResponseDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
+import com.kh.jde.review.model.dto.ReviewUpdateRequest;
 import com.kh.jde.review.model.vo.RestaurantCreateVO;
 import com.kh.jde.review.model.vo.ReviewCreateVO;
 import com.kh.jde.review.model.vo.ReviewFileCreateVO;
+import com.kh.jde.review.model.vo.ReviewUpdateVo;
+import com.kh.jde.review.validator.ReviewValidator;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -36,6 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
 	
 	private final ReviewMapper reviewMapper;
 	private final S3Service s3service;
+	private final ReviewValidator reviewValidator;
 
 	@Override
 	public List<ReviewListResponseDTO> getReviewList(QueryDTO req, CustomUserDetails principal) {
@@ -113,24 +118,26 @@ public class ReviewServiceImpl implements ReviewService {
 	public void deleteById(Long reviewNo, CustomUserDetails principal) {
 		
 		// 1. 게시글 상태 조회
-		if(reviewMapper.existsReview(reviewNo) == 0) {
-			throw new PostNotFoundException("조회된 게시글이 없습니다.");
-		}
+		getReviewOrThrow(reviewNo);
 		
 		
 		// 2. 리뷰글 작성자 = 로그인 사용자?
-		if(reviewMapper.getWriterById(reviewNo).equals(principal.getMemberNo())) {
-			throw new AccessDeniedException("삭제 권한이 없습니다.");
-		}
+		getWriterById(reviewNo, principal, "삭제");
 		
 		// 3. 삭제 진행
 		int result = reviewMapper.deleteById(reviewNo);
 		
-		if(result != 1) {
-			throw new IllegalStateException("리뷰 삭제에 실패했습니다. 리뷰 번호를 확인해주세요.");
-		}
+		reviewValidator.validateResult(result);
 	}
 	
+	private void getWriterById(Long reviewNo, CustomUserDetails principal, String action) {
+		reviewValidator.validateWriter(reviewMapper.getWriterById(reviewNo), principal.getMemberNo(), action);
+	}
+
+	private void getReviewOrThrow(Long reviewNo) {
+		reviewValidator.validateReviewExists(reviewMapper.getExistsReview(reviewNo));
+	}
+
 	@Override
 	@Transactional
 	public void create(ReviewCreateRequest review, CustomUserDetails principal) {
@@ -176,15 +183,21 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewMapper.createReviewKeywordMap(reviewNo, review.getKeywordNos());
 		
 		// 파일 저장 -> URL 받고 -> DB 저장 슛
+		createFiles(reviewNo, review.getImages());
+		
+		
+	}
+	
+	private void createFiles(Long reviewNo, List<MultipartFile> images) {
 		List<String> uploadUrl = new ArrayList<>();
 		
 		try {
 			
-			if (review.getImages() != null) {
+			if (images != null) {
 				
 				int order = 1;
 				
-				for (MultipartFile f : review.getImages()) {
+				for (MultipartFile f : images) {
 					
 					if (f == null || f.isEmpty()) continue;
 					
@@ -209,7 +222,7 @@ public class ReviewServiceImpl implements ReviewService {
 			throw e;
 		}
 	}
-	
+
 	@Override
 	public List<ReviewListResponseDTO> getMyReviewList(QueryDTO req, CustomUserDetails principal) {
 	    // 1. 로그인 사용자 정보 및 기본값 세팅
@@ -226,6 +239,49 @@ public class ReviewServiceImpl implements ReviewService {
 	    }
 
 	    return reviews;
+	}
+
+	@Override
+	@Transactional
+	public void update(Long reviewNo, @Valid ReviewUpdateRequest review, CustomUserDetails principal) {
+
+		// 데이터 유효성 검사 하기
+		getReviewOrThrow(reviewNo);
+		// 님 작성자 맞음?
+		getWriterById(reviewNo, principal, "수정");
+		
+		// 리뷰글 db로 update 슛
+		ReviewUpdateVo requestReview = ReviewUpdateVo.builder()
+													 .reviewNo(reviewNo)
+													 .content(review.getContent())
+													 .rating(review.getRating())
+													 .build();
+		reviewMapper.update(requestReview);
+		
+		// 키워드 삭제 후 다시 create 슛
+		reviewMapper.deleteKeywordsById(reviewNo); // 삭제
+		reviewMapper.createReviewKeywordMap(reviewNo, review.getKeywordNos());
+		
+		
+		
+		// 파일 삭제 후 업로드
+		// 1. 파일 삭제: URL 호출 해 s3 제거, db 제거
+		// 2. 파일 업로드: 재사용
+		List<String> legacyUrl = reviewMapper.getUrlById(reviewNo);
+		
+		// 1.
+		try {
+			for(String url : legacyUrl) {
+				s3service.deleteFile(url);
+			}
+		} catch (Exception e) {}
+		
+		reviewMapper.deleteFilesById(reviewNo);
+		
+		// 2.
+		createFiles(reviewNo, review.getImages());
+		
+		
 	}
 
 }

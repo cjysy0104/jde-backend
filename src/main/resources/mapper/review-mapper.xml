@@ -578,5 +578,45 @@
         </choose>
     ROWS FETCH NEXT #{size} ROWS ONLY
 	</select>
+	
+	<update id="update"
+			parameterType="ReviewUpdateVO">
+		UPDATE
+				TB_REVIEW
+		SET
+				  CONTENT = #{content}
+				, RATING = #{rating}
+		WHERE
+				REVIEW_NO = #{reviewNo}
+	</update>
 
+	<delete id="deleteKeywordsById"
+			parameterType="Long">
+		DELETE
+		FROM
+				TB_REVIEW_KEYWORD_MAP
+		WHERE
+				REVIEW_NO = #{reviewNo}
+				
+	</delete>
+	
+	<delete id="deleteFilesById"
+			parameterType="Long">
+		DELETE
+		FROM
+				TB_REVIEW_FILE
+		WHERE
+				REVIEW_NO = #{reviewNo}
+	</delete>
+	
+	<select id="getUrlById"
+			parameterType="Long">
+		SELECT
+				FILE_URL
+		FROM
+				TB_REVIEW_FILE
+		WHERE
+				REVIEW_NO= #{reviewNo}
+	</select>
+	
 </mapper>

@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
+import com.kh.jde.review.model.dto.ReviewUpdateRequest;
 import com.kh.jde.review.model.service.ReviewService;
 
 import jakarta.validation.Valid;
@@ -77,5 +79,16 @@ public class ReviewController {
 	    List<ReviewListResponseDTO> result = reviewService.getMyReviewList(req, principal);
 	    return SuccessResponse.ok(result, "내 리뷰 조회 성공");
 	}
+	
+	@PatchMapping("/{reviewNo}")
+	public ResponseEntity<SuccessResponse<Void>> update(@PathVariable("reviewNo")Long reviewNo,
+														@ModelAttribute @Valid ReviewUpdateRequest review,
+														@AuthenticationPrincipal CustomUserDetails principal){
+		
+		reviewService.update(reviewNo, review, principal);
+		
+		return SuccessResponse.ok("수정 성공");
+	}
+	
 
 }
