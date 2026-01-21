@@ -8,4 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface FileMapper {
 	
 	List<String> getDefaultImage();
+	
+	String getfileUrl(Long memberNo);
 }
