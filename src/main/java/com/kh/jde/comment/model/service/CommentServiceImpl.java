@@ -100,5 +100,25 @@ public class CommentServiceImpl implements CommentService {
 		
 		commentValidator.validateResult("댓글 수정", commentMapper.update(param));
 	}
+	
+	@Override
+	public List<CommentDTO> getMyComments(com.kh.jde.review.model.dto.QueryDTO req, CustomUserDetails principal) {
+	    // 1. 인증 검증
+	    commentValidator.validateAuthenticated(principal);
+
+	    // 2. req가 null인 경우 초기화
+	    if (req == null) req = new com.kh.jde.review.model.dto.QueryDTO();
+
+	    // 3. 페이지(cursor) 및 사이즈 기본값 설정
+	    // offset 계산 시 null 에러 방지를 위해 1페이지(1L), 10개(10)를 기본으로 함
+	    if (req.getCursor() == null || req.getCursor() <= 0) req.setCursor(1L); 
+	    if (req.getSize() == null || req.getSize() <= 0) req.setSize(10);
+
+	    // 4. 내 memberNo 세팅
+	    req.setMemberNo(principal.getMemberNo());
+
+	    // 5. 조회 실행
+	    return commentMapper.getMyComments(req);
+	}
 
 }

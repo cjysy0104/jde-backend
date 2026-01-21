@@ -57,13 +57,25 @@ public class ReviewController {
 		return SuccessResponse.ok("삭제 성공");
 	} 
 	
-	
 	@PostMapping
 	public ResponseEntity<SuccessResponse<Void>> create(@ModelAttribute @Valid ReviewCreateRequest review
-														, @AuthenticationPrincipal CustomUserDetails principal){
+			, @AuthenticationPrincipal CustomUserDetails principal){
 		
 		reviewService.create(review, principal);
 		
 		return SuccessResponse.created("등록 성공");
 	}
+
+	@GetMapping("/me")
+	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getMyReviews(
+	        @ModelAttribute QueryDTO req,
+	        @AuthenticationPrincipal CustomUserDetails principal
+	) {
+		// 로그인 필수
+	    if (principal == null) throw new com.kh.jde.exception.AccessDeniedException("로그인이 필요합니다.");
+
+	    List<ReviewListResponseDTO> result = reviewService.getMyReviewList(req, principal);
+	    return SuccessResponse.ok(result, "내 리뷰 조회 성공");
+	}
+
 }
