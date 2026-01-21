@@ -1,8 +1,6 @@
-package com.kh.jde.report.model.dto;
+package com.kh.jde.auth.model.dto;
 
-import java.util.List;
-
-import com.kh.jde.common.page.PageInfo;
+import java.sql.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +13,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ReportPageResponse<T> {
-	
-	private List<T> list;
-	private PageInfo pageInfo;
+public class RefreshTokenRequestDTO {
+	private String refreshToken;
 }
