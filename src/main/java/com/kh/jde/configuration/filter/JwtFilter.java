@@ -42,27 +42,14 @@ public class JwtFilter extends OncePerRequestFilter {
 		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
 		// 아래 요청은 다 통과
-		if (uri.equals("/api/auth/login") // 로그인
-			    || uri.equals("/api/auth/refresh") // 로그인연장
-			    || (uri.equals("/api/members") && request.getMethod().equals("POST")) // 회원가입
-			) {
-		    filterChain.doFilter(request, response);
-		    return;
-		}
-		if (authorization == null || !authorization.startsWith("Bearer ")) {
-		    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		    return;
-		}
-
-		
+	    if (authorization == null || !authorization.startsWith("Bearer ")) {
+	        filterChain.doFilter(request, response);
+	        return;
+	    }
 		
 		// 토큰 검증
-		// log.info("헤더에 포함시킨 Authorization : {}", authorization);
 		String token = authorization.split(" ")[1];
-		// log.info("토큰 값 : {}", token);
-		
-		// 1. 서버에서 관리하는 시크릿키로 만든게 맞는가?
-		// 2. 유효기간이 지나지 않았는가?
+
 		try {
 			Claims claims = jwtUtil.parseJwt(token);
 			String username = claims.getSubject();
