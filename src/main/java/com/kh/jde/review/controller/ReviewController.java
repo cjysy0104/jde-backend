@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.review.model.dto.QueryDTO;
+import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
 import com.kh.jde.review.model.service.ReviewService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -55,6 +57,15 @@ public class ReviewController {
 		return SuccessResponse.ok("삭제 성공");
 	} 
 	
+	@PostMapping
+	public ResponseEntity<SuccessResponse<Void>> create(@ModelAttribute @Valid ReviewCreateRequest review
+			, @AuthenticationPrincipal CustomUserDetails principal){
+		
+		reviewService.create(review, principal);
+		
+		return SuccessResponse.created("등록 성공");
+	}
+
 	@GetMapping("/me")
 	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getMyReviews(
 	        @ModelAttribute QueryDTO req,
