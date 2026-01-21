@@ -14,6 +14,7 @@ import com.kh.jde.auth.model.dto.LoginResponseDTO;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.LogoutFailureException;
+import com.kh.jde.file.dao.FileMapper;
 import com.kh.jde.member.model.dto.MemberLoginDTO;
 import com.kh.jde.member.model.dto.MemberLogoutDTO;
 import com.kh.jde.token.model.dao.TokenMapper;
@@ -30,8 +31,10 @@ public class AuthServiceImpl implements AuthService {
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
 	private final TokenMapper tokenMapper;
+	private final FileMapper fileMapper;
 
 	@Override
+	@Transactional
 	public LoginResponseDTO  login(MemberLoginDTO member) {
 		
 		Authentication auth = null;
@@ -42,8 +45,10 @@ public class AuthServiceImpl implements AuthService {
 		}
 		CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
 		
+		
 		Map<String, String> tokens = tokenService.generateToken(user.getUsername());
 		// 토큰 정보에 추가로 앞단에서 필요한 정보들을 담아서 같이 보내준다.
+		String fileUrl = fileMapper.getfileUrl(user.getMemberNo());
 		
 		LoginResponseDTO loginResponse = LoginResponseDTO.builder()
 														 .accessToken(tokens.get("accessToken"))
@@ -55,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
 														 .memberNo(user.getMemberNo())
 														 .enrollDate(user.getEnrollDate())
 														 .role(user.getRole())
-														 .fileUrl(user.getFileUrl())
+														 .fileUrl(fileUrl)
 														 .status(user.getStatus())
 														 .build();
 		return loginResponse;

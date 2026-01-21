@@ -28,5 +28,4 @@ public class CustomUserDetails implements UserDetails {
 	private String fileUrl;
 
 	
-	
 }

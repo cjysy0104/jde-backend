@@ -31,6 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		} else if ("N".equals(user.getStatus())) {
 		    throw new AccessDeniedException("정지된 계정입니다.");
 		}
+		
 		return CustomUserDetails.builder().username(user.getEmail())
 				  						  .password(user.getPassword())
 				  						  .memberName(user.getMemberName())
