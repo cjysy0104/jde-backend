@@ -23,6 +23,6 @@ public interface ReviewService {
 	
 	List<ReviewListResponseDTO> getMyReviewList(QueryDTO req, CustomUserDetails principal);
 
-	public void update(Long reviewNo, @Valid ReviewUpdateRequest review, CustomUserDetails principal);
+	public void update(Long reviewNo, ReviewUpdateRequest review, CustomUserDetails principal);
 
 }

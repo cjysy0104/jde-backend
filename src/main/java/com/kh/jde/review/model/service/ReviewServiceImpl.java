@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.AccessDeniedException;
 import com.kh.jde.exception.PostNotFoundException;
+import com.kh.jde.exception.S3ServiceFailureException;
 import com.kh.jde.file.service.S3Service;
 import com.kh.jde.review.model.dao.ReviewMapper;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
@@ -188,6 +189,7 @@ public class ReviewServiceImpl implements ReviewService {
 		
 	}
 	
+	// S3 저장 메서드
 	private void createFiles(Long reviewNo, List<MultipartFile> images) {
 		List<String> uploadUrl = new ArrayList<>();
 		
@@ -216,10 +218,36 @@ public class ReviewServiceImpl implements ReviewService {
 				}
 			}
 		} catch (Exception e) {
+			// 예외 발생 시: 이전까지 업로드한 uploadUrl 전부 삭제 처리(되돌림)
 			for (String url : uploadUrl) {
-				try { s3service.deleteFile(url); } catch (Exception ignore) {}
+				try { 
+					s3service.deleteFile(url);
+				} catch (Exception ignore) {
+					// 실패 시 재시도
+					deleteWitRetry(url, 5);
+				}
 			}
 			throw e;
+		}
+	}
+
+	// 파일 삭제 재시도 메서드
+	private void deleteWitRetry(String url, int maxAttempt) {
+		int attempt = 0;
+		
+		while(true) {
+			// 삭제 성공 시 바로 돌아감
+			try {
+				s3service.deleteFile(url);
+				return;
+				// 실패 시 시도 횟수 count 하며 재시도, 특정 횟수 넘어가면 예외로 던져버리기
+			} catch (Exception e) {
+				attempt++;
+				if(attempt >= maxAttempt) {
+					e.printStackTrace();
+					throw new S3ServiceFailureException(url + ": 파일 업로드에 실패했습니다.");
+				}
+			}
 		}
 	}
 
@@ -243,7 +271,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional
-	public void update(Long reviewNo, @Valid ReviewUpdateRequest review, CustomUserDetails principal) {
+	public void update(Long reviewNo, ReviewUpdateRequest review, CustomUserDetails principal) {
 
 		// 데이터 유효성 검사 하기
 		getReviewOrThrow(reviewNo);
@@ -273,8 +301,13 @@ public class ReviewServiceImpl implements ReviewService {
 		try {
 			for(String url : legacyUrl) {
 				s3service.deleteFile(url);
+				legacyUrl.remove(url);
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			for(String url : legacyUrl) {
+				deleteWitRetry(url, 5);
+			}
+		}
 		
 		reviewMapper.deleteFilesById(reviewNo);
 		
