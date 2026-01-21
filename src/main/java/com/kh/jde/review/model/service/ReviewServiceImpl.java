@@ -51,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
 		// 목록 조회
 		List<ReviewListResponseDTO> reviews = reviewMapper.getReviewList(normalized);
 		
-		// 조회한애들 No 뽑아서 키워드 조회하고 주입해
+		// 조회한애들 No 뽑아서 키워드 조회하고 주입
 		attachKeyword(reviews);
 
 		return reviews;
@@ -121,7 +121,7 @@ public class ReviewServiceImpl implements ReviewService {
 		getReviewOrThrow(reviewNo);
 		
 		
-		// 2. 리뷰글 작성자 = 로그인 사용자?
+		// 2. 리뷰글 작성자 = 로그인 사용자 체크
 		getWriterById(reviewNo, principal, "삭제");
 		
 		// 3. 삭제 진행
@@ -182,7 +182,7 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		reviewMapper.createReviewKeywordMap(reviewNo, review.getKeywordNos());
 		
-		// 파일 저장 -> URL 받고 -> DB 저장 슛
+		// 파일 S3 저장 -> 반환받은 URL을 DB 저장
 		createFiles(reviewNo, review.getImages());
 		
 		
@@ -247,10 +247,10 @@ public class ReviewServiceImpl implements ReviewService {
 
 		// 데이터 유효성 검사 하기
 		getReviewOrThrow(reviewNo);
-		// 님 작성자 맞음?
+		// 작성자 여부 체크
 		getWriterById(reviewNo, principal, "수정");
 		
-		// 리뷰글 db로 update 슛
+		// 리뷰글 db로 update
 		ReviewUpdateVo requestReview = ReviewUpdateVo.builder()
 													 .reviewNo(reviewNo)
 													 .content(review.getContent())
@@ -258,7 +258,7 @@ public class ReviewServiceImpl implements ReviewService {
 													 .build();
 		reviewMapper.update(requestReview);
 		
-		// 키워드 삭제 후 다시 create 슛
+		// 키워드 삭제 후 다시 create
 		reviewMapper.deleteKeywordsById(reviewNo); // 삭제
 		reviewMapper.createReviewKeywordMap(reviewNo, review.getKeywordNos());
 		
