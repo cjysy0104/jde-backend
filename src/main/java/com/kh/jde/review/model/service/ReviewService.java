@@ -3,6 +3,8 @@ package com.kh.jde.review.model.service;
 import java.util.List;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
+import com.kh.jde.review.model.dto.BestReviewListResponse;
+import com.kh.jde.review.model.dto.BestReviewPagingRequest;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
@@ -24,5 +26,7 @@ public interface ReviewService {
 	List<ReviewListResponseDTO> getMyReviewList(QueryDTO req, CustomUserDetails principal);
 
 	public void update(Long reviewNo, ReviewUpdateRequest review, CustomUserDetails principal);
+
+	public List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
 
 }

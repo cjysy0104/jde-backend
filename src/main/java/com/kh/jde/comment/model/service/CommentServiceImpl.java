@@ -12,7 +12,10 @@ import com.kh.jde.comment.model.dto.CommentRequestDTO;
 import com.kh.jde.comment.model.dto.CommentUpdateDTO;
 import com.kh.jde.comment.model.vo.CommentVO;
 import com.kh.jde.comment.validator.CommentValidator;
+import com.kh.jde.common.util.RequestNormalizer;
 import com.kh.jde.review.model.dao.ReviewMapper;
+import com.kh.jde.review.model.dto.ScrollRequest;
+import com.kh.jde.review.model.service.ReviewServiceImpl;
 import com.kh.jde.review.validator.ReviewValidator;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class CommentServiceImpl implements CommentService {
 	private final ReviewMapper reviewMapper;
 	private final CommentValidator commentValidator;
 	private final ReviewValidator reviewValidator;
+	private final RequestNormalizer requestNormalizer;
 
 	@Override
 	public List<CommentDTO> getCommentListById(Long reviewNo) {
@@ -108,12 +112,10 @@ public class CommentServiceImpl implements CommentService {
 
 	    // 2. req가 null인 경우 초기화
 	    if (req == null) req = new com.kh.jde.review.model.dto.QueryDTO();
-
 	    // 3. 페이지(cursor) 및 사이즈 기본값 설정
 	    // offset 계산 시 null 에러 방지를 위해 1페이지(1L), 10개(10)를 기본으로 함
 	    if (req.getCursor() == null || req.getCursor() <= 0) req.setCursor(1L); 
-	    if (req.getSize() == null || req.getSize() <= 0) req.setSize(10);
-
+	    req.setScroll(requestNormalizer.applyScroll(req.getScroll(), 10));
 	    // 4. 내 memberNo 세팅
 	    req.setMemberNo(principal.getMemberNo());
 
