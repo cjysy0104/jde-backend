@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.AccessDeniedException;
 import com.kh.jde.exception.PostNotFoundException;
+import com.kh.jde.exception.S3ServiceFailureException;
 import com.kh.jde.file.service.S3Service;
 import com.kh.jde.review.model.dao.ReviewMapper;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
@@ -21,11 +22,15 @@ import com.kh.jde.review.model.dto.RestaurantRequestDTO;
 import com.kh.jde.review.model.dto.RestaurantResponseDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
+import com.kh.jde.review.model.dto.ReviewUpdateRequest;
 import com.kh.jde.review.model.vo.RestaurantCreateVO;
 import com.kh.jde.review.model.vo.ReviewCreateVO;
 import com.kh.jde.review.model.vo.ReviewFileCreateVO;
+import com.kh.jde.review.model.vo.ReviewUpdateVo;
+import com.kh.jde.review.validator.ReviewValidator;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -36,6 +41,7 @@ public class ReviewServiceImpl implements ReviewService {
 	
 	private final ReviewMapper reviewMapper;
 	private final S3Service s3service;
+	private final ReviewValidator reviewValidator;
 
 	@Override
 	public List<ReviewListResponseDTO> getReviewList(QueryDTO req, CustomUserDetails principal) {
@@ -46,7 +52,7 @@ public class ReviewServiceImpl implements ReviewService {
 		// 목록 조회
 		List<ReviewListResponseDTO> reviews = reviewMapper.getReviewList(normalized);
 		
-		// 조회한애들 No 뽑아서 키워드 조회하고 주입해
+		// 조회한애들 No 뽑아서 키워드 조회하고 주입
 		attachKeyword(reviews);
 
 		return reviews;
@@ -113,24 +119,26 @@ public class ReviewServiceImpl implements ReviewService {
 	public void deleteById(Long reviewNo, CustomUserDetails principal) {
 		
 		// 1. 게시글 상태 조회
-		if(reviewMapper.existsReview(reviewNo) == 0) {
-			throw new PostNotFoundException("조회된 게시글이 없습니다.");
-		}
+		getReviewOrThrow(reviewNo);
 		
 		
-		// 2. 리뷰글 작성자 = 로그인 사용자?
-		if(reviewMapper.getWriterById(reviewNo).equals(principal.getMemberNo())) {
-			throw new AccessDeniedException("삭제 권한이 없습니다.");
-		}
+		// 2. 리뷰글 작성자 = 로그인 사용자 체크
+		getWriterById(reviewNo, principal, "삭제");
 		
 		// 3. 삭제 진행
 		int result = reviewMapper.deleteById(reviewNo);
 		
-		if(result != 1) {
-			throw new IllegalStateException("리뷰 삭제에 실패했습니다. 리뷰 번호를 확인해주세요.");
-		}
+		reviewValidator.validateResult(result);
 	}
 	
+	private void getWriterById(Long reviewNo, CustomUserDetails principal, String action) {
+		reviewValidator.validateWriter(reviewMapper.getWriterById(reviewNo), principal.getMemberNo(), action);
+	}
+
+	private void getReviewOrThrow(Long reviewNo) {
+		reviewValidator.validateReviewExists(reviewMapper.getExistsReview(reviewNo));
+	}
+
 	@Override
 	@Transactional
 	public void create(ReviewCreateRequest review, CustomUserDetails principal) {
@@ -175,16 +183,23 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		reviewMapper.createReviewKeywordMap(reviewNo, review.getKeywordNos());
 		
-		// 파일 저장 -> URL 받고 -> DB 저장 슛
+		// 파일 S3 저장 -> 반환받은 URL을 DB 저장
+		createFiles(reviewNo, review.getImages());
+		
+		
+	}
+	
+	// S3 저장 메서드
+	private void createFiles(Long reviewNo, List<MultipartFile> images) {
 		List<String> uploadUrl = new ArrayList<>();
 		
 		try {
 			
-			if (review.getImages() != null) {
+			if (images != null) {
 				
 				int order = 1;
 				
-				for (MultipartFile f : review.getImages()) {
+				for (MultipartFile f : images) {
 					
 					if (f == null || f.isEmpty()) continue;
 					
@@ -203,13 +218,39 @@ public class ReviewServiceImpl implements ReviewService {
 				}
 			}
 		} catch (Exception e) {
+			// 예외 발생 시: 이전까지 업로드한 uploadUrl 전부 삭제 처리(되돌림)
 			for (String url : uploadUrl) {
-				try { s3service.deleteFile(url); } catch (Exception ignore) {}
+				try { 
+					s3service.deleteFile(url);
+				} catch (Exception ignore) {
+					// 실패 시 재시도
+					deleteWitRetry(url, 5);
+				}
 			}
 			throw e;
 		}
 	}
-	
+
+	// 파일 삭제 재시도 메서드
+	private void deleteWitRetry(String url, int maxAttempt) {
+		int attempt = 0;
+		
+		while(true) {
+			// 삭제 성공 시 바로 돌아감
+			try {
+				s3service.deleteFile(url);
+				return;
+				// 실패 시 시도 횟수 count 하며 재시도, 특정 횟수 넘어가면 예외로 던져버리기
+			} catch (Exception e) {
+				attempt++;
+				if(attempt >= maxAttempt) {
+					e.printStackTrace();
+					throw new S3ServiceFailureException(url + ": 파일 업로드에 실패했습니다.");
+				}
+			}
+		}
+	}
+
 	@Override
 	public List<ReviewListResponseDTO> getMyReviewList(QueryDTO req, CustomUserDetails principal) {
 	    // 1. 로그인 사용자 정보 및 기본값 세팅
@@ -226,6 +267,54 @@ public class ReviewServiceImpl implements ReviewService {
 	    }
 
 	    return reviews;
+	}
+
+	@Override
+	@Transactional
+	public void update(Long reviewNo, ReviewUpdateRequest review, CustomUserDetails principal) {
+
+		// 데이터 유효성 검사 하기
+		getReviewOrThrow(reviewNo);
+		// 작성자 여부 체크
+		getWriterById(reviewNo, principal, "수정");
+		
+		// 리뷰글 db로 update
+		ReviewUpdateVo requestReview = ReviewUpdateVo.builder()
+													 .reviewNo(reviewNo)
+													 .content(review.getContent())
+													 .rating(review.getRating())
+													 .build();
+		reviewMapper.update(requestReview);
+		
+		// 키워드 삭제 후 다시 create
+		reviewMapper.deleteKeywordsById(reviewNo); // 삭제
+		reviewMapper.createReviewKeywordMap(reviewNo, review.getKeywordNos());
+		
+		
+		
+		// 파일 삭제 후 업로드
+		// 1. 파일 삭제: URL 호출 해 s3 제거, db 제거
+		// 2. 파일 업로드: 재사용
+		List<String> legacyUrl = reviewMapper.getUrlById(reviewNo);
+		
+		// 1.
+		try {
+			for(String url : legacyUrl) {
+				s3service.deleteFile(url);
+				legacyUrl.remove(url);
+			}
+		} catch (Exception e) {
+			for(String url : legacyUrl) {
+				deleteWitRetry(url, 5);
+			}
+		}
+		
+		reviewMapper.deleteFilesById(reviewNo);
+		
+		// 2.
+		createFiles(reviewNo, review.getImages());
+		
+		
 	}
 
 }
