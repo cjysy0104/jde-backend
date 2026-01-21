@@ -87,7 +87,7 @@ public class ReviewController {
 		
 		reviewService.update(reviewNo, review, principal);
 		
-		return SuccessResponse.ok("수정 성공");
+		return SuccessResponse.created("수정 성공");
 	}
 	
 
