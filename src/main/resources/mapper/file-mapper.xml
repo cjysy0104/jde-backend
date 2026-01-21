@@ -11,4 +11,14 @@
 		       TB_DEFAULT_PROFILE
 	</select>
 	
+	<select id="getfileUrl" resultType="String">
+		SELECT
+		       FILE_URL fileUrl
+		  FROM
+		       TB_MEMBER_FILE
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+	</select>
+	
+	
 </mapper>
