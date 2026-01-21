@@ -4,12 +4,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
+import com.kh.jde.review.model.dto.RestaurantRequestDTO;
+import com.kh.jde.review.model.dto.RestaurantResponseDTO;
 import com.kh.jde.review.model.dto.ReviewDTO;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
+import com.kh.jde.review.model.vo.RestaurantCreateVO;
+import com.kh.jde.review.model.vo.ReviewCreateVO;
+import com.kh.jde.review.model.vo.ReviewFileCreateVO;
 
 @Mapper
 public interface ReviewMapper {
@@ -36,4 +42,18 @@ public interface ReviewMapper {
 	int existsReview(Long reviewNo);	// 리뷰 존재(정상) 여부
 
 	ReviewDTO getExistsReview(Long reviewNo);
+	
+	RestaurantResponseDTO getRestaurantByName(RestaurantRequestDTO request);
+	
+	void createReview(ReviewCreateVO requestReview);
+	
+	void createReviewKeywordMap(@Param("reviewNo") Long reviewNo,
+			@Param("keywordNos") List<Long> keywordNos);
+	
+	void createRestaurant(RestaurantCreateVO createRestaurant);
+	
+	void createReviewFile(ReviewFileCreateVO reviewFileCreateVO);
+
+	List<ReviewListResponseDTO> getMyReviewList(QueryDTO req);
+
 }

@@ -394,10 +394,189 @@
 				REVIEW_NO = #{reviewNo}
 	</select>
 
+	<select id="getRestaurantByName"
+			parameterType="RestaurantRequestDTO"
+			resultType="RestaurantResponseDTO">
+		SELECT
+				  RESTAURANT_NO restaurantNo
+				, NORMAL_NAME normalName
+				, ADDRESS address
+				, LATITUDE latitude
+				, LONGITUDE longitude
+		FROM
+				TB_RESTAURANT
+		WHERE
+				NORMAL_NAME = #{normalName}
+		AND
+				ADDRESS = #{address}
+	</select>
+	
+	<insert id="createRestaurant"
+			parameterType="RestaurantCreateVO">
+		<selectKey keyProperty="restaurantNo" resultType="Long" order="BEFORE">
+			SELECT SEQ_RESTAURANT_NO.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT
+		INTO
+				TB_RESTAURANT
+				(
+				  RESTAURANT_NO
+				, NORMAL_NAME
+				, ADDRESS
+				, LATITUDE
+				, LONGITUDE
+				)
+		VALUES
+				(
+				  #{restaurantNo}
+				, #{normalName}
+				, #{address}
+				, #{latitude}
+				, #{longitude}
+				)
+	</insert>
+	
+	<insert id="createReview"
+			parameterType="ReviewCreateVO">
+		<selectKey keyProperty="reviewNo" resultType="Long" order="BEFORE">
+			SELECT SEQ_REVIEW_NO.NEXTVAL FROM DUAL
+		</selectKey>	
+		INSERT
+		INTO
+				TB_REVIEW
+				(
+				  REVIEW_NO
+				, MEMBER_NO
+				, RESTAURANT_NO
+				, CONTENT
+				, RATING
+				, STATUS
+				, CREATED_AT
+				, UPDATED_AT
+				, VIEW_COUNT
+				)
+		VALUES
+				(
+				  #{reviewNo}
+				, #{memberNo}
+				, #{restaurantNo}
+				, #{content}
+				, #{rating}
+				, 'Y'
+				, SYSDATE
+				, SYSDATE
+				, 0
+				)
+	</insert>
+
+	<insert id="createReviewKeywordMap">
+		INSERT
+		ALL
+			<foreach collection="keywordNos" item="keywordNo">
+				INTO 
+						TB_REVIEW_KEYWORD_MAP
+						(
+						REVIEW_NO
+						, KEYWORD_NO
+						)
+				VALUES
+						(
+						  #{reviewNo}
+						, #{keywordNo}
+						)
+			</foreach>
+			SELECT 1 
+			FROM DUAL
+	</insert>
+	
+	<insert id="createReviewFile"
+			parameterType="ReviewFileCreateVO">
+		INSERT
+		INTO	
+				TB_REVIEW_FILE
+				(
+				  FILE_NO
+				, REVIEW_NO
+				, FILE_URL
+				, SORT_ORDER
+				, IS_THUMNAIL
+				, CREATED_AT
+				)
+		VALUES
+				(
+				  SEQ_FILE_NO.NEXTVAL 
+				, #{reviewNo}
+				, #{fileUrl}
+				, #{sortOrder}
+				, #{isThumbnail}
+				, SYSDATE
+				)
+	</insert>
 
 
-
-
-
+	<select id="getMyReviewList"
+	        parameterType="QueryDTO"
+	        resultMap="reviewListMap">
+	    SELECT
+	          RV.REVIEW_NO
+	        , (
+	            SELECT RVF.FILE_URL
+	            FROM TB_REVIEW_FILE RVF
+	            WHERE RV.REVIEW_NO = RVF.REVIEW_NO
+	              AND RVF.IS_THUMNAIL = 'Y'
+	          ) THUMBNAIL_URL
+	        , RT.NORMAL_NAME AS restaurantName
+	        , M.NICKNAME
+	        , RV.CONTENT
+	        , RV.RATING
+	        , RV.UPDATED_AT  AS updatedAt
+	        , RV.VIEW_COUNT  AS viewCount
+	        , NVL(LC.LIKE_COUNT, 0) AS likeCount
+	        , NVL(CC.COMMENT_COUNT, 0) AS commentCount
+	
+	        , CASE WHEN EXISTS (
+		            SELECT 1 FROM TB_REVIEW_LIKE RVL
+		            WHERE RVL.REVIEW_NO = RV.REVIEW_NO AND RVL.MEMBER_NO = #{memberNo}
+		      ) THEN 'Y' ELSE 'N' END AS isLiked
+	        , CASE WHEN EXISTS (
+		            SELECT 1 FROM TB_BOOKMARK B
+		            WHERE B.REVIEW_NO = RV.REVIEW_NO AND B.MEMBER_NO = #{memberNo}
+		      ) THEN 'Y' ELSE 'N' END AS isMarked
+	    FROM
+	          TB_REVIEW RV
+	    JOIN TB_MEMBER M ON (RV.MEMBER_NO = M.MEMBER_NO)
+	    JOIN TB_RESTAURANT RT ON (RV.RESTAURANT_NO = RT.RESTAURANT_NO)
+	    LEFT JOIN (
+		          SELECT REVIEW_NO, COUNT(*) LIKE_COUNT
+		          FROM TB_REVIEW_LIKE
+		          GROUP BY REVIEW_NO
+		      ) LC ON (LC.REVIEW_NO = RV.REVIEW_NO)
+	    LEFT JOIN (
+		          SELECT REVIEW_NO, COUNT(*) COMMENT_COUNT
+		          FROM TB_COMMENT
+		          WHERE STATUS = 'Y'
+		          GROUP BY REVIEW_NO
+		      ) CC ON (CC.REVIEW_NO = RV.REVIEW_NO)
+	    WHERE
+	        RV.STATUS = 'Y'
+	      AND
+	        RV.MEMBER_NO = #{memberNo}
+	ORDER BY 
+	
+    <choose>
+        <when test="sort == 'oldest'">RV.REVIEW_NO ASC</when>
+        <when test="sort == 'rating'">RV.RATING DESC, RV.REVIEW_NO DESC</when>
+        <when test="sort == 'liked'">NVL(LC.LIKE_COUNT,0) DESC, RV.REVIEW_NO DESC</when>
+        <otherwise>RV.REVIEW_NO DESC</otherwise>
+    </choose>
+	
+    OFFSET 
+        <choose>
+            <when test="cursor != null and cursor > 0">(#{cursor} - 1) * #{size}</when>
+            <otherwise>0</otherwise>
+        </choose>
+    ROWS FETCH NEXT #{size} ROWS ONLY
+	</select>
 
 </mapper>

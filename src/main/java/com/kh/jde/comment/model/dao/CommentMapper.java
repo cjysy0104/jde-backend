@@ -21,4 +21,6 @@ public interface CommentMapper {
 
 	int update(CommentUpdateDTO param);
 	
+	List<CommentDTO> getMyComments(com.kh.jde.review.model.dto.QueryDTO req);
+
 }
