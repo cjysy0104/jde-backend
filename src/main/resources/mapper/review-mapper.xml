@@ -639,6 +639,7 @@
 				, RT.NORMAL_NAME NORMAL_NAME
 				, M.NICKNAME 
 				, RV.RATING 
+				, NVL(LC.RECENT_LIKE_COUNT, 0) RECENT_LIKE_COUNT
 		FROM
 				TB_REVIEW RV
 		JOIN
@@ -661,10 +662,15 @@
 				)
 				LC ON (LC.REVIEW_NO = RV.REVIEW_NO)
 		<!-- Cursor 조건 설정-->
-	    AND 	(
+	    WHERE
+	    		1=1
+	    <if test="cursor != null and cursorLikeCount != null">
+	    AND
+	    	 	(
 	         		NVL(LC.RECENT_LIKE_COUNT,0) &lt; #{cursorLikeCount}
 	   			OR (NVL(LC.RECENT_LIKE_COUNT,0) = #{cursorLikeCount} AND RV.REVIEW_NO &lt; #{cursor})
 	    		)
+	    </if>
 		<!-- 정렬하기-->
 		ORDER
 		BY 
