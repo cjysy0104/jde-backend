@@ -15,6 +15,7 @@ import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
 import com.kh.jde.admin.model.vo.DefaultImageVO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.common.page.PageInfo;
@@ -419,6 +420,16 @@ public class AdminServiceImpl implements AdminService {
 		}
 		
 		return defaultImages;
+	}
+	
+	// 월별 리뷰 작성수 조회
+	@Override
+	@Transactional(readOnly = true)
+	public List<MonthlyReviewCountDTO> getMonthlyReviewCount() {
+		List<MonthlyReviewCountDTO> monthlyReviewCount = adminMapper.selectMonthlyReviewCount();
+		// 빈 리스트는 정상적인 경우일 수 있으므로 그대로 반환
+		// (아직 리뷰가 없는 경우)
+		return monthlyReviewCount;
 	}
 
 	// 기본 프로필 이미지 삭제

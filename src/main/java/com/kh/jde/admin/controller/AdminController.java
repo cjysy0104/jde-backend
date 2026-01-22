@@ -23,6 +23,7 @@ import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.service.AdminService;
@@ -298,7 +299,16 @@ public class AdminController {
 		return SuccessResponse.ok("회원 기본이미지 삭제 성공");
 	}
 	
+	// 월별 리뷰 수
+	@GetMapping("/reviews/monthly")
+	public ResponseEntity<SuccessResponse<List<MonthlyReviewCountDTO>>> getMonthlyReviewCount(){
+		List<MonthlyReviewCountDTO> monthlyReviewCount = adminService.getMonthlyReviewCount();
+		return SuccessResponse.ok(monthlyReviewCount, "월별 리뷰 수 조회 성공");
+	}
 	
+	// 신규 가입자 수
+	
+	// 이용자 전체 수
 	
 	
 }
