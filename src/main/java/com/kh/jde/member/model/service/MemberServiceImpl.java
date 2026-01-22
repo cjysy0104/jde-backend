@@ -53,8 +53,7 @@ public class MemberServiceImpl implements MemberService {
 	public void signUp(MemberSignUpDTO member) {
 		duplicateValidator.nicknameDuplicateCheck(member.getNickname());
 		duplicateValidator.emailDuplicateCheck(member.getEmail());
-		duplicateValidator.phoneDuplicateCheck(member.getPhone());
-		// 닉네임, 이메일, 휴대폰 중복 체크
+		// 닉네임, 이메일 중복 체크
 		
 		// 비밀번호 암호화
 		// String encodedPwd = passwordEncoder.encode(member.getPassword());
@@ -82,7 +81,9 @@ public class MemberServiceImpl implements MemberService {
 											  .build();
 		
 		int result = memberMapper.createProfileImage(memberFile);
-		
+		if(result < 1) {
+			throw new UnexpectedSQLResponseException("회원 기본 프로필 이미지 저장 실패");
+		}
 		
 	}
 
