@@ -6,6 +6,8 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.kh.jde.review.model.dto.BestReviewListResponse;
+import com.kh.jde.review.model.dto.BestReviewPagingRequest;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
@@ -61,5 +63,7 @@ public interface ReviewMapper {
 	void deleteFilesById(Long reviewNo);
 
 	List<String> getUrlById(Long reviewNo);
+
+	List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
 
 }

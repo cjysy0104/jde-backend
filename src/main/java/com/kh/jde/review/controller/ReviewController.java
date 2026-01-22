@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
+import com.kh.jde.review.model.dto.BestReviewListResponse;
+import com.kh.jde.review.model.dto.BestReviewPagingRequest;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
@@ -91,4 +93,11 @@ public class ReviewController {
 	}
 	
 
+	@GetMapping("/best")
+	public ResponseEntity<SuccessResponse<List<BestReviewListResponse>>> getBestReviewList(@ModelAttribute BestReviewPagingRequest req){
+		
+		List<BestReviewListResponse> result = reviewService.getBestReviewList(req);
+		
+		return SuccessResponse.ok(result, "베스트 리뷰 조회 성공");
+	}
 }
