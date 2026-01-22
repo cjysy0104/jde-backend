@@ -314,6 +314,11 @@ public class AdminController {
 	}
 	
 	// 이용자 전체 수
+	@GetMapping("/members/total")
+	public ResponseEntity<SuccessResponse<Integer>> getTotalMemberCount(){
+		int totalMemberCount = adminService.getTotalMemberCount();
+		return SuccessResponse.ok(totalMemberCount, "이용자 전체 수 조회 성공");
+	}
 	
 	
 }

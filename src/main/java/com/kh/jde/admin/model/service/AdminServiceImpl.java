@@ -438,6 +438,13 @@ public class AdminServiceImpl implements AdminService {
 	public int getNewMemberCountLastMonth() {
 		return adminMapper.selectNewMemberCountLastMonth();
 	}
+	
+	// 이용자 전체 수 조회
+	@Override
+	@Transactional(readOnly = true)
+	public int getTotalMemberCount() {
+		return adminMapper.countAllMembers();
+	}
 
 	// 기본 프로필 이미지 삭제
 	@Override
