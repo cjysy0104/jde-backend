@@ -978,15 +978,18 @@
 		SELECT
 		       TO_CHAR(TRUNC(CREATED_AT, 'MM'), 'YYYY-MM') AS yearMonth
 		     , COUNT(*) AS count
-		FROM
+		  FROM
 		       TB_REVIEW
-		WHERE
+		 WHERE
 		       STATUS = 'Y'
-		  AND CREATED_AT >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -11)
-		GROUP BY
+		  AND 
+		  	   CREATED_AT >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -11)
+		GROUP 
+		   BY
 		       TRUNC(CREATED_AT, 'MM')
-		ORDER BY
-		       TRUNC(CREATED_AT, 'MM') DESC;
+		ORDER 
+		   BY
+		       TRUNC(CREATED_AT, 'MM') DESC
 	</select>
 	
 	<!-- 최근 1개월 신규 가입자 수 조회 -->
