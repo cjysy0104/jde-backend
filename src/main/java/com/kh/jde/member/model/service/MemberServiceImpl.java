@@ -81,7 +81,9 @@ public class MemberServiceImpl implements MemberService {
 											  .build();
 		
 		int result = memberMapper.createProfileImage(memberFile);
-		
+		if(result < 1) {
+			throw new UnexpectedSQLResponseException("회원 기본 프로필 이미지 저장 실패");
+		}
 		
 	}
 
