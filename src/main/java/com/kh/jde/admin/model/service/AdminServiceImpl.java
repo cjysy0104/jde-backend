@@ -431,6 +431,13 @@ public class AdminServiceImpl implements AdminService {
 		// (아직 리뷰가 없는 경우)
 		return monthlyReviewCount;
 	}
+	
+	// 최근 1개월 신규 가입자 수 조회
+	@Override
+	@Transactional(readOnly = true)
+	public int getNewMemberCountLastMonth() {
+		return adminMapper.selectNewMemberCountLastMonth();
+	}
 
 	// 기본 프로필 이미지 삭제
 	@Override
