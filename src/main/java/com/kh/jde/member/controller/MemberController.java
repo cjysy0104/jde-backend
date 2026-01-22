@@ -132,5 +132,14 @@ public class MemberController {
 		duplicateValidator.nicknameDuplicateCheck(nickname);
 		return SuccessResponse.ok("사용 가능한 닉네임입니다.");
 	}
+	
+	// 비밀번호 검증 체크
+	@PostMapping("/password/verify")
+	public ResponseEntity<SuccessResponse<String>> verifyPassword(
+	        @Valid @RequestBody MemberWithdrawDTO dto
+	) {
+	    memberService.verifyPassword(dto.getPassword());
+	    return SuccessResponse.ok("비밀번호 확인 성공");
+	}
 
 }
