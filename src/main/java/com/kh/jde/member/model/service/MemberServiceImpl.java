@@ -42,7 +42,7 @@ public class MemberServiceImpl implements MemberService {
 	
 	private final MemberMapper memberMapper;
 	private final PasswordEncoder passwordEncoder;
-	private final MemberInformationValidator miv;
+	private final MemberInformationValidator duplicateValidator;
 	private final TokenMapper tokenMapper;
 	private final FileService fileService;
 	private final S3Service s3Service;
@@ -51,7 +51,9 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public void signUp(MemberSignUpDTO member) {
-		miv.MemberInfomationDuplicateCheck(member.getNickname(), member.getEmail(), member.getPhone());
+		duplicateValidator.nicknameDuplicateCheck(member.getNickname());
+		duplicateValidator.emailDuplicateCheck(member.getEmail());
+		duplicateValidator.phoneDuplicateCheck(member.getPhone());
 		// 닉네임, 이메일, 휴대폰 중복 체크
 		
 		// 비밀번호 암호화
@@ -156,7 +158,7 @@ public class MemberServiceImpl implements MemberService {
 	    CustomUserDetails user = validatePassword(changeNickname.getCurrentPassword());
 
 	    // 닉네임 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
-	    miv.MemberInfomationDuplicateCheck(changeNickname.getNickname(), null, null);
+	    duplicateValidator.nicknameDuplicateCheck(changeNickname.getNickname());
 
 	    MemberVO param = MemberVO.builder()
 	            .email(user.getUsername())
@@ -175,7 +177,7 @@ public class MemberServiceImpl implements MemberService {
 	    CustomUserDetails user = validatePassword(changePhone.getCurrentPassword());
 
 	    // 폰 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
-	    miv.MemberInfomationDuplicateCheck(null, null, changePhone.getPhone());
+	    duplicateValidator.phoneDuplicateCheck(changePhone.getPhone());
 
 	    MemberVO param = MemberVO.builder()
 	            .email(user.getUsername())
