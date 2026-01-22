@@ -973,6 +973,21 @@
 		       STATUS = 'Y'
 	</select>
 	
+	<!-- 월별 리뷰 수 조회 -->
+	<select id="selectMonthlyReviewCount" resultType="MonthlyReviewCountDTO">
+		SELECT
+		       TO_CHAR(CREATED_AT, 'YYYY-MM') AS yearMonth
+		     , COUNT(*) AS count
+		  FROM
+		       TB_REVIEW
+		 WHERE
+		       STATUS = 'Y'
+		 GROUP BY
+		       TO_CHAR(CREATED_AT, 'YYYY-MM')
+		 ORDER BY
+		       TO_CHAR(CREATED_AT, 'YYYY-MM') DESC
+	</select>
+	
 	<!-- 리뷰 페이징 조회 -->
 	<select id="selectReviewList" resultType="ReviewListDTO">
 		SELECT

@@ -15,6 +15,7 @@ import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
 import com.kh.jde.admin.model.vo.DefaultImageVO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.common.page.PageInfo;
@@ -419,6 +420,12 @@ public class AdminServiceImpl implements AdminService {
 		}
 		
 		return defaultImages;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<MonthlyReviewCountDTO> getMonthlyReviewCount() {
+		return adminMapper.selectMonthlyReviewCount();
 	}
 
 	// 기본 프로필 이미지 삭제
