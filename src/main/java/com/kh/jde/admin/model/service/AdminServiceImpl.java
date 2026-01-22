@@ -422,10 +422,14 @@ public class AdminServiceImpl implements AdminService {
 		return defaultImages;
 	}
 	
+	// 월별 리뷰 작성수 조회
 	@Override
 	@Transactional(readOnly = true)
 	public List<MonthlyReviewCountDTO> getMonthlyReviewCount() {
-		return adminMapper.selectMonthlyReviewCount();
+		List<MonthlyReviewCountDTO> monthlyReviewCount = adminMapper.selectMonthlyReviewCount();
+		// 빈 리스트는 정상적인 경우일 수 있으므로 그대로 반환
+		// (아직 리뷰가 없는 경우)
+		return monthlyReviewCount;
 	}
 
 	// 기본 프로필 이미지 삭제
