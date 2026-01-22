@@ -19,8 +19,7 @@ public class QueryDTO {
 	private Long memberNo;
 	
 	// 스크롤
-	private Integer size;
-	private Integer sizePlusOne; // size + 1
+	private ScrollRequest scroll;
 	private String sort;	// latest | oldest | rating | liked
 	
 	// 커서

@@ -148,10 +148,10 @@
 	    
 	    OFFSET 
 	        <choose>
-	            <when test="cursor != null and cursor > 0">(#{cursor} - 1) * #{size}</when>
+	            <when test="cursor != null and cursor > 0">(#{cursor} - 1) * #{scroll.size}</when>
 	            <otherwise>0</otherwise>
 	        </choose>
-	    ROWS FETCH NEXT #{size} ROWS ONLY
+	    ROWS FETCH NEXT #{scroll.size} ROWS ONLY
 </select>
 
 
