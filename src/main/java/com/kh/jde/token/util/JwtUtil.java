@@ -27,29 +27,35 @@ public class JwtUtil {
 	private String secretKey;
 	private SecretKey key;
 	
+	// yml에서 주입 받을 만료시간
+	@Value("${jwt.access-token-expiration}")
+	private Duration accessTokenExpiration;
+
+	@Value("${jwt.refresh-token-expiration}")
+	private Duration refreshTokenExpiration;
+	
 	@PostConstruct
 	public void init() {
-		log.info("{}", secretKey);
 		byte[] arr = Base64.getDecoder().decode(secretKey);
 		this.key = Keys.hmacShaKeyFor(arr);
 	}
 	
 	public String getAccessToken(String username) {
-		
-		return Jwts.builder().subject(username) // 사용자 아이디
-							 .issuedAt(new Date()) // 발급일
-							 .expiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 120))) // 만료일
-							 .signWith(key) // 서명
-							 .compact();
+		return getToken(username, accessTokenExpiration);
 	}
 	
 	public String getRefreshToken(String username) {
+		return getToken(username, refreshTokenExpiration);
+	}
+	
+	private String getToken(String username, Duration expiration) {
+		Instant now = Instant.now();
 		
 		return Jwts.builder().subject(username) // 사용자 아이디
-				 			 .issuedAt(new Date()) // 발급일
-				 			 .expiration(Date.from(Instant.now().plus(Duration.ofDays(30)))) // 만료일 30일
-				 			 .signWith(key) // 서명
-				 			 .compact();
+	 			 .issuedAt(Date.from(now)) // 발급일
+	 			 .expiration(Date.from(now.plus(expiration))) // 만료일 
+	 			 .signWith(key) // 서명
+	 			 .compact();
 	}
 	
 	public Claims parseJwt(String token) {

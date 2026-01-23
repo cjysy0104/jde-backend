@@ -45,7 +45,6 @@ public class AuthServiceImpl implements AuthService {
 		}
 		CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
 		
-		
 		Map<String, String> tokens = tokenService.generateToken(user.getUsername());
 		// 토큰 정보에 추가로 앞단에서 필요한 정보들을 담아서 같이 보내준다.
 		String fileUrl = fileMapper.getfileUrl(user.getMemberNo());
@@ -66,7 +65,6 @@ public class AuthServiceImpl implements AuthService {
 		return loginResponse;
 	}
 	
-	
 	@Override
 	@Transactional
 	public void logout(MemberLogoutDTO member) {
@@ -78,8 +76,8 @@ public class AuthServiceImpl implements AuthService {
 		} else {
 			throw new LogoutFailureException("로그아웃 오류 발생, 관리자에게 문의해주세요.");
 		}
+		
 	}
-
 
 	@Override
 	public AccessTokenResponseDTO reissueAccessToken(String refreshToken) {

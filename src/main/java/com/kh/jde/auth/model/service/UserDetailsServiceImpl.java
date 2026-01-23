@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.AccessDeniedException;
@@ -23,6 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	private final MemberMapper mapper;
 	@Override
+	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		MemberLoginDTO user = mapper.loadUser(username);
 		
