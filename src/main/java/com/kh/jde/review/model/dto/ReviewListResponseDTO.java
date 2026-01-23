@@ -25,6 +25,7 @@ public class ReviewListResponseDTO {
 	private String content;
 	private float rating;
 	private Date updateDate;
+	private Date createDate;
 	
 	private int viewCount;
 	private int likeCount;
