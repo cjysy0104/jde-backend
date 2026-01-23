@@ -235,13 +235,40 @@
 	
 	<!-- 프로필 이미지 변경 -->	
 	<update id="upsertProfileImage" parameterType="com.kh.jde.member.model.vo.MemberFileVO">
-	    UPDATE
-	    	   TB_MEMBER_FILE
-	       SET
-	    	   FILE_URL = #{fileUrl}
-	    	 , CREATED_AT = SYSDATE
-	     WHERE	   
-	    	   MEMBER_NO = #{memberNo}
+  		MERGE
+  		 INTO 
+  		      TB_MEMBER_FILE t USING (
+    								  SELECT
+      										 #{memberNo} AS MEMBER_NO,
+     										 #{fileUrl}  AS FILE_URL
+    									FROM 
+    										 dual
+  									 ) s ON (t.MEMBER_NO = s.MEMBER_NO)
+  		 WHEN
+  	  MATCHED
+  	     THEN
+       		  UPDATE
+                 SET
+      		         t.FILE_URL   = s.FILE_URL,
+                     t.CREATED_AT = SYSDATE
+         WHEN
+          NOT 
+      MATCHED
+         THEN
+    		  INSERT
+    		         (
+    		         FILE_NO
+    		       , MEMBER_NO
+    		       , FILE_URL
+    		       , CREATED_AT
+    		         )
+             VALUES 
+                     (
+                     SEQ_MEMBER_FILE_NO.NEXTVAL
+                   , s.MEMBER_NO
+                   , s.FILE_URL
+                   , SYSDATE
+                     )
 	</update>
 	
 	<insert id="createProfileImage">
