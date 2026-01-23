@@ -103,6 +103,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 	
+	@Transactional(readOnly = true)
 	private CustomUserDetails validatePassword(String plainPassword) {
 		// 이미 N인 회원은 JwtFilter에서 이미 걸러짐.
 		// 입력한 비밀번호는 진짜 비밀번호인지 볼거임.

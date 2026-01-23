@@ -1,9 +1,13 @@
 package com.kh.jde.token.model.service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.token.model.dao.TokenMapper;
@@ -23,6 +27,9 @@ public class TokenServiceImpl implements TokenService {
 	private final JwtUtil tokenUtil;
 	private final TokenMapper tokenMapper;
 
+	@Value("${jwt.refresh-token-expiration}")
+	private Duration refreshTokenExpiration;
+	
 	public Map<String, String> generateToken(String username) {
 		
 		Map<String, String> tokens = createTokens(username);
@@ -45,14 +52,17 @@ public class TokenServiceImpl implements TokenService {
 	}
 	
 	private void saveToken(String refreshToken, String username) {
+		long expirationMillis = System.currentTimeMillis() + refreshTokenExpiration.toMillis();
+		
 		RefreshToken token = RefreshToken.builder()
 										 .token(refreshToken)
 										 .username(username)
-				   						 .expiration(System.currentTimeMillis() + 3600000L * 72)
+				   						 .expiration(expirationMillis)
 				   						 .build();
 		tokenMapper.saveToken(token);
 	}
 	
+	@Transactional
 	public String validateToken(String refreshToken) {
 		RefreshToken token = tokenMapper.findByToken(refreshToken);
 		// DB에서 토큰 조회해서 검증하기
