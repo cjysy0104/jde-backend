@@ -15,6 +15,7 @@
 		<result property="content" column="CONTENT"/>
 		<result property="rating" column="RATING"/>
 		<result property="updateDate" column="UPDATED_AT"/>
+		<result property="createDate" column="CREATED_AT"/>
 		
 		<result property="viewCount" column="VIEW_COUNT"/>
 		<result property="likeCount" column="LIKE_COUNT"/>
@@ -51,6 +52,7 @@
 				, RV.CONTENT 
 				, RV.RATING 
 				, RV.UPDATED_AT 
+				, RV.CREATED_AT 
 				
 				, RV.VIEW_COUNT
 				, NVL(LC.LIKE_COUNT, 0) LIKE_COUNT
@@ -512,6 +514,7 @@
 	       , M.NICKNAME
 	       , RV.CONTENT
 	       , RV.RATING
+	       , RV.CREATED_AT AS CREATED_AT
 	       , RV.UPDATED_AT  AS UPDATED_AT
 	       , RV.VIEW_COUNT  AS VIEW_COUNT
 	       , NVL(LC.LIKE_COUNT, 0) AS LIKE_COUNT
