@@ -306,9 +306,19 @@ public class AdminController {
 		return SuccessResponse.ok(monthlyReviewCount, "월별 리뷰 수 조회 성공");
 	}
 	
-	// 신규 가입자 수
+	// 신규 가입자 수 (최근 1개월)
+	@GetMapping("/members/new")
+	public ResponseEntity<SuccessResponse<Integer>> getNewMemberCountLastMonth(){
+		int newMemberCount = adminService.getNewMemberCountLastMonth();
+		return SuccessResponse.ok(newMemberCount, "최근 1개월 신규 가입자 수 조회 성공");
+	}
 	
 	// 이용자 전체 수
+	@GetMapping("/members/total")
+	public ResponseEntity<SuccessResponse<Integer>> getTotalMemberCount(){
+		int totalMemberCount = adminService.getTotalMemberCount();
+		return SuccessResponse.ok(totalMemberCount, "이용자 전체 수 조회 성공");
+	}
 	
 	
 }

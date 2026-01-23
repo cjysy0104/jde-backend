@@ -28,4 +28,6 @@ public interface MemberService {
 	
 	String changeProfileToDefault(String plainPassword, Long fileNo);
 	
+	void verifyPassword(String plainPassword);
+	
 }

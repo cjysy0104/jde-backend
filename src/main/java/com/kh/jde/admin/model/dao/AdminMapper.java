@@ -142,4 +142,7 @@ public interface AdminMapper {
 	// 월별 리뷰 수 조회
 	List<MonthlyReviewCountDTO> selectMonthlyReviewCount();
 	
+	// 최근 1개월 신규 가입자 수 조회
+	int selectNewMemberCountLastMonth();
+	
 }

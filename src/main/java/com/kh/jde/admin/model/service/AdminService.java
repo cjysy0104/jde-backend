@@ -99,4 +99,10 @@ public interface AdminService {
 	// 월별 리뷰 수 조회
 	List<MonthlyReviewCountDTO> getMonthlyReviewCount();
 	
+	// 최근 1개월 신규 가입자 수 조회
+	int getNewMemberCountLastMonth();
+	
+	// 이용자 전체 수 조회
+	int getTotalMemberCount();
+	
 }

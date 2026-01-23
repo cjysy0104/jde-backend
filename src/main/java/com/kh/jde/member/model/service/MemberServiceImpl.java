@@ -277,6 +277,11 @@ public class MemberServiceImpl implements MemberService {
 		return captains;
 	}
 	
-
+	// 비밀번호 검증 체크
+	@Override
+	@Transactional(readOnly = true)
+	public void verifyPassword(String plainPassword) {
+	    validatePassword(plainPassword);
+	}
 }
 
