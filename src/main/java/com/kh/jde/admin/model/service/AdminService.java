@@ -9,6 +9,7 @@ import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
@@ -94,5 +95,14 @@ public interface AdminService {
 	
 	// 기본 프로필 이미지 삭제
 	void deleteDefaultImage(DefaultImageDTO defaultImage);
+	
+	// 월별 리뷰 수 조회
+	List<MonthlyReviewCountDTO> getMonthlyReviewCount();
+	
+	// 최근 1개월 신규 가입자 수 조회
+	int getNewMemberCountLastMonth();
+	
+	// 이용자 전체 수 조회
+	int getTotalMemberCount();
 	
 }

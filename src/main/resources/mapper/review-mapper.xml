@@ -502,66 +502,73 @@
 	<select id="getMyReviewList"
 	        parameterType="QueryDTO"
 	        resultMap="reviewListMap">
-	    SELECT
-	          RV.REVIEW_NO
-	        , (
-	            SELECT RVF.FILE_URL
-	            FROM TB_REVIEW_FILE RVF
-	            WHERE RV.REVIEW_NO = RVF.REVIEW_NO
-	              AND RVF.IS_THUMNAIL = 'Y'
-	          ) THUMBNAIL_URL
-	        , RT.NORMAL_NAME AS restaurantName
-	        , M.NICKNAME
-	        , RV.CONTENT
-	        , RV.RATING
-	        , RV.UPDATED_AT  AS updatedAt
-	        , RV.VIEW_COUNT  AS viewCount
-	        , NVL(LC.LIKE_COUNT, 0) AS likeCount
-	        , NVL(CC.COMMENT_COUNT, 0) AS commentCount
+	  SELECT
+	         RV.REVIEW_NO
+	       , RVF.THUMBNAIL_URL AS THUMBNAIL_URL
+	       , RT.NORMAL_NAME AS NORMAL_NAME
+	       , M.NICKNAME
+	       , RV.CONTENT
+	       , RV.RATING
+	       , RV.CREATED_AT AS CREATED_AT
+	       , RV.UPDATED_AT  AS UPDATED_AT
+	       , RV.VIEW_COUNT  AS VIEW_COUNT
+	       , NVL(LC.LIKE_COUNT, 0) AS LIKE_COUNT
+	       , NVL(CC.COMMENT_COUNT, 0) AS COMMENT_COUNT
 	
-	        , CASE WHEN EXISTS (
-		            SELECT 1 FROM TB_REVIEW_LIKE RVL
-		            WHERE RVL.REVIEW_NO = RV.REVIEW_NO AND RVL.MEMBER_NO = #{memberNo}
-		      ) THEN 'Y' ELSE 'N' END AS isLiked
-	        , CASE WHEN EXISTS (
-		            SELECT 1 FROM TB_BOOKMARK B
-		            WHERE B.REVIEW_NO = RV.REVIEW_NO AND B.MEMBER_NO = #{memberNo}
-		      ) THEN 'Y' ELSE 'N' END AS isMarked
+	       , CASE WHEN EXISTS (
+	           SELECT 1
+	           FROM TB_REVIEW_LIKE RVL
+	           WHERE RVL.REVIEW_NO = RV.REVIEW_NO
+	             AND RVL.MEMBER_NO = #{memberNo}
+	         ) THEN 'Y' ELSE 'N' END AS IS_LIKED
+	
+	       , CASE WHEN EXISTS (
+	           SELECT 1
+	           FROM TB_BOOKMARK B
+	           WHERE B.REVIEW_NO = RV.REVIEW_NO
+	             AND B.MEMBER_NO = #{memberNo}
+	          ) THEN 'Y' ELSE 'N' END AS IS_MARKED
 	    FROM
-	          TB_REVIEW RV
+	         TB_REVIEW RV
 	    JOIN TB_MEMBER M ON (RV.MEMBER_NO = M.MEMBER_NO)
 	    JOIN TB_RESTAURANT RT ON (RV.RESTAURANT_NO = RT.RESTAURANT_NO)
 	    LEFT JOIN (
-		          SELECT REVIEW_NO, COUNT(*) LIKE_COUNT
-		          FROM TB_REVIEW_LIKE
-		          GROUP BY REVIEW_NO
-		      ) LC ON (LC.REVIEW_NO = RV.REVIEW_NO)
+			    SELECT REVIEW_NO
+				     , MAX(FILE_URL) KEEP (DENSE_RANK FIRST ORDER BY SORT_ORDER ASC, FILE_NO ASC) AS THUMBNAIL_URL
+			    FROM TB_REVIEW_FILE
+			    WHERE IS_THUMNAIL = 'Y'
+			    GROUP BY REVIEW_NO
+			  ) RVF ON RVF.REVIEW_NO = RV.REVIEW_NO
 	    LEFT JOIN (
-		          SELECT REVIEW_NO, COUNT(*) COMMENT_COUNT
-		          FROM TB_COMMENT
-		          WHERE STATUS = 'Y'
-		          GROUP BY REVIEW_NO
-		      ) CC ON (CC.REVIEW_NO = RV.REVIEW_NO)
-	    WHERE
-	        RV.STATUS = 'Y'
-	      AND
-	        RV.MEMBER_NO = #{memberNo}
-	ORDER BY 
-	
-    <choose>
-        <when test="sort == 'oldest'">RV.REVIEW_NO ASC</when>
-        <when test="sort == 'rating'">RV.RATING DESC, RV.REVIEW_NO DESC</when>
-        <when test="sort == 'liked'">NVL(LC.LIKE_COUNT,0) DESC, RV.REVIEW_NO DESC</when>
-        <otherwise>RV.REVIEW_NO DESC</otherwise>
-    </choose>
-	
-    OFFSET 
-        <choose>
-            <when test="cursor != null and cursor > 0">(#{cursor} - 1) * #{scroll.size}</when>
-            <otherwise>0</otherwise>
-        </choose>
-    ROWS FETCH NEXT #{scroll.size} ROWS ONLY
+	           SELECT REVIEW_NO, COUNT(*) LIKE_COUNT
+	           FROM TB_REVIEW_LIKE
+	           GROUP BY REVIEW_NO
+	          ) LC ON (LC.REVIEW_NO = RV.REVIEW_NO)
+	    LEFT JOIN (
+	           SELECT REVIEW_NO, COUNT(*) COMMENT_COUNT
+	           FROM TB_COMMENT
+	           WHERE STATUS = 'Y'
+	           GROUP BY REVIEW_NO
+	          ) CC ON (CC.REVIEW_NO = RV.REVIEW_NO)
+	   WHERE
+	         RV.STATUS = 'Y'
+	     AND
+	         RV.MEMBER_NO = #{memberNo}
+	   ORDER BY
+	    <choose>
+	      <when test="sort == 'oldest'">RV.REVIEW_NO ASC</when>
+	      <when test="sort == 'rating'">RV.RATING DESC, RV.REVIEW_NO DESC</when>
+	      <when test="sort == 'liked'">NVL(LC.LIKE_COUNT,0) DESC, RV.REVIEW_NO DESC</when>
+	      <otherwise>RV.REVIEW_NO DESC</otherwise>
+	    </choose>
+	  OFFSET
+	    <choose>
+	      <when test="cursor != null and cursor > 0">(#{cursor} - 1) * #{scroll.size}</when>
+	      <otherwise>0</otherwise>
+	    </choose>
+	  ROWS FETCH NEXT #{scroll.size} ROWS ONLY
 	</select>
+
 	
 	<update id="update"
 			parameterType="ReviewUpdateVO">

@@ -10,6 +10,7 @@ import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.vo.DefaultImageVO;
 import com.kh.jde.common.page.PageInfo;
@@ -137,5 +138,11 @@ public interface AdminMapper {
 	
 	// 회원 기본 프로필 이미지 삭제
 	int deleteDefaultImageByFileNo(Long fileNo);
+	
+	// 월별 리뷰 수 조회
+	List<MonthlyReviewCountDTO> selectMonthlyReviewCount();
+	
+	// 최근 1개월 신규 가입자 수 조회
+	int selectNewMemberCountLastMonth();
 	
 }

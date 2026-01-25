@@ -973,6 +973,36 @@
 		       STATUS = 'Y'
 	</select>
 	
+	<!-- 월별 리뷰 수 조회 (최근 1년) -->
+	<select id="selectMonthlyReviewCount" resultType="MonthlyReviewCountDTO">
+		SELECT
+		       TO_CHAR(TRUNC(CREATED_AT, 'MM'), 'YYYY-MM') AS yearMonth
+		     , COUNT(*) AS count
+		  FROM
+		       TB_REVIEW
+		 WHERE
+		       STATUS = 'Y'
+		  AND 
+		  	   CREATED_AT >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -11)
+		GROUP 
+		   BY
+		       TRUNC(CREATED_AT, 'MM')
+		ORDER 
+		   BY
+		       TRUNC(CREATED_AT, 'MM') DESC
+	</select>
+	
+	<!-- 최근 1개월 신규 가입자 수 조회 -->
+	<select id="selectNewMemberCountLastMonth" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+		   AND ENROLL_DATE >= ADD_MONTHS(SYSDATE, -1)
+	</select>
+	
 	<!-- 리뷰 페이징 조회 -->
 	<select id="selectReviewList" resultType="ReviewListDTO">
 		SELECT

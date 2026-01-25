@@ -152,7 +152,7 @@
 	            <otherwise>0</otherwise>
 	        </choose>
 	    ROWS FETCH NEXT #{scroll.size} ROWS ONLY
-</select>
+	</select>
 
 
 </mapper>
