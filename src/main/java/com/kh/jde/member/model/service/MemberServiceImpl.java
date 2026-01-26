@@ -2,8 +2,6 @@ package com.kh.jde.member.model.service;
 
 import java.util.List;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +12,8 @@ import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.exception.CustomAuthenticationException;
 import com.kh.jde.exception.PostNotFoundException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
-
 import com.kh.jde.file.service.FileService;
-
 import com.kh.jde.file.service.S3Service;
-
 import com.kh.jde.member.model.dao.MemberMapper;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
@@ -225,6 +220,11 @@ public class MemberServiceImpl implements MemberService {
 	    }
 
 	    return newUrl;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<DefaultImageDTO> getDefaultProfiles() {
+	  return memberMapper.selectDefaultProfiles();
 	}
 	
 	// 기본 이미지 선택(변경)

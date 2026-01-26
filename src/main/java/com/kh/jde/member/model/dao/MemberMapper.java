@@ -31,8 +31,8 @@ public interface MemberMapper {
 	int updateNameByEmail(MemberVO member);
 	int updateNicknameByEmail(MemberVO member);
 	int updatePhoneByEmail(MemberVO member);
-	
-	// 기본 이미지 단건 조회
+	// 기본 이미지 목록/단건 조회
+	List<DefaultImageDTO> selectDefaultProfiles();
 	DefaultImageDTO selectDefaultProfileByNo(Long fileNo);
 	
 	// 내 프로필 URL 조회/저장

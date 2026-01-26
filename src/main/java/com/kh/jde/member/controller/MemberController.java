@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.CaptainDTO;
@@ -105,6 +106,12 @@ public class MemberController {
 	) {
 	    String url = memberService.updateMyProfileImage(password, file, user);
 	    return SuccessResponse.ok(url, "프로필 이미지가 변경되었습니다.");
+	}
+	
+	@GetMapping("/profile-image/default")
+	public ResponseEntity<SuccessResponse<List<DefaultImageDTO>>> getDefaultProfiles() {
+		List<DefaultImageDTO> list = memberService.getDefaultProfiles();
+		return SuccessResponse.ok(list, "기본 프로필 이미지 목록 조회 성공");
 	}
 	
 	// 기본 이미지 선택(변경)

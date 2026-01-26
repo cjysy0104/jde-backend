@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
@@ -24,6 +25,8 @@ public interface MemberService {
 	void changeName(ChangeNameDTO changeName, CustomUserDetails user);
 	void changeNickname(ChangeNicknameDTO changeNickname, CustomUserDetails user);
 	void changePhone(ChangePhoneDTO changePhone, CustomUserDetails user);
+	
+	List<DefaultImageDTO> getDefaultProfiles();
 	
 	String updateMyProfileImage(String plainPassword, MultipartFile file, CustomUserDetails user);
 	
