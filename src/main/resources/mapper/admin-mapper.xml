@@ -1003,6 +1003,18 @@
 		   AND ENROLL_DATE >= ADD_MONTHS(SYSDATE, -1)
 	</select>
 	
+	<!-- 이전 달 가입자 수 조회 -->
+	<select id="selectNewMemberCountPreviousMonth" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+		   AND ENROLL_DATE >= TRUNC(ADD_MONTHS(SYSDATE, -1), 'MM')
+		   AND ENROLL_DATE &lt; TRUNC(SYSDATE, 'MM')
+	</select>
+	
 	<!-- 리뷰 페이징 조회 -->
 	<select id="selectReviewList" resultType="ReviewListDTO">
 		SELECT

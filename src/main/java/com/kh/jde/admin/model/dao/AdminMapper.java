@@ -145,4 +145,7 @@ public interface AdminMapper {
 	// 최근 1개월 신규 가입자 수 조회
 	int selectNewMemberCountLastMonth();
 	
+	// 이전 달 가입자 수 조회
+	int selectNewMemberCountPreviousMonth();
+	
 }
