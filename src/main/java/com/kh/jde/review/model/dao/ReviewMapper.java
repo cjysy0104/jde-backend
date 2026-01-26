@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
+import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
@@ -25,6 +26,9 @@ public interface ReviewMapper {
 
 	// 전체 목록 조회
 	List<ReviewListResponseDTO> getReviewList(QueryDTO req);
+	
+	// 미식대장의 리뷰 전체 조회
+	List<ReviewListResponseDTO> getCaptainReviewList(CaptainQueryDTO req);
 	
 	// 리뷰 상세 조회
 	DetailReviewDTO getDetailReview(Map<String,Object> param);
