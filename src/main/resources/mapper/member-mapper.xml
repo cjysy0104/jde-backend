@@ -209,6 +209,19 @@
 	       AND STATUS = 'Y'
 	</update>
 	
+	<!-- 기본 프로필 이미지 목록 조회 -->
+	<select id="selectDefaultProfiles" resultType="com.kh.jde.admin.model.dto.DefaultImageDTO">
+	  SELECT
+	         FILE_NO    AS fileNo
+	       , FILE_NAME  AS fileName
+	       , FILE_URL   AS fileUrl
+	       , CREATED_AT AS createdAt
+	    FROM
+	         TB_DEFAULT_PROFILE
+	   ORDER BY
+	         FILE_NO ASC
+	</select>
+	
 	<!-- 기본 프로필 이미지 단건 조회 -->
 	<select id="selectDefaultProfileByNo" parameterType="long"
 	        resultType="com.kh.jde.admin.model.dto.DefaultImageDTO">
