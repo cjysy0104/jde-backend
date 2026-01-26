@@ -14,6 +14,7 @@ import com.kh.jde.file.service.S3Service;
 import com.kh.jde.review.model.dao.ReviewMapper;
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
+import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.RestaurantRequestDTO;
@@ -42,10 +43,10 @@ public class ReviewServiceImpl implements ReviewService {
 	private final RequestNormalizer requestNormalizer;
 
 	@Override
-	public List<ReviewListResponseDTO> getReviewList(QueryDTO req, CustomUserDetails principal) {
+	public List<ReviewListResponseDTO> getReviewList(QueryDTO request, CustomUserDetails principal) {
 		
 		// 쿼리DTO 가공
-		QueryDTO normalized = nomarizedRequest(req, principal);
+		QueryDTO normalized = nomarizedRequest(request, principal);
 		
 		// 목록 조회
 		List<ReviewListResponseDTO> reviews = reviewMapper.getReviewList(normalized);
@@ -53,21 +54,35 @@ public class ReviewServiceImpl implements ReviewService {
 		return reviews;
 	}
 	
-	private QueryDTO nomarizedRequest(QueryDTO req, CustomUserDetails principal) {
+	@Override
+	public List<ReviewListResponseDTO> getCaptainReviewList(QueryDTO request, CustomUserDetails principal, Long captainNo) {
+		// 미식대장쿼리DTO 가공
+		QueryDTO normalized = nomarizedRequest(request, principal);
+		CaptainQueryDTO captainNormalized = new CaptainQueryDTO();
+		captainNormalized.setCatptainNo(captainNo);
+		captainNormalized.setQuery(normalized);
+		
+		// 미식대장의 리뷰 목록 조회
+		List<ReviewListResponseDTO> captainReviews = reviewMapper.getCaptainReviewList(captainNormalized);
+		
+		return captainReviews;
+	}
+	
+	private QueryDTO nomarizedRequest(QueryDTO request, CustomUserDetails principal) {
 
 		// 0. query null 방지
-		if(req == null) req = new QueryDTO();
+		if(request == null) request = new QueryDTO();
 		
 		// 1. 로그인? 했으면 memberNo 주입 / 아니면 null
 		if(principal != null) {
-			req.setMemberNo(principal.getMemberNo());
+			request.setMemberNo(principal.getMemberNo());
 		} else {
-			req.setMemberNo(null);
+			request.setMemberNo(null);
 		}
 		
 		// 2. scroll 만들자
-		req.setScroll(requestNormalizer.applyScroll(req.getScroll(), 5)); 
-		return req;
+		request.setScroll(requestNormalizer.applyScroll(request.getScroll(), 5)); 
+		return request;
 	}
 
 	@Override

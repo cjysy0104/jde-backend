@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
+import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeNameDTO;
 import com.kh.jde.member.model.dto.ChangeNicknameDTO;
@@ -15,19 +17,21 @@ public interface MemberService {
 	
 	void signUp(MemberSignUpDTO member);
 	
-	void withdraw(String password);
+	void withdraw(String password, CustomUserDetails user);
 	
 	List<CaptainDTO> getCaptainList();
 	
-	void changePassword(ChangePasswordDTO changePassword);
-	void changeName(ChangeNameDTO changeName);
-	void changeNickname(ChangeNicknameDTO changeNickname);
-	void changePhone(ChangePhoneDTO changePhone);
+	void changePassword(ChangePasswordDTO changePassword, CustomUserDetails user);
+	void changeName(ChangeNameDTO changeName, CustomUserDetails user);
+	void changeNickname(ChangeNicknameDTO changeNickname, CustomUserDetails user);
+	void changePhone(ChangePhoneDTO changePhone, CustomUserDetails user);
 	
-	String updateMyProfileImage(String plainPassword, MultipartFile file);
+	List<DefaultImageDTO> getDefaultProfiles();
 	
-	String changeProfileToDefault(String plainPassword, Long fileNo);
+	String updateMyProfileImage(String plainPassword, MultipartFile file, CustomUserDetails user);
 	
-	void verifyPassword(String plainPassword);
+	String changeProfileToDefault(String plainPassword, Long fileNo, CustomUserDetails user);
+	
+	void verifyPassword(String plainPassword, CustomUserDetails user);
 	
 }

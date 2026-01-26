@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
+import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.member.model.dto.CaptainDTO;
 import com.kh.jde.member.model.dto.ChangeDefaultProfileDTO;
@@ -54,8 +57,8 @@ public class MemberController {
 	}
 	
 	@DeleteMapping
-	public ResponseEntity<SuccessResponse<String>> withdraw(@Valid @RequestBody MemberWithdrawDTO member){
-		memberService.withdraw(member.getPassword());
+	public ResponseEntity<SuccessResponse<String>> withdraw(@Valid @RequestBody MemberWithdrawDTO member, @AuthenticationPrincipal CustomUserDetails user){
+		memberService.withdraw(member.getPassword(), user);
 		return SuccessResponse.ok("탈퇴 되었습니다.");
 	}
 	
@@ -71,26 +74,26 @@ public class MemberController {
 	}
 	
 	@PatchMapping("/password")
-	public ResponseEntity<SuccessResponse<String>> changePassword(@Valid @RequestBody ChangePasswordDTO changePassword) {
-	    memberService.changePassword(changePassword);
+	public ResponseEntity<SuccessResponse<String>> changePassword(@Valid @RequestBody ChangePasswordDTO changePassword, @AuthenticationPrincipal CustomUserDetails user) {
+	    memberService.changePassword(changePassword, user);
 	    return SuccessResponse.ok("비밀번호가 변경되었습니다.");
 	}
 	
 	@PatchMapping("/name")
-	public ResponseEntity<SuccessResponse<String>> changeName(@Valid @RequestBody ChangeNameDTO ChangeName) {
-	    memberService.changeName(ChangeName);
+	public ResponseEntity<SuccessResponse<String>> changeName(@Valid @RequestBody ChangeNameDTO ChangeName, @AuthenticationPrincipal CustomUserDetails user) {
+	    memberService.changeName(ChangeName, user);
 	    return SuccessResponse.ok("이름이 변경되었습니다.");
 	}
 	
 	@PatchMapping("/nickname")
-	public ResponseEntity<SuccessResponse<String>> changeNickname(@Valid @RequestBody ChangeNicknameDTO changeNickname) {
-	    memberService.changeNickname(changeNickname);
+	public ResponseEntity<SuccessResponse<String>> changeNickname(@Valid @RequestBody ChangeNicknameDTO changeNickname, @AuthenticationPrincipal CustomUserDetails user) {
+	    memberService.changeNickname(changeNickname, user);
 	    return SuccessResponse.ok("닉네임이 변경되었습니다.");
 	}
 	
 	@PatchMapping("/phone")
-	public ResponseEntity<SuccessResponse<String>> changePhone(@Valid @RequestBody ChangePhoneDTO changePhone) {
-	    memberService.changePhone(changePhone);
+	public ResponseEntity<SuccessResponse<String>> changePhone(@Valid @RequestBody ChangePhoneDTO changePhone, @AuthenticationPrincipal CustomUserDetails user) {
+	    memberService.changePhone(changePhone, user);
 	    return SuccessResponse.ok("전화번호가 변경되었습니다.");
 	}
 	
@@ -98,18 +101,26 @@ public class MemberController {
 	@PatchMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<SuccessResponse<String>> updateProfileImage(
 	        @RequestPart("password") String password,
-	        @RequestPart("file") MultipartFile file
+	        @RequestPart("file") MultipartFile file,
+	        @AuthenticationPrincipal CustomUserDetails user
 	) {
-	    String url = memberService.updateMyProfileImage(password, file);
+	    String url = memberService.updateMyProfileImage(password, file, user);
 	    return SuccessResponse.ok(url, "프로필 이미지가 변경되었습니다.");
+	}
+	
+	@GetMapping("/profile-image/default")
+	public ResponseEntity<SuccessResponse<List<DefaultImageDTO>>> getDefaultProfiles() {
+		List<DefaultImageDTO> list = memberService.getDefaultProfiles();
+		return SuccessResponse.ok(list, "기본 프로필 이미지 목록 조회 성공");
 	}
 	
 	// 기본 이미지 선택(변경)
 	@PatchMapping(value = "/profile-image/default", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SuccessResponse<String>> changeProfileToDefault(
-			@RequestBody ChangeDefaultProfileDTO defaultProfile
+			@RequestBody ChangeDefaultProfileDTO defaultProfile, 
+			@AuthenticationPrincipal CustomUserDetails user
 	) {
-	    String url = memberService.changeProfileToDefault(defaultProfile.getPassword(), defaultProfile.getFileNo());
+	    String url = memberService.changeProfileToDefault(defaultProfile.getPassword(), defaultProfile.getFileNo(), user);
 	    return SuccessResponse.ok(url, "기본 프로필 이미지로 변경되었습니다.");
 	}
 	
@@ -136,9 +147,9 @@ public class MemberController {
 	// 비밀번호 검증 체크
 	@PostMapping("/password/verify")
 	public ResponseEntity<SuccessResponse<String>> verifyPassword(
-	        @Valid @RequestBody MemberWithdrawDTO dto
+	        @Valid @RequestBody MemberWithdrawDTO dto, @AuthenticationPrincipal CustomUserDetails user
 	) {
-	    memberService.verifyPassword(dto.getPassword());
+	    memberService.verifyPassword(dto.getPassword(), user);
 	    return SuccessResponse.ok("비밀번호 확인 성공");
 	}
 
