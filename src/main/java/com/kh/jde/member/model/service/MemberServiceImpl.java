@@ -89,9 +89,9 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional 
-	public void withdraw(String plainPassword) {
+	public void withdraw(String plainPassword, CustomUserDetails user) {
 		// 비밀번호 검증 + 유저정보 반환
-		CustomUserDetails user = validatePassword(plainPassword);
+		validatePassword(plainPassword, user);
 		
 		int tokenResult = tokenMapper.deleteToken(user.getUsername()); // 해당 유저의 토큰 일괄삭제
 		if(tokenResult < 1) {
@@ -104,11 +104,11 @@ public class MemberServiceImpl implements MemberService {
 	}
 	
 	@Transactional(readOnly = true)
-	private CustomUserDetails validatePassword(String plainPassword) {
+	private void validatePassword(String plainPassword, CustomUserDetails user) {
 		// 이미 N인 회원은 JwtFilter에서 이미 걸러짐.
 		// 입력한 비밀번호는 진짜 비밀번호인지 볼거임.
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
+		// Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		// CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
 
 		String encodedPassword = memberMapper.findPasswordByEmail(user.getUsername());
 		
@@ -116,14 +116,13 @@ public class MemberServiceImpl implements MemberService {
 		if(!Password.matches(plainPassword, encodedPassword, passwordEncoder)) {
 			throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
 		}
-		// 검증 성공시 유저정보 반환
-		return user;
+		
 	}
 
 	@Override
 	@Transactional
-	public void changePassword(ChangePasswordDTO changePassword) {
-	    CustomUserDetails user = validatePassword(changePassword.getCurrentPassword());
+	public void changePassword(ChangePasswordDTO changePassword, CustomUserDetails user) {
+	    validatePassword(changePassword.getCurrentPassword(), user);
 
 	    Password newEncoded = Password.toEncoded(changePassword.getNewPassword(), passwordEncoder);
 
@@ -140,8 +139,8 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	@Transactional
-	public void changeName(ChangeNameDTO changeName) {
-	    CustomUserDetails user = validatePassword(changeName.getCurrentPassword());
+	public void changeName(ChangeNameDTO changeName, CustomUserDetails user) {
+	    validatePassword(changeName.getCurrentPassword(), user);
 
 	    MemberVO param = MemberVO.builder()
 	            .email(user.getUsername())
@@ -156,8 +155,8 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	@Transactional
-	public void changeNickname(ChangeNicknameDTO changeNickname) {
-	    CustomUserDetails user = validatePassword(changeNickname.getCurrentPassword());
+	public void changeNickname(ChangeNicknameDTO changeNickname, CustomUserDetails user) {
+	    validatePassword(changeNickname.getCurrentPassword(), user);
 
 	    // 닉네임 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
 	    duplicateValidator.nicknameDuplicateCheck(changeNickname.getNickname());
@@ -175,8 +174,8 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	@Transactional
-	public void changePhone(ChangePhoneDTO changePhone) {
-	    CustomUserDetails user = validatePassword(changePhone.getCurrentPassword());
+	public void changePhone(ChangePhoneDTO changePhone, CustomUserDetails user) {
+	    validatePassword(changePhone.getCurrentPassword(), user);
 
 	    // 폰 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
 	    duplicateValidator.phoneDuplicateCheck(changePhone.getPhone());
@@ -194,10 +193,10 @@ public class MemberServiceImpl implements MemberService {
 	// 자신의 이미지 업로드로 변경
 	@Override
 	@Transactional
-	public String updateMyProfileImage(String plainPassword, MultipartFile file) {
+	public String updateMyProfileImage(String plainPassword, MultipartFile file, CustomUserDetails user) {
 		
 		// 현재 비밀번호 재검증 + principal 반환
-	    CustomUserDetails user = validatePassword(plainPassword);
+	    validatePassword(plainPassword, user);
 	    Long memberNo = user.getMemberNo(); // 여기서 바로 사용 (DB 재조회 X)
 	    
 	    // 1) 기존 URL 조회	
@@ -217,7 +216,7 @@ public class MemberServiceImpl implements MemberService {
 	    // 4) DB 업데이트
 	    MemberFileVO memberFile = MemberFileVO.builder()
 	            .memberNo(memberNo)
-	            .fileUrl(newUrl )
+	            .fileUrl(newUrl)
 	            .build();
 
 	    int result = memberMapper.upsertProfileImage(memberFile);
@@ -231,9 +230,9 @@ public class MemberServiceImpl implements MemberService {
 	// 기본 이미지 선택(변경)
 	@Override
 	@Transactional
-	public String changeProfileToDefault(String plainPassword, Long fileNo) {
+	public String changeProfileToDefault(String plainPassword, Long fileNo, CustomUserDetails user) {
 
-	    CustomUserDetails user = validatePassword(plainPassword);
+	    validatePassword(plainPassword, user);
 	    Long memberNo = user.getMemberNo();
 
 	    if (fileNo == null) {
@@ -281,8 +280,8 @@ public class MemberServiceImpl implements MemberService {
 	// 비밀번호 검증 체크
 	@Override
 	@Transactional(readOnly = true)
-	public void verifyPassword(String plainPassword) {
-	    validatePassword(plainPassword);
+	public void verifyPassword(String plainPassword, CustomUserDetails user) {
+	    validatePassword(plainPassword, user);
 	}
 }
 
