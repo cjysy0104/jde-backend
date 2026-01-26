@@ -102,6 +102,9 @@ public interface AdminService {
 	// 최근 1개월 신규 가입자 수 조회
 	int getNewMemberCountLastMonth();
 	
+	// 이전 달 가입자 수 조회
+	int getNewMemberCountPreviousMonth();
+	
 	// 이용자 전체 수 조회
 	int getTotalMemberCount();
 	
