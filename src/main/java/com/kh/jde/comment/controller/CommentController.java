@@ -34,9 +34,10 @@ public class CommentController {
 	
 	@GetMapping("/{reviewNo}")
 	public ResponseEntity<SuccessResponse<CommentResponse>> getCommentListById(@PathVariable("reviewNo")Long reviewNo,
-																				@RequestParam(name = "currentPage", defaultValue = "1")int currentPage){
+																				@RequestParam(name = "currentPage", defaultValue = "1")int currentPage,
+																				@AuthenticationPrincipal CustomUserDetails principal){
 		
-		return SuccessResponse.ok(commentService.getCommentListById(reviewNo, currentPage), "댓글 조회 성공");
+		return SuccessResponse.ok(commentService.getCommentListById(reviewNo, currentPage, principal), "댓글 조회 성공");
 	}
 	
 	@PostMapping("/{reviewNo}")

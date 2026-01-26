@@ -43,6 +43,7 @@
 	        resultType="CommentDTO">
 		SELECT
 				  TC.COMMENT_NO commentNo
+				, TC.MEMBER_NO memberNo
 				, TC.REVIEW_NO reviewNo
 				, M.NICKNAME nickname
 				, TC.CONTENT content

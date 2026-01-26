@@ -32,7 +32,7 @@ public class CommentServiceImpl implements CommentService {
 	private final RequestNormalizer requestNormalizer;
 
 	@Override
-	public CommentResponse getCommentListById(Long reviewNo, int page) {
+	public CommentResponse getCommentListById(Long reviewNo, int page, CustomUserDetails principal) {
 		
 		// 1. 게시글 상태 조회
 		getReviewOrThrow(reviewNo);
@@ -48,6 +48,15 @@ public class CommentServiceImpl implements CommentService {
 		
 		// 4. 댓글 조회
 		List<CommentDTO> comments = commentMapper.getCommentList(reviewNo, pi);
+		
+		// 5. 댓글 본인 여부 추가
+		for(CommentDTO comment : comments) {
+			if(principal.getMemberNo().equals(comment.getMemberNo())) {
+				comment.setIsOwner("Y");
+			} else {
+				comment.setIsOwner("N");
+			}
+		}
 		
 		return new CommentResponse(comments, pi);
 	}

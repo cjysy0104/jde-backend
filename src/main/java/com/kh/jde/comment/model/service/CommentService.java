@@ -9,7 +9,7 @@ import com.kh.jde.comment.model.dto.CommentResponse;
 
 public interface CommentService {
 
-	CommentResponse getCommentListById(Long reviewNo, int page);
+	CommentResponse getCommentListById(Long reviewNo, int page, CustomUserDetails principal);
 
 	void create(Long reviewNo, CustomUserDetails principal, CommentRequestDTO request);
 	
