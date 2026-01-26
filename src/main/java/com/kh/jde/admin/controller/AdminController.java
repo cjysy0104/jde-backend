@@ -313,6 +313,13 @@ public class AdminController {
 		return SuccessResponse.ok(newMemberCount, "최근 1개월 신규 가입자 수 조회 성공");
 	}
 	
+	// 이전 달 가입자 수
+	@GetMapping("/members/previous")
+	public ResponseEntity<SuccessResponse<Integer>> getNewMemberCountPreviousMonth(){
+		int previousMonthCount = adminService.getNewMemberCountPreviousMonth();
+		return SuccessResponse.ok(previousMonthCount, "이전 달 가입자 수 조회 성공");
+	}
+	
 	// 이용자 전체 수
 	@GetMapping("/members/total")
 	public ResponseEntity<SuccessResponse<Integer>> getTotalMemberCount(){
