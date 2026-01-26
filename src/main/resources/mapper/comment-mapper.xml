@@ -26,40 +26,47 @@
 		          TC.COMMENT_NO = #{commentNo}
     </select>
     
+    <select id="getCommentCount"
+    		parameterType="Long"
+    		resultType="int">
+    	SELECT
+    			COUNT(*)
+    	FROM
+    			TB_COMMENT TC
+    	WHERE
+    			REVIEW_NO = #{reviewNo}
+    	AND
+    			STATUS='Y'
+	</select>
+    
     <select id="getCommentList"
-	        parameterType="Long"
 	        resultType="CommentDTO">
-
 		SELECT
 				  TC.COMMENT_NO commentNo
 				, TC.REVIEW_NO reviewNo
 				, M.NICKNAME nickname
 				, TC.CONTENT content
 				, TC.COMMENT_DATE commentDate
-		        , NVL(CNT.LIKE_COUNT, 0) likeCount
-	    FROM
+				, NVL(CNT.LIKE_COUNT, 0) likeCount
+		FROM
 				TB_COMMENT TC
 		JOIN
-				TB_MEMBER M ON (M.MEMBER_NO = TC.MEMBER_NO)
-		LEFT
-		JOIN
-		    	(
-		    		SELECT
-		    				  COMMENT_NO
-		    				, COUNT(*) LIKE_COUNT
-		    		FROM
-		    				TB_COMMENT_LIKE
-		    		GROUP
-		    		BY
-		    				COMMENT_NO
-		    	)	CNT ON (CNT.COMMENT_NO = TC.COMMENT_NO)
-		WHERE
-				TC.REVIEW_NO = #{reviewNo}
-		AND
-				TC.STATUS = 'Y'
-		ORDER
-		BY
-				TC.COMMENT_DATE ASC
+				TB_MEMBER M ON M.MEMBER_NO = TC.MEMBER_NO
+		LEFT 
+		JOIN 
+				(
+					SELECT	
+							COMMENT_NO, COUNT(*) LIKE_COUNT
+					FROM	
+							TB_COMMENT_LIKE
+					GROUP
+					BY 		
+							COMMENT_NO
+				) CNT ON CNT.COMMENT_NO = TC.COMMENT_NO
+		WHERE TC.REVIEW_NO = #{reviewNo}
+		AND TC.STATUS = 'Y'
+		ORDER BY TC.COMMENT_DATE ASC
+		OFFSET #{pi.offset} ROWS FETCH NEXT #{pi.boardLimit} ROWS ONLY
 	
 	</select>
 

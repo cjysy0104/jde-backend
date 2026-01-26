@@ -9,13 +9,14 @@ import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.comment.model.dao.CommentMapper;
 import com.kh.jde.comment.model.dto.CommentDTO;
 import com.kh.jde.comment.model.dto.CommentRequestDTO;
+import com.kh.jde.comment.model.dto.CommentResponse;
 import com.kh.jde.comment.model.dto.CommentUpdateDTO;
 import com.kh.jde.comment.model.vo.CommentVO;
 import com.kh.jde.comment.validator.CommentValidator;
+import com.kh.jde.common.page.PageInfo;
+import com.kh.jde.common.page.Pagination;
 import com.kh.jde.common.util.RequestNormalizer;
 import com.kh.jde.review.model.dao.ReviewMapper;
-import com.kh.jde.review.model.dto.ScrollRequest;
-import com.kh.jde.review.model.service.ReviewServiceImpl;
 import com.kh.jde.review.validator.ReviewValidator;
 
 import lombok.RequiredArgsConstructor;
@@ -31,15 +32,24 @@ public class CommentServiceImpl implements CommentService {
 	private final RequestNormalizer requestNormalizer;
 
 	@Override
-	public List<CommentDTO> getCommentListById(Long reviewNo) {
+	public CommentResponse getCommentListById(Long reviewNo, int page) {
 		
 		// 1. 게시글 상태 조회
 		getReviewOrThrow(reviewNo);
-
-		// 2. 댓글 가져와
-		List<CommentDTO> comments = commentMapper.getCommentList(reviewNo);
 		
-		return comments;
+		// 2. 댓글 개수 조회
+		int listCount = commentMapper.getCommentCount(reviewNo);
+		
+		// 3. pageInfo 계산
+		int pageLimit = 5;
+		int boardLimit = 10;
+
+		PageInfo pi = Pagination.getPageInfo(listCount, page, pageLimit, boardLimit);
+		
+		// 4. 댓글 조회
+		List<CommentDTO> comments = commentMapper.getCommentList(reviewNo, pi);
+		
+		return new CommentResponse(comments, pi);
 	}
 
 	private void getReviewOrThrow(Long reviewNo) {

@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.comment.model.dto.CommentDTO;
 import com.kh.jde.comment.model.dto.CommentRequestDTO;
+import com.kh.jde.comment.model.dto.CommentResponse;
 import com.kh.jde.comment.model.service.CommentService;
 import com.kh.jde.common.responseData.SuccessResponse;
 
@@ -31,9 +33,10 @@ public class CommentController {
 	private final CommentService commentService;
 	
 	@GetMapping("/{reviewNo}")
-	public ResponseEntity<SuccessResponse<List<CommentDTO>>> getCommentListById(@PathVariable("reviewNo")Long reviewNo){
+	public ResponseEntity<SuccessResponse<CommentResponse>> getCommentListById(@PathVariable("reviewNo")Long reviewNo,
+																				@RequestParam(name = "currentPage", defaultValue = "1")int currentPage){
 		
-		return SuccessResponse.ok(commentService.getCommentListById(reviewNo), "댓글 조회 성공");
+		return SuccessResponse.ok(commentService.getCommentListById(reviewNo, currentPage), "댓글 조회 성공");
 	}
 	
 	@PostMapping("/{reviewNo}")
