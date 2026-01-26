@@ -45,13 +45,20 @@ public class ReviewController {
 		return SuccessResponse.ok(result, "리뷰 전체 조회 성공");
 	}
 	
+	@GetMapping("captain/{captainNo}")
+	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getCaptainReviewList(@ModelAttribute QueryDTO request
+			, @AuthenticationPrincipal CustomUserDetails principal
+			, @PathVariable("captainNo") Long captainNo){
+		List<ReviewListResponseDTO> result = reviewService.getCaptainReviewList(request, principal, captainNo);
+		return SuccessResponse.ok(result, "미식대장 리뷰 전체 조회 성공");
+	}
+	
 	@GetMapping("/{reviewNo}")
 	public ResponseEntity<SuccessResponse<ReviewListResponseDTO>> getDetailReview(@PathVariable("reviewNo") Long reviewNo
 															, @AuthenticationPrincipal CustomUserDetails principal){
 		
 		return SuccessResponse.ok(reviewService.getDetailReview(reviewNo, principal), "리뷰 상세 조회 성공");
 	}
-	
 	
 	@DeleteMapping("/{reviewNo}")
 	public ResponseEntity<SuccessResponse<Void>> deleteById(@PathVariable("reviewNo")Long reviewNo

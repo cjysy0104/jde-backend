@@ -14,6 +14,7 @@ import com.kh.jde.file.service.S3Service;
 import com.kh.jde.review.model.dao.ReviewMapper;
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
+import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.RestaurantRequestDTO;
@@ -51,6 +52,20 @@ public class ReviewServiceImpl implements ReviewService {
 		List<ReviewListResponseDTO> reviews = reviewMapper.getReviewList(normalized);
 		
 		return reviews;
+	}
+	
+	@Override
+	public List<ReviewListResponseDTO> getCaptainReviewList(QueryDTO req, CustomUserDetails principal, Long captainNo) {
+		// 미식대장쿼리DTO 가공
+		QueryDTO normalized = nomarizedRequest(req, principal);
+		CaptainQueryDTO captainNormalized = new CaptainQueryDTO();
+		captainNormalized.setCatptainNo(captainNo);
+		captainNormalized.setQuery(normalized);
+		
+		// 미식대장의 리뷰 목록 조회
+		List<ReviewListResponseDTO> captainReviews = reviewMapper.getCaptainReviewList(captainNormalized);
+		
+		return captainReviews;
 	}
 	
 	private QueryDTO nomarizedRequest(QueryDTO req, CustomUserDetails principal) {
