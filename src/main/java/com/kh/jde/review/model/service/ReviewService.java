@@ -15,9 +15,9 @@ import jakarta.validation.Valid;
 
 public interface ReviewService {
 
-	public List<ReviewListResponseDTO> getReviewList(QueryDTO req, CustomUserDetails principal);
+	public List<ReviewListResponseDTO> getReviewList(QueryDTO request, CustomUserDetails principal);
 	
-	public List<ReviewListResponseDTO> getCaptainReviewList(QueryDTO req, CustomUserDetails principal, Long captainNo);
+	public List<ReviewListResponseDTO> getCaptainReviewList(QueryDTO request, CustomUserDetails principal, Long captainNo);
 	
 	public DetailReviewDTO getDetailReview(Long reviewNo, CustomUserDetails principal);
 

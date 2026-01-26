@@ -37,10 +37,10 @@ public class ReviewController {
 	private final ReviewService reviewService;
 	
 	@GetMapping
-	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getReviewList(@ModelAttribute QueryDTO req
+	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getReviewList(@ModelAttribute QueryDTO request
 																, @AuthenticationPrincipal CustomUserDetails principal){
 		
-		List<ReviewListResponseDTO> result = reviewService.getReviewList(req, principal);
+		List<ReviewListResponseDTO> result = reviewService.getReviewList(request, principal);
 		
 		return SuccessResponse.ok(result, "리뷰 전체 조회 성공");
 	}
