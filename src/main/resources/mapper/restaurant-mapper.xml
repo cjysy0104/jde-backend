@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.jde.restaurant.model.dao.RestaurantMapper">
+	
+	<!-- 레스토랑 무한 스크롤 조회 -->
+	<select id="selectRestaurantList" parameterType="com.kh.jde.restaurant.model.dto.RestaurantQueryDTO" resultType="com.kh.jde.restaurant.model.dto.RestaurantListDTO">
+		SELECT
+		       RESTAURANT_NO restaurantNo
+		     , NORMAL_NAME normalName
+		     , ADDRESS address
+		     , LATITUDE latitude
+		     , LONGITUDE longitude
+		  FROM
+		       TB_RESTAURANT
+		 <where>
+		     <if test="cursor != null">
+		         RESTAURANT_NO &lt; #{cursor}
+		     </if>
+		 </where>
+		 ORDER BY
+		       RESTAURANT_NO DESC
+		 FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
+	</select>
+	
+</mapper>
