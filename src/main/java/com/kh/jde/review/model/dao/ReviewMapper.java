@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
-import com.kh.jde.review.model.dto.BestReviewSearchRequest;
 import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordDTO;
@@ -35,7 +34,7 @@ public interface ReviewMapper {
 	// 리뷰 상세 조회
 	DetailReviewDTO getDetailReview(Map<String,Object> param);
 	
-	List<KeywordRowDTO> getKeywordsByIds(List<Long> reviewNo);
+	List<KeywordRowDTO> getKeywordsByIds(@Param("reviewNos") List<Long> reviewNos);
 	
 	Long getWriterById(Long reviewNo);
 	
@@ -73,7 +72,5 @@ public interface ReviewMapper {
 	List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
 
 	List<KeywordDTO> getKeywordList();
-
-	List<BestReviewListResponse> getBestReviewSearched(BestReviewSearchRequest req);
 
 }

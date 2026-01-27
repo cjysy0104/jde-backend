@@ -15,10 +15,10 @@ import com.kh.jde.file.service.S3Service;
 import com.kh.jde.review.model.dao.ReviewMapper;
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
-import com.kh.jde.review.model.dto.BestReviewSearchRequest;
 import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordDTO;
+import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.RestaurantRequestDTO;
 import com.kh.jde.review.model.dto.RestaurantResponseDTO;
@@ -302,9 +302,34 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req) {
 		
+		// query값 공백 null 
+		if (req.getQuery() != null && req.getQuery().trim().isEmpty()) {
+            req.setQuery(null);
+        }
+		
 		req.setScroll(requestNormalizer.applyScroll(req.getScroll(), 3));
 		
 		List<BestReviewListResponse> reviews = reviewMapper.getBestReviewList(req);
+		if(reviews == null || reviews.isEmpty()) {
+			return reviews;
+		}
+		
+		List<Long> reviewNos = reviews.stream()
+                .map(BestReviewListResponse::getReviewNo)
+                .toList();
+
+        List<KeywordRowDTO> rows = reviewMapper.getKeywordsByIds(reviewNos);
+
+        // 3) reviewNo별 keywords 그룹핑해서 주입
+        Map<Long, List<KeywordDTO>> keywordMap = new HashMap<>();
+        for (KeywordRowDTO row : rows) {
+            keywordMap.computeIfAbsent(row.getReviewNo(), k -> new ArrayList<>())
+                    .add(new KeywordDTO(row.getKeywordNo(), row.getKeywordName())); // 생성자 없으면 너 DTO에 맞게 변경
+        }
+
+        for (BestReviewListResponse r : reviews) {
+            r.setKeywords(keywordMap.getOrDefault(r.getReviewNo(), new ArrayList<>()));
+        }
 		
 		
 		return reviews;
@@ -315,14 +340,5 @@ public class ReviewServiceImpl implements ReviewService {
 		return reviewMapper.getKeywordList();
 	}
 
-	@Override
-	public List<BestReviewListResponse> getBestReviewSearched(BestReviewSearchRequest req) {
-		
-		req.setScroll(requestNormalizer.applyScroll(req.getScroll(), 3));
-		
-		List<BestReviewListResponse> reviews = reviewMapper.getBestReviewSearched(req);
-		
-		return reviews;
-	}
 
 }

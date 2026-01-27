@@ -5,15 +5,12 @@ import java.util.List;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
-import com.kh.jde.review.model.dto.BestReviewSearchRequest;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
 import com.kh.jde.review.model.dto.ReviewUpdateRequest;
-
-import jakarta.validation.Valid;
 
 public interface ReviewService {
 
@@ -34,7 +31,5 @@ public interface ReviewService {
 	public List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
 
 	public List<KeywordDTO> getKeywordList();
-
-	public List<BestReviewListResponse> getBestReviewSearched(BestReviewSearchRequest req);
 
 }

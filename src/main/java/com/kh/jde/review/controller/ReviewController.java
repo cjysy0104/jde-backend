@@ -17,7 +17,6 @@ import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.common.responseData.SuccessResponse;
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
-import com.kh.jde.review.model.dto.BestReviewSearchRequest;
 import com.kh.jde.review.model.dto.KeywordDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
@@ -106,14 +105,6 @@ public class ReviewController {
 	public ResponseEntity<SuccessResponse<List<BestReviewListResponse>>> getBestReviewList(@ModelAttribute BestReviewPagingRequest req){
 		
 		List<BestReviewListResponse> result = reviewService.getBestReviewList(req);
-		
-		return SuccessResponse.ok(result, "베스트 리뷰 조회 성공");
-	}
-	
-	@GetMapping("/best/search")
-	public ResponseEntity<SuccessResponse<List<BestReviewListResponse>>> getBestReviewByQuery(@ModelAttribute BestReviewSearchRequest req){
-		
-		List<BestReviewListResponse> result = reviewService.getBestReviewSearched(req);
 		
 		return SuccessResponse.ok(result, "베스트 리뷰 조회 성공");
 	}
