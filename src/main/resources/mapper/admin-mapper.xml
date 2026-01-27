@@ -1184,6 +1184,7 @@
 		       FILE_NO = #{fileNo}
 	</select>
 	
+	
 	<!-- 회원 기본 프로필 이미지 삭제 -->
 	<delete id="deleteDefaultImageByFileNo">
 		DELETE
