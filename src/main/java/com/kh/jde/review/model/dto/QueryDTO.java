@@ -14,6 +14,7 @@ public class QueryDTO {
 	private String keyword;
 	private Float minRating = (float) 0;
 	private Float maxRating = (float) 5;
+	private Long restaurantNo; // 레스토랑 번호 필터
 	
 	// 로그인 사용자
 	private Long memberNo;
