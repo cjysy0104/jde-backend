@@ -49,9 +49,11 @@ public class CommentServiceImpl implements CommentService {
 		// 4. 댓글 조회
 		List<CommentDTO> comments = commentMapper.getCommentList(reviewNo, pi);
 		
+		Long memberNo = (principal != null) ? principal.getMemberNo() : null;
+		
 		// 5. 댓글 본인 여부 추가
 		for(CommentDTO comment : comments) {
-			if(principal.getMemberNo().equals(comment.getMemberNo())) {
+			if(memberNo != null && memberNo.equals(comment.getMemberNo())) {
 				comment.setIsOwner("Y");
 			} else {
 				comment.setIsOwner("N");

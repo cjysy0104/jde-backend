@@ -18,6 +18,7 @@ import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
 import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
+import com.kh.jde.review.model.dto.KeywordDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.RestaurantRequestDTO;
 import com.kh.jde.review.model.dto.RestaurantResponseDTO;
@@ -305,6 +306,11 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		
 		return reviews;
+	}
+
+	@Override
+	public List<KeywordDTO> getKeywordList() {
+		return reviewMapper.getKeywordList();
 	}
 
 }

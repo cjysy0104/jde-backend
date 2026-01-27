@@ -864,5 +864,16 @@
 
 		FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
 	</select>
+	
+	<select id="getKeywordList" resultType="KeywordDTO">
+		SELECT
+				  KEYWORD_NO keywordNo
+				, KEYWORD_NAME keywordName
+		FROM
+				TB_KEYWORD
+		ORDER
+		BY
+				KEYWORD_NO ASC
+	</select>
 
 </mapper>
