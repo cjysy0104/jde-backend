@@ -7,20 +7,52 @@
 	<!-- 레스토랑 무한 스크롤 조회 -->
 	<select id="selectRestaurantList" parameterType="com.kh.jde.restaurant.model.dto.RestaurantQueryDTO" resultType="com.kh.jde.restaurant.model.dto.RestaurantListDTO">
 		SELECT
-		       RESTAURANT_NO restaurantNo
-		     , NORMAL_NAME normalName
-		     , ADDRESS address
-		     , LATITUDE latitude
-		     , LONGITUDE longitude
+		       RT.RESTAURANT_NO restaurantNo
+		     , RT.NORMAL_NAME normalName
+		     , RT.ADDRESS address
+		     , RT.LATITUDE latitude
+		     , RT.LONGITUDE longitude
+		     , (
+		     		SELECT FILE_URL
+		     		  FROM (
+		     		       SELECT
+		     		              RVF.FILE_URL
+		     		            , NVL(LC.LIKE_COUNT, 0) LIKE_COUNT
+		     		          FROM
+		     		               TB_REVIEW RV
+		     		          JOIN
+		     		               TB_REVIEW_FILE RVF
+		     		            ON RV.REVIEW_NO = RVF.REVIEW_NO
+		     		           AND RVF.IS_THUMNAIL = 'Y'
+		     		          LEFT
+		     		          JOIN (
+		     		               SELECT
+		     		                      REVIEW_NO
+		     		                    , COUNT(*) LIKE_COUNT
+		     		                 FROM
+		     		                      TB_REVIEW_LIKE
+		     		                 GROUP BY
+		     		                      REVIEW_NO
+		     		          ) LC
+		     		            ON LC.REVIEW_NO = RV.REVIEW_NO
+		     		         WHERE
+		     		               RV.STATUS = 'Y'
+		     		           AND RV.RESTAURANT_NO = RT.RESTAURANT_NO
+		     		         ORDER BY
+		     		               NVL(LC.LIKE_COUNT, 0) DESC
+		     		             , RV.REVIEW_NO DESC
+		     		     )
+		     		 WHERE ROWNUM = 1
+		     ) thumbnailUrl
 		  FROM
-		       TB_RESTAURANT
+		       TB_RESTAURANT RT
 		 <where>
 		     <if test="cursor != null">
-		         RESTAURANT_NO &lt; #{cursor}
+		         RT.RESTAURANT_NO &lt; #{cursor}
 		     </if>
 		 </where>
 		 ORDER BY
-		       RESTAURANT_NO DESC
+		       RT.RESTAURANT_NO DESC
 		 FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
 	</select>
 	

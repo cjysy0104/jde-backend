@@ -18,4 +18,5 @@ public class RestaurantListDTO {
 	private String address;
 	private Float latitude;
 	private Float longitude;
+	private String thumbnailUrl; // 좋아요 가장 많은 리뷰 썸네일
 }
