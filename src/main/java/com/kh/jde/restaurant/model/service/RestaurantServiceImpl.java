@@ -30,7 +30,6 @@ public class RestaurantServiceImpl implements RestaurantService {
 		
 		// 목록 조회
 		List<RestaurantListDTO> restaurants = restaurantMapper.selectRestaurantList(normalized);
-		log.info("레스토랑 번호 :{} ", restaurants.get(0));
 		return restaurants;
 	}
 	
