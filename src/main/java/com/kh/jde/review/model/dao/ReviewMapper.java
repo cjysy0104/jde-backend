@@ -10,6 +10,7 @@ import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
 import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
+import com.kh.jde.review.model.dto.KeywordDTO;
 import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.RestaurantRequestDTO;
@@ -69,5 +70,7 @@ public interface ReviewMapper {
 	List<String> getUrlById(Long reviewNo);
 
 	List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
+
+	List<KeywordDTO> getKeywordList();
 
 }
