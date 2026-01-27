@@ -119,6 +119,11 @@
 
 		WHERE
 				RV.STATUS = 'Y'
+		<!-- 레스토랑 필터 -->
+		<if test="restaurantNo != null">
+		AND
+				RV.RESTAURANT_NO = #{restaurantNo}
+		</if>
 		<!-- 검색 필터 -->
 		<if test="query != null and query != ''">
 		AND
@@ -197,6 +202,9 @@
 
 		FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
 	</select>
+
+	<!-- 레스토랑별 좋아요가 가장 많은 리뷰의 썸네일 1장 조회 -->
+	<!-- 현재는 레스토랑 목록 조회 쿼리에서 서브쿼리로 처리 중 -->
 
 	<!-- ========================= -->
 	<!-- 미식대장의 리뷰 전체 조회 -->

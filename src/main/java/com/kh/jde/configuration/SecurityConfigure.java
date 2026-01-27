@@ -45,7 +45,7 @@ public class SecurityConfigure {
 						   .authorizeHttpRequests(requests -> {
 							   requests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
 							   requests.requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/members", "/api/auth/refresh").permitAll(); // 누구나 허용할 기능 
-							   requests.requestMatchers(HttpMethod.GET, "/api/reviews/**", "/api/comments/**", "/api/uploads/**", "/api/members", "/api/members/email", "/api/members/nickname").permitAll(); // 게시글 전체조회 및 상세조회는 아무나
+							   requests.requestMatchers(HttpMethod.GET, "/api/reviews/**", "/api/comments/**", "/api/uploads/**", "/api/members", "/api/members/email", "/api/members/nickname", "/api/restaurants/**").permitAll(); // 게시글 전체조회 및 상세조회는 아무나
 							   
 							   requests.requestMatchers(HttpMethod.PUT, "/api/members", "/api/reviews/**", "/api/comments/**").authenticated(); // 테이블의 행 전체 수정, 부분 수정(전체수정일지 부분 수정일지 알 수 없을 때), 인증 필요한 기능
 							   requests.requestMatchers(HttpMethod.PATCH, "/api/members/**", "/api/comments/**", "/api/reviews/**").authenticated(); // 테이블의 행 중 부분만 수정
