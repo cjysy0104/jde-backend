@@ -5,10 +5,11 @@ import java.util.List;
 import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.comment.model.dto.CommentDTO;
 import com.kh.jde.comment.model.dto.CommentRequestDTO;
+import com.kh.jde.comment.model.dto.CommentResponse;
 
 public interface CommentService {
 
-	List<CommentDTO> getCommentListById(Long reviewNo);
+	CommentResponse getCommentListById(Long reviewNo, int page, CustomUserDetails principal);
 
 	void create(Long reviewNo, CustomUserDetails principal, CommentRequestDTO request);
 	

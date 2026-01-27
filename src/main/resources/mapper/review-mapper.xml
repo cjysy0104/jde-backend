@@ -458,21 +458,30 @@
 			    	WHERE
 			    			RV.REVIEW_NO = RVL.REVIEW_NO
 			    ) LIKE_COUNT
-				, CASE WHEN EXISTS (
+			<choose>
+				<when test="memberNo != null">
+				, CASE WHEN
+					EXISTS (
 			          SELECT 1
-			          FROM TB_REVIEW_LIKE RVL
+			          FROM 	TB_REVIEW_LIKE RVL
 			          WHERE RVL.REVIEW_NO = RV.REVIEW_NO
-			            AND RVL.MEMBER_NO = #{memberNo}
-			      ) THEN 'Y' ELSE 'N'
-			      END IS_LIKED
-			    , CASE WHEN EXISTS (
+			            AND	RVL.MEMBER_NO = #{memberNo}
+			        ) THEN 'Y' ELSE 'N'
+		      	  END IS_LIKED
+				, CASE WHEN 
+					EXISTS (
 			          SELECT 1
-			          FROM TB_BOOKMARK RVB2
-			          WHERE RVB2.REVIEW_NO = RV.REVIEW_NO
-			            AND RVB2.MEMBER_NO = #{memberNo}
-			      ) THEN 'Y' ELSE 'N'
-			      END IS_MARKED
-
+			          FROM 	TB_BOOKMARK B
+			          WHERE B.REVIEW_NO = RV.REVIEW_NO
+			            AND	B.MEMBER_NO = #{memberNo}
+		        	) THEN 'Y' ELSE 'N'
+		      	  END IS_MARKED
+				</when>
+				<otherwise>
+				, 'N' IS_LIKED
+    			, 'N' IS_MARKED
+				</otherwise>
+			</choose>
 			    , M.MEMBER_NO
 			    , M.NICKNAME
 

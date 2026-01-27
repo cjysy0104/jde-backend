@@ -1,6 +1,8 @@
 package com.kh.jde.review.model.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,12 +89,13 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public DetailReviewDTO getDetailReview(Long reviewNo, CustomUserDetails principal) {
-		
-		Map<String, Object> param = Map.of(
-				"reviewNo", reviewNo,
-				"memberNo", principal.getMemberNo());
-		
-		return reviewMapper.getDetailReview(param);
+
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("reviewNo", reviewNo);
+	    param.put("memberNo", principal == null ? null : principal.getMemberNo()); // 비로그인:ㅜㅕㅣㅣ
+
+
+	    return reviewMapper.getDetailReview(param);
 	}
 
 	@Override
