@@ -6,6 +6,7 @@ import com.kh.jde.auth.model.vo.CustomUserDetails;
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
+import com.kh.jde.review.model.dto.KeywordDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
@@ -30,5 +31,7 @@ public interface ReviewService {
 	public void update(Long reviewNo, ReviewUpdateRequest review, CustomUserDetails principal);
 
 	public List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
+
+	public List<KeywordDTO> getKeywordList();
 
 }
