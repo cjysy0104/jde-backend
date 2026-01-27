@@ -73,6 +73,7 @@ public class ReviewController {
 	public ResponseEntity<SuccessResponse<Void>> create(@ModelAttribute @Valid ReviewCreateRequest review
 			, @AuthenticationPrincipal CustomUserDetails principal){
 		
+		log.info(">??????????{}",review);
 		reviewService.create(review, principal);
 		
 		return SuccessResponse.created("등록 성공");
