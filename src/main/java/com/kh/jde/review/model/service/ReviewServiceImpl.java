@@ -15,6 +15,7 @@ import com.kh.jde.file.service.S3Service;
 import com.kh.jde.review.model.dao.ReviewMapper;
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
+import com.kh.jde.review.model.dto.BestReviewSearchRequest;
 import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordDTO;
@@ -128,7 +129,8 @@ public class ReviewServiceImpl implements ReviewService {
 	public void create(ReviewCreateRequest review, CustomUserDetails principal) {
 		
 		
-		// 유효성검사 review / principal
+		// 유효성검사 principal
+		
 		
 		// 식당 조회 -> 있으면 No반환 없으면 insert
 		RestaurantRequestDTO requestRestaurant = RestaurantRequestDTO.builder()
@@ -311,6 +313,16 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public List<KeywordDTO> getKeywordList() {
 		return reviewMapper.getKeywordList();
+	}
+
+	@Override
+	public List<BestReviewListResponse> getBestReviewSearched(BestReviewSearchRequest req) {
+		
+		req.setScroll(requestNormalizer.applyScroll(req.getScroll(), 3));
+		
+		List<BestReviewListResponse> reviews = reviewMapper.getBestReviewSearched(req);
+		
+		return reviews;
 	}
 
 }

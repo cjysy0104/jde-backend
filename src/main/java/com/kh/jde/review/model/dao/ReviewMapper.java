@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
+import com.kh.jde.review.model.dto.BestReviewSearchRequest;
 import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordDTO;
@@ -72,5 +73,7 @@ public interface ReviewMapper {
 	List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
 
 	List<KeywordDTO> getKeywordList();
+
+	List<BestReviewListResponse> getBestReviewSearched(BestReviewSearchRequest req);
 
 }
