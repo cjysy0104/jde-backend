@@ -21,7 +21,7 @@ import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.common.page.PageInfo;
 import com.kh.jde.common.page.Pagination;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
-import com.kh.jde.file.FileRenamePolicy;
+import com.kh.jde.exception.IllegalArgumentException;
 import com.kh.jde.file.service.S3Service;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
 import com.kh.jde.report.model.dto.CommentReportProcessDTO;
@@ -38,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminServiceImpl implements AdminService {
 	
 	private final AdminMapper adminMapper;
-	private final FileRenamePolicy fileRenamePolicy;
 	private final S3Service s3Service;
 	private static final int PAGE_LIMIT = 10; // 페이징바에 표시될 페이지 수
 	private static final int BOARD_LIMIT = 15; // 한 페이지에 표시될 게시글 수
@@ -404,7 +403,7 @@ public class AdminServiceImpl implements AdminService {
 		int result = adminMapper.countByFileName(duplicateCheck);
 		
 		if(result >= 1) {
-			throw new UnexpectedSQLResponseException("동일한 이름의 프로필 이미지가 이미 존재합니다.");
+			throw new IllegalArgumentException("동일한 이름의 프로필 이미지가 이미 존재합니다.");
 		}
 	}
 	
@@ -455,7 +454,9 @@ public class AdminServiceImpl implements AdminService {
 
 	// 기본 프로필 이미지 삭제
 	@Override
+	@Transactional
 	public void deleteDefaultImage(DefaultImageDTO defaultImage) {
+		
 		int getResult = adminMapper.getDefaultImageByFileNo(defaultImage.getFileNo());
 		if(getResult == 0) {
 			throw new UnexpectedSQLResponseException("존재하지 않는 프로필 이미지입니다.");
