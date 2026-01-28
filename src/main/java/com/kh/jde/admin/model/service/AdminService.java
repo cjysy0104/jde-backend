@@ -10,6 +10,8 @@ import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
+import com.kh.jde.admin.model.dto.RankRequest;
+import com.kh.jde.admin.model.dto.RankResponse;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.report.model.dto.CommentReportListDTO;
@@ -53,8 +55,14 @@ public interface AdminService {
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO getMemberByNo(Long memberNo);
 
+	// 랭킹 기준 조회
+	List<RankResponse> getRanks();
+	
 	// 미식대장 랭킹 제한 기준 변경
 	void updateCaptainRankPolicy(int topN);
+	
+	// 랭킹 기준 변경
+	void updateRankPolicy(RankRequest request);
 
 	// 회원 권한 변경
 	void updateMemberRole(MemberRoleUpdateDTO dto);

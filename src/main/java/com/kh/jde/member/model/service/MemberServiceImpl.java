@@ -153,7 +153,7 @@ public class MemberServiceImpl implements MemberService {
 	public void changeNickname(ChangeNicknameDTO changeNickname, CustomUserDetails user) {
 	    validatePassword(changeNickname.getCurrentPassword(), user);
 
-	    // 닉네임 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
+	    // 닉네임 중복체크 필요하면 여기서 처리 (현재 duplicateValidator 시그니처에 맞춰 조정)
 	    duplicateValidator.nicknameDuplicateCheck(changeNickname.getNickname());
 
 	    MemberVO param = MemberVO.builder()
@@ -172,7 +172,7 @@ public class MemberServiceImpl implements MemberService {
 	public void changePhone(ChangePhoneDTO changePhone, CustomUserDetails user) {
 	    validatePassword(changePhone.getCurrentPassword(), user);
 
-	    // 폰 중복체크 필요하면 여기서 처리 (현재 miv 시그니처에 맞춰 조정)
+	    // 폰 중복체크 필요하면 여기서 처리 (현재 duplicateValidator 시그니처에 맞춰 조정)
 	    duplicateValidator.phoneDuplicateCheck(changePhone.getPhone());
 
 	    MemberVO param = MemberVO.builder()
