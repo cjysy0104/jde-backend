@@ -28,7 +28,7 @@ public class ReviewCreateRequest {
 	private String normalName;
 	private String address;
 	private float latitude;
-	private float Longitude;
+	private float longitude;
 	
 	// Files
 	private List<MultipartFile> images;

@@ -119,6 +119,11 @@
 
 		WHERE
 				RV.STATUS = 'Y'
+		<!-- 레스토랑 필터 -->
+		<if test="restaurantNo != null">
+		AND
+				RV.RESTAURANT_NO = #{restaurantNo}
+		</if>
 		<!-- 검색 필터 -->
 		<if test="query != null and query != ''">
 		AND
@@ -197,6 +202,9 @@
 
 		FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
 	</select>
+
+	<!-- 레스토랑별 좋아요가 가장 많은 리뷰의 썸네일 1장 조회 -->
+	<!-- 현재는 레스토랑 목록 조회 쿼리에서 서브쿼리로 처리 중 -->
 
 	<!-- ========================= -->
 	<!-- 미식대장의 리뷰 전체 조회 -->
@@ -789,81 +797,90 @@
 	</select>
 
 	<!-- 베스트 리뷰 조회 -->
-	<resultMap id="BestReviewListMap" type="BestReviewListResponse">
-		<id property="reviewNo" column="REVIEW_NO"/>
-
-		<result property="thumbnailUrl" column="THUMBNAIL_URL"/>
-		<result property="restaurantName" column="NORMAL_NAME"/>
-		<result property="nickname" column="NICKNAME"/>
-
-		<result property="recentLikeCount" column="RECENT_LIKE_COUNT"/>
-
-		<result property="rating" column="RATING"/>
-
-		<collection property="keywords"
-					ofType="KeywordDTO"
-					select="getKeywords"
-					column="REVIEW_NO" />
+	<resultMap id="bestReviewListMap" type="com.kh.jde.review.model.dto.BestReviewListResponse">
+	  <id property="reviewNo" column="REVIEW_NO"/>
+	  <result property="thumbnailUrl" column="THUMBNAIL_URL"/>
+	  <result property="restaurantName" column="RESTAURANT_NAME"/>
+	  <result property="nickname" column="NICKNAME"/>
+	  <result property="recentLikeCount" column="RECENT_LIKE_COUNT"/>
+	  <result property="rating" column="RATING"/>
 	</resultMap>
 
-	<select id="getBestReviewList"
-			parameterType="BestReviewPagingRequest"
-			resultMap="BestReviewListMap">
-		SELECT
-				  RV.REVIEW_NO
 
-				, (
-					SELECT
-							RVF.FILE_URL
-					FROM
-							TB_REVIEW_FILE RVF
-					WHERE
-							RV.REVIEW_NO = RVF.REVIEW_NO
-					AND
-							RVF.IS_THUMNAIL = 'Y'
-				) THUMBNAIL_URL
-				, RT.NORMAL_NAME NORMAL_NAME
-				, M.NICKNAME
-				, RV.RATING
-				, NVL(LC.RECENT_LIKE_COUNT, 0) RECENT_LIKE_COUNT
-		FROM
-				TB_REVIEW RV
-		JOIN
-				TB_MEMBER M ON (RV.MEMBER_NO = M.MEMBER_NO)
-		JOIN
-				TB_RESTAURANT RT ON (RV.RESTAURANT_NO = RT.RESTAURANT_NO)
-		<!-- 좋아요 COUNT -->
-		LEFT
-		JOIN	(
-					SELECT
-							  REVIEW_NO
-							, COUNT(*) RECENT_LIKE_COUNT
-					FROM
-							TB_REVIEW_LIKE
-					WHERE
-							REVIEW_LIKE_DATE >= SYSDATE - 7
-					GROUP
-					BY
-							REVIEW_NO
-				)
-				LC ON (LC.REVIEW_NO = RV.REVIEW_NO)
-		<!-- Cursor 조건 설정 -->
-	    WHERE
-	    		1=1
-	    <if test="cursor != null and cursorLikeCount != null">
-	    AND
-	    	 	(
-	         		NVL(LC.RECENT_LIKE_COUNT,0) &lt; #{cursorLikeCount}
-	   			OR (NVL(LC.RECENT_LIKE_COUNT,0) = #{cursorLikeCount} AND RV.REVIEW_NO &lt; #{cursor})
-	    		)
-	    </if>
-		<!-- 정렬하기 -->
-		ORDER
-		BY
-				NVL(LC.RECENT_LIKE_COUNT,0) DESC, RV.REVIEW_NO DESC
 
-		FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
+
+	<select id="getBestReviewList" parameterType="map" resultMap="bestReviewListMap">
+ 	 SELECT
+	        RV.REVIEW_NO
+	      , (
+			    SELECT RVF.FILE_URL
+			    FROM TB_REVIEW_FILE RVF
+			    WHERE RVF.REVIEW_NO = RV.REVIEW_NO
+			      AND RVF.IS_THUMNAIL = 'Y'
+			    FETCH FIRST 1 ROWS ONLY
+			  ) AS THUMBNAIL_URL
+	      , R.NORMAL_NAME AS RESTAURANT_NAME
+	      , M.NICKNAME
+	      , RV.RATING
+	      , NVL(LK.LIKE_CNT, 0) AS RECENT_LIKE_COUNT
+	  FROM TB_REVIEW RV
+	  JOIN TB_RESTAURANT R ON R.RESTAURANT_NO = RV.RESTAURANT_NO
+	  JOIN TB_MEMBER M ON M.MEMBER_NO = RV.MEMBER_NO
+	  LEFT JOIN (
+	      SELECT REVIEW_NO, COUNT(*) AS LIKE_CNT
+	      FROM TB_REVIEW_LIKE
+	      GROUP BY REVIEW_NO
+	  ) LK ON LK.REVIEW_NO = RV.REVIEW_NO
+	  WHERE 1=1
+	    AND RV.STATUS = 'Y'
+	
+	  <if test="keywordNo != null">
+	    AND EXISTS (
+	      SELECT 1
+	      FROM TB_REVIEW_KEYWORD_MAP RKM
+	      WHERE RKM.REVIEW_NO = RV.REVIEW_NO
+	        AND RKM.KEYWORD_NO = #{keywordNo}
+	    )
+	  </if>
+	
+	  <if test="query != null and query != ''">
+	    AND (
+	         RV.CONTENT LIKE '%' || #{query} || '%'
+	      OR R.NORMAL_NAME LIKE '%' || #{query} || '%'
+	      OR R.ADDRESS LIKE '%' || #{query} || '%'
+	    )
+	  </if>
+	
+	  <if test="cursor != null and cursorLikeCount != null">
+	    AND (
+	      NVL(LK.LIKE_CNT, 0) &lt; #{cursorLikeCount}
+	      OR (
+	        NVL(LK.LIKE_CNT, 0) = #{cursorLikeCount}
+	        AND RV.REVIEW_NO &lt; #{cursor}
+	      )
+	    )
+	  </if>
+	
+	  ORDER BY RECENT_LIKE_COUNT DESC, RV.REVIEW_NO DESC
+	  FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
 	</select>
+
+	<select id="getKeywordsByIds" resultType="com.kh.jde.review.model.dto.KeywordRowDTO">
+    SELECT
+          RKM.REVIEW_NO   AS reviewNo
+        , K.KEYWORD_NO    AS keywordNo
+        , K.KEYWORD_NAME  AS keywordName
+    FROM TB_REVIEW_KEYWORD_MAP RKM
+    JOIN TB_KEYWORD K ON K.KEYWORD_NO = RKM.KEYWORD_NO
+    WHERE RKM.REVIEW_NO IN
+    <foreach collection="reviewNos" item="no" open="(" separator="," close=")">
+        #{no}
+    </foreach>
+    ORDER BY RKM.REVIEW_NO DESC, K.KEYWORD_NO ASC
+</select>
+
+
+
 	
 	<select id="getKeywordList" resultType="KeywordDTO">
 		SELECT
