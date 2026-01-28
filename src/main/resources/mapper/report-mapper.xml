@@ -89,5 +89,17 @@
 		   AND 
 		       STATUS = 'Y'
 	</select>
+	
+	<!-- 신고 카테고리 조회 -->
+	<select id="selectReportCategories" resultType="ReportCategoryVO">
+	    SELECT
+	      	   REPORT_CATEGORY_NO    AS reportCategoryNo
+	      	 , REPORT_CATEGORY_TITLE AS reportCategoryTitle
+	      FROM 
+	           TB_REPORT_CATEGORY
+	     ORDER 
+	        BY 
+	           REPORT_CATEGORY_NO
+	  </select>
 
 </mapper>

@@ -26,4 +26,5 @@ public class BookmarkResponseDTO {
     private Integer commentCount;
 
     private String thumbnailUrl;
+    private String restaurantName;
 }
