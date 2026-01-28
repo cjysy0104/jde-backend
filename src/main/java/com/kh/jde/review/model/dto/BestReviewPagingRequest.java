@@ -16,7 +16,6 @@ public class BestReviewPagingRequest {
 	private ScrollRequest scroll;
 	
 	// filter
-	private String query;
 	private Long keywordNo;
 	
 	// 커서

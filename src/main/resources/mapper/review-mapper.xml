@@ -842,15 +842,6 @@
 	        AND RKM.KEYWORD_NO = #{keywordNo}
 	    )
 	  </if>
-	
-	  <if test="query != null and query != ''">
-	    AND (
-	         RV.CONTENT LIKE '%' || #{query} || '%'
-	      OR R.NORMAL_NAME LIKE '%' || #{query} || '%'
-	      OR R.ADDRESS LIKE '%' || #{query} || '%'
-	    )
-	  </if>
-	
 	  <if test="cursor != null and cursorLikeCount != null">
 	    AND (
 	      NVL(LK.LIKE_CNT, 0) &lt; #{cursorLikeCount}
@@ -860,7 +851,6 @@
 	      )
 	    )
 	  </if>
-	
 	  ORDER BY RECENT_LIKE_COUNT DESC, RV.REVIEW_NO DESC
 	  FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
 	</select>

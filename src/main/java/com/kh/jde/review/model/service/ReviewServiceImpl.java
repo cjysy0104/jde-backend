@@ -302,11 +302,6 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req) {
 		
-		// query값 공백 null 
-		if (req.getQuery() != null && req.getQuery().trim().isEmpty()) {
-            req.setQuery(null);
-        }
-		
 		req.setScroll(requestNormalizer.applyScroll(req.getScroll(), 3));
 		
 		List<BestReviewListResponse> reviews = reviewMapper.getBestReviewList(req);
