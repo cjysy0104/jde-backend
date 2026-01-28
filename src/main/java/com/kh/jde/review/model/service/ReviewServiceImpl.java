@@ -93,7 +93,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	    Map<String, Object> param = new HashMap<>();
 	    param.put("reviewNo", reviewNo);
-	    param.put("memberNo", principal == null ? null : principal.getMemberNo()); // 비로그인:ㅜㅕㅣㅣ
+	    param.put("memberNo", principal == null ? null : principal.getMemberNo()); // 비로그인:
 
 
 	    return reviewMapper.getDetailReview(param);
@@ -324,13 +324,12 @@ public class ReviewServiceImpl implements ReviewService {
         Map<Long, List<KeywordDTO>> keywordMap = new HashMap<>();
         for (KeywordRowDTO row : rows) {
             keywordMap.computeIfAbsent(row.getReviewNo(), k -> new ArrayList<>())
-                    .add(new KeywordDTO(row.getKeywordNo(), row.getKeywordName())); // 생성자 없으면 너 DTO에 맞게 변경
+                    .add(new KeywordDTO(row.getKeywordNo(), row.getKeywordName()));
         }
 
         for (BestReviewListResponse r : reviews) {
             r.setKeywords(keywordMap.getOrDefault(r.getReviewNo(), new ArrayList<>()));
         }
-		
 		
 		return reviews;
 	}
