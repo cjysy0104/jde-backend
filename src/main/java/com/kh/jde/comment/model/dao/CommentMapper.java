@@ -15,7 +15,7 @@ public interface CommentMapper {
 	
 	CommentDTO existsComment(Long commentNo);
 
-	List<CommentDTO> getCommentList(@Param("reviewNo")Long reviewNo, @Param("pi")PageInfo pi);
+	List<CommentDTO> getCommentList(@Param("reviewNo")Long reviewNo, @Param("memberNo")Long memberNo, @Param("pi")PageInfo pi);
 
 	int create(CommentVO comment);
 

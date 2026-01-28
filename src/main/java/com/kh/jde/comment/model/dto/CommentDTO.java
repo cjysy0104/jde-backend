@@ -24,4 +24,5 @@ public class CommentDTO {
 	private Date commentDate;
 	private String status;
 	private String isOwner;
+	private String isLiked;
 }
