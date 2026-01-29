@@ -22,6 +22,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.kh.jde.configuration.filter.JwtFilter;
+import com.kh.jde.configuration.handler.CustomAccessDeniedHandler;
+import com.kh.jde.configuration.handler.CustomAuthEntryPoint;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfigure {
 	
 	private final JwtFilter jwtFilter;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
+	private final CustomAuthEntryPoint customAuthEntryPoint;
 	
 	@Value("${app.server.url}")
 	private String serverUrl;
@@ -43,7 +47,7 @@ public class SecurityConfigure {
 						   .csrf(AbstractHttpConfigurer::disable)
 						   .cors(Customizer.withDefaults())
 						   .authorizeHttpRequests(requests -> {
-							   // requests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+							   requests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
 							   requests.requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/members", "/api/auth/refresh").permitAll(); // 누구나 허용할 기능 
 							   requests.requestMatchers(HttpMethod.GET, "/api/reviews/**", "/api/comments/**", "/api/uploads/**", "/api/members", "/api/members/email", "/api/members/nickname", "/api/restaurants/**").permitAll(); // 게시글 전체조회 및 상세조회는 아무나
 							   
@@ -51,8 +55,8 @@ public class SecurityConfigure {
 							   requests.requestMatchers(HttpMethod.PATCH, "/api/members/**", "/api/comments/**", "/api/reviews/**").authenticated(); // 테이블의 행 중 부분만 수정
 
 							   requests.requestMatchers(HttpMethod.DELETE, "/api/bookmarks/**", "/api/members/**", "/api/reviews/**", "/api/comments/**", "/api/reviewLikes/**", "/api/commentLikes/**").authenticated(); // 삭제, 인증 필요한 기능
-							   requests.requestMatchers(HttpMethod.GET, "/api/bookmarks/**", "/api/members/**").authenticated();
-							   requests.requestMatchers(HttpMethod.POST, "/api/bookmarks/**", "/api/reviews/**", "/api/comments/**", "/api/auth/logout", "/api/reviewLikes/**", "/api/commentLikes/**", "/api/members/**").authenticated(); // 게시글 작성 및 신고 시 로그인 필요
+							   requests.requestMatchers(HttpMethod.GET, "/api/bookmarks/**", "/api/members/**", "/api/reports/**").authenticated();
+							   requests.requestMatchers(HttpMethod.POST, "/api/bookmarks/**", "/api/reviews/**", "/api/comments/**", "/api/auth/logout", "/api/reviewLikes/**", "/api/commentLikes/**", "/api/members/**", "/api/reports/**").authenticated(); // 게시글 작성 및 신고 시 로그인 필요
 							   
 							   requests.requestMatchers("/api/admin/**").hasRole("ADMIN"); // 관리자 권한이 필요한 요청 (신고 조회, 상세 조회, 처리)
 
@@ -64,6 +68,10 @@ public class SecurityConfigure {
 						    */
 						   .sessionManagement(manager -> 
 								   				manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+						   .exceptionHandling(exception -> exception
+							          .authenticationEntryPoint(customAuthEntryPoint)
+							          .accessDeniedHandler(customAccessDeniedHandler)
+							      )
 						   .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 						   .build();
 	}

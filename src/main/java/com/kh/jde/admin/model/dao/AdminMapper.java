@@ -11,6 +11,8 @@ import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
+import com.kh.jde.admin.model.dto.RankRequest;
+import com.kh.jde.admin.model.dto.RankResponse;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.vo.DefaultImageVO;
 import com.kh.jde.common.page.PageInfo;
@@ -73,9 +75,15 @@ public interface AdminMapper {
 	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
 	MemberDetailDTO selectMemberByNo(Long memberNo);
 	
+	// 랭킹 전제 조회
+	List<RankResponse> getRanks();
+	
 	// 미식대장 랭킹 제한 기준 변경
 	int updateCaptainRankPolicy(int topN);
-
+	
+	// 랭킹 기준 변경
+	int updateRankPolicy(RankRequest request);
+	
 	// 회원 권한 변경
 	int updateMemberRole(MemberRoleUpdateDTO dto);
 

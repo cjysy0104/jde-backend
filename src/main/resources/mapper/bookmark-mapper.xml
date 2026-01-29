@@ -76,6 +76,7 @@
 	         , likeCount
 	         , commentCount
 	         , thumbnailUrl
+	         , restaurantName
 	      FROM (
 	           SELECT
 	            	  t.reviewNo
@@ -88,6 +89,7 @@
 	            	, t.likeCount
 	            	, t.commentCount
 	            	, t.thumbnailUrl
+	            	, t.restaurantName
 	            	, ROWNUM rn
 	             FROM 
 	                  (
@@ -100,6 +102,7 @@
 	               		   , r.CREATED_AT  AS reviewCreatedAt
 	               		   , r.MEMBER_NO   AS writerMemberNo
 	               		   , m.NICKNAME    AS writerNickname
+	               		   , rt.NORMAL_NAME AS restaurantName
 	               		   , (
 	               		     SELECT 
 	               		            COUNT(*)
@@ -139,6 +142,8 @@
 	            		      TB_REVIEW r ON r.REVIEW_NO = b.REVIEW_NO
 	            		 JOIN 
 	            		      TB_MEMBER m ON m.MEMBER_NO = r.MEMBER_NO
+	            		 JOIN TB_RESTAURANT rt
+                   		   ON rt.RESTAURANT_NO = r.RESTAURANT_NO
 	            		WHERE 
 	            		      b.MEMBER_NO = #{memberNo}
 	              		  AND 

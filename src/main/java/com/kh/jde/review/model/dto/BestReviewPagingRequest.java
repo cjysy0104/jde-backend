@@ -15,6 +15,9 @@ public class BestReviewPagingRequest {
 
 	private ScrollRequest scroll;
 	
+	// filter
+	private Long keywordNo;
+	
 	// 커서
 	private Long cursor;
 	private Integer cursorLikeCount;

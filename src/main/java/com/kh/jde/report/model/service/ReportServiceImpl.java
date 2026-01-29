@@ -1,6 +1,7 @@
 package com.kh.jde.report.model.service;
 
 import java.sql.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import com.kh.jde.report.model.dao.ReportMapper;
 import com.kh.jde.report.model.dto.CommentReportCreateDTO;
 import com.kh.jde.report.model.dto.ReviewReportCreateDTO;
 import com.kh.jde.report.model.vo.CommentReportVO;
+import com.kh.jde.report.model.vo.ReportCategoryVO;
 import com.kh.jde.report.model.vo.ReviewReportVO;
 
 import lombok.RequiredArgsConstructor;
@@ -104,4 +106,9 @@ public class ReportServiceImpl implements ReportService {
 		}
 	}
 	
+	// 신고 카테고리
+	@Override
+	public List<ReportCategoryVO> getReportCategories() {
+	  return reportMapper.selectReportCategories();
+	}
 }

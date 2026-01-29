@@ -34,10 +34,11 @@ public interface ReviewMapper {
 	// 리뷰 상세 조회
 	DetailReviewDTO getDetailReview(Map<String,Object> param);
 	
-	List<KeywordRowDTO> getKeywordsByIds(List<Long> reviewNo);
+	List<KeywordRowDTO> getKeywordsByIds(@Param("reviewNos")List<Long> reviewNos);
 	
 	Long getWriterById(Long reviewNo);
 	
+	void increaseViewCount(Long reviewNo);
 	// 리뷰 작성
 	void createReview(ReviewCreateVO requestReview);
 	
@@ -72,5 +73,6 @@ public interface ReviewMapper {
 	List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
 
 	List<KeywordDTO> getKeywordList();
+
 
 }
