@@ -24,6 +24,8 @@ import com.kh.jde.admin.model.dto.MemberDetailDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
+import com.kh.jde.admin.model.dto.RankRequest;
+import com.kh.jde.admin.model.dto.RankResponse;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.service.AdminService;
@@ -35,6 +37,7 @@ import com.kh.jde.report.model.dto.ReportPageResponse;
 import com.kh.jde.report.model.dto.ReviewReportListDTO;
 import com.kh.jde.report.model.dto.ReviewReportProcessDTO;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -163,12 +166,27 @@ public class AdminController {
 		return SuccessResponse.ok(member, "회원 상세 조회 성공");
 	}
 	
+	// 여러 랭킹 기준 조회
+	@GetMapping("rank")
+	public ResponseEntity<SuccessResponse<RankResponse>> getRanks(){
+		List<RankResponse> ranks = adminService.getRanks();
+		
+		
+		return SuccessResponse.ok(ranks, "랭킹 기준 조회 성공");
+	}
 
 	// 미식대장 랭킹 몇위까지 보여줄 것인지 변경 가능	
-	@PatchMapping("/captainRank/{topN:\\d+}")
+	@PatchMapping("rank/{topN:\\d+}")
 	public ResponseEntity<SuccessResponse<String>> updateCaptainRankPolicy(@PathVariable(name="topN") @Min(value=0, message="0이상의 정수만 입력해주세요.") int topN){
 		adminService.updateCaptainRankPolicy(topN);
 		
+		return SuccessResponse.ok("미식대장 랭킹 기준을 변경했습니다.");
+	}
+	
+	// 랭킹 기준 변경
+	@PatchMapping("rank")
+	public ResponseEntity<SuccessResponse<String>> updateRankPolicy(@RequestBody @Valid RankRequest request){
+		adminService.updateRankPolicy(request);
 		return SuccessResponse.ok("미식대장 랭킹 기준을 변경했습니다.");
 	}
 	
@@ -326,6 +344,8 @@ public class AdminController {
 		int totalMemberCount = adminService.getTotalMemberCount();
 		return SuccessResponse.ok(totalMemberCount, "이용자 전체 수 조회 성공");
 	}
+	
+	
 	
 	
 }

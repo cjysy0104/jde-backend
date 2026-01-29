@@ -16,6 +16,8 @@ import com.kh.jde.admin.model.dto.SearchDTO;
 import com.kh.jde.admin.model.dto.MemberListDTO;
 import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
 import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
+import com.kh.jde.admin.model.dto.RankRequest;
+import com.kh.jde.admin.model.dto.RankResponse;
 import com.kh.jde.admin.model.vo.DefaultImageVO;
 import com.kh.jde.admin.model.dto.ReviewListDTO;
 import com.kh.jde.common.page.PageInfo;
@@ -245,6 +247,17 @@ public class AdminServiceImpl implements AdminService {
 		}
 	}
 	
+	// 랭킹 기준 전체조회
+	@Override
+	public List<RankResponse> getRanks() {
+	
+		List<RankResponse> ranks = adminMapper.getRanks();
+		if(ranks.isEmpty()) {
+			throw new UnexpectedSQLResponseException("랭킹 기준 조회 실패.");
+		}
+		
+		return ranks;
+	}
 
 	// 미식대장 랭킹 제한 기준 변경(미식대장을 몇 명이나 선정해서 보여줄것인지)
 	@Override
@@ -257,8 +270,13 @@ public class AdminServiceImpl implements AdminService {
 		}
 	}
 	
-
-
+	@Override
+	public void updateRankPolicy(RankRequest request) {
+		int result = adminMapper.updateRankPolicy(request);
+		if(result < 1) {
+			throw new UnexpectedSQLResponseException("미식대장 랭킹 기준 변경에 실패했습니다.");
+		}
+	}
 
 	@Override
 	@Transactional
@@ -469,9 +487,8 @@ public class AdminServiceImpl implements AdminService {
 		
 		s3Service.deleteFile(defaultImage.getFileUrl());
 	}
-	
-	
 
+	
 
 
 }

@@ -22,6 +22,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.kh.jde.configuration.filter.JwtFilter;
+import com.kh.jde.configuration.handler.CustomAccessDeniedHandler;
+import com.kh.jde.configuration.handler.CustomAuthEntryPoint;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfigure {
 	
 	private final JwtFilter jwtFilter;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
+	private final CustomAuthEntryPoint customAuthEntryPoint;
 	
 	@Value("${app.server.url}")
 	private String serverUrl;
@@ -64,6 +68,10 @@ public class SecurityConfigure {
 						    */
 						   .sessionManagement(manager -> 
 								   				manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+						   .exceptionHandling(exception -> exception
+							          .authenticationEntryPoint(customAuthEntryPoint)
+							          .accessDeniedHandler(customAccessDeniedHandler)
+							      )
 						   .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 						   .build();
 	}
