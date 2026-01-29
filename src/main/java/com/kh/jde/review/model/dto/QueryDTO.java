@@ -27,7 +27,7 @@ public class QueryDTO {
 	private Long cursor;
 	
 	private Float cursorRating; // sort = rating일 때,
-	private Integer cursorLikedCount; // sort = liked일 때 혹은 다른 정렬기능 추가 시
+	private Integer cursorLikeCount; // sort = liked일 때 혹은 다른 정렬기능 추가 시
 	
 	
 }
