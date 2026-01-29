@@ -89,7 +89,11 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Transactional
 	public DetailReviewDTO getDetailReview(Long reviewNo, CustomUserDetails principal) {
+		
+		// 0. 조회수 먼저 증가
+		reviewMapper.increaseViewCount(reviewNo);
 
 	    Map<String, Object> param = new HashMap<>();
 	    param.put("reviewNo", reviewNo);

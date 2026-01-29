@@ -882,5 +882,18 @@
 		BY
 				KEYWORD_NO ASC
 	</select>
+	
+	<update id="increaseViewCount"
+			parameterType="Long">
+			
+		UPDATE
+				TB_REVIEW
+		SET
+				VIEW_COUNT = VIEW_COUNT + 1
+		WHERE
+				REVIEW_NO = #{reviewNo}
+		AND
+				STATUS = 'Y'
+	</update>
 
 </mapper>
