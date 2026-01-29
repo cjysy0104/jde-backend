@@ -89,7 +89,11 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Transactional
 	public DetailReviewDTO getDetailReview(Long reviewNo, CustomUserDetails principal) {
+		
+		// 0. 조회수 먼저 증가
+		reviewMapper.increaseViewCount(reviewNo);
 
 	    Map<String, Object> param = new HashMap<>();
 	    param.put("reviewNo", reviewNo);
@@ -301,11 +305,6 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	public List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req) {
-		
-		// query값 공백 null 
-		if (req.getQuery() != null && req.getQuery().trim().isEmpty()) {
-            req.setQuery(null);
-        }
 		
 		req.setScroll(requestNormalizer.applyScroll(req.getScroll(), 3));
 		

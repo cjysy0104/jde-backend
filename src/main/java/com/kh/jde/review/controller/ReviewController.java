@@ -114,4 +114,5 @@ public class ReviewController {
 		
 		return SuccessResponse.ok(reviewService.getKeywordList(), "키워드 조회 성공");
 	}
+	
 }

@@ -38,6 +38,7 @@ public interface ReviewMapper {
 	
 	Long getWriterById(Long reviewNo);
 	
+	void increaseViewCount(Long reviewNo);
 	// 리뷰 작성
 	void createReview(ReviewCreateVO requestReview);
 	
@@ -72,5 +73,6 @@ public interface ReviewMapper {
 	List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
 
 	List<KeywordDTO> getKeywordList();
+
 
 }
