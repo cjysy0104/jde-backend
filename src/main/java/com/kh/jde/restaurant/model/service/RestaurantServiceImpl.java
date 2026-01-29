@@ -9,6 +9,7 @@ import com.kh.jde.common.util.RequestNormalizer;
 import com.kh.jde.restaurant.model.dao.RestaurantMapper;
 import com.kh.jde.restaurant.model.dto.RestaurantListDTO;
 import com.kh.jde.restaurant.model.dto.RestaurantQueryDTO;
+import com.kh.jde.restaurant.model.dto.RestaurantSearchDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +34,22 @@ public class RestaurantServiceImpl implements RestaurantService {
 		return restaurants;
 	}
 	
+	@Override
+	@Transactional(readOnly = true)
+	public List<RestaurantListDTO> searchRestaurant(RestaurantSearchDTO request) {
+		RestaurantSearchDTO normalized = normalizeSearchRequest(request);
+		return restaurantMapper.selectRestaurantListByKeyword(normalized);
+	}
+
 	private RestaurantQueryDTO normalizeRequest(RestaurantQueryDTO request) {
-		// 0. request null 방지
 		if (request == null) request = new RestaurantQueryDTO();
-		
-		// 1. scroll 만들기
 		request.setScroll(requestNormalizer.applyScroll(request.getScroll(), DEFAULT_SIZE));
-		
+		return request;
+	}
+
+	private RestaurantSearchDTO normalizeSearchRequest(RestaurantSearchDTO request) {
+		if (request == null) request = new RestaurantSearchDTO();
+		request.setScroll(requestNormalizer.applyScroll(request.getScroll(), DEFAULT_SIZE));
 		return request;
 	}
 }
