@@ -34,7 +34,7 @@ public interface ReviewMapper {
 	// 리뷰 상세 조회
 	DetailReviewDTO getDetailReview(Map<String,Object> param);
 	
-	List<KeywordRowDTO> getKeywordsByIds(List<Long> reviewNo);
+	List<KeywordRowDTO> getKeywordsByIds(@Param("reviewNos")List<Long> reviewNos);
 	
 	Long getWriterById(Long reviewNo);
 	

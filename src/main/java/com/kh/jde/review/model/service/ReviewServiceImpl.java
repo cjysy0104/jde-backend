@@ -18,6 +18,7 @@ import com.kh.jde.review.model.dto.BestReviewPagingRequest;
 import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
 import com.kh.jde.review.model.dto.KeywordDTO;
+import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.RestaurantRequestDTO;
 import com.kh.jde.review.model.dto.RestaurantResponseDTO;
@@ -92,7 +93,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	    Map<String, Object> param = new HashMap<>();
 	    param.put("reviewNo", reviewNo);
-	    param.put("memberNo", principal == null ? null : principal.getMemberNo()); // 비로그인:ㅜㅕㅣㅣ
+	    param.put("memberNo", principal == null ? null : principal.getMemberNo()); // 비로그인:
 
 
 	    return reviewMapper.getDetailReview(param);
@@ -127,7 +128,9 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public void create(ReviewCreateRequest review, CustomUserDetails principal) {
 		
-		// 유효성검사 review / principal
+		
+		// 유효성검사 principal
+		
 		
 		// 식당 조회 -> 있으면 No반환 없으면 insert
 		RestaurantRequestDTO requestRestaurant = RestaurantRequestDTO.builder()
@@ -299,10 +302,34 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req) {
 		
+		// query값 공백 null 
+		if (req.getQuery() != null && req.getQuery().trim().isEmpty()) {
+            req.setQuery(null);
+        }
+		
 		req.setScroll(requestNormalizer.applyScroll(req.getScroll(), 3));
 		
 		List<BestReviewListResponse> reviews = reviewMapper.getBestReviewList(req);
+		if(reviews == null || reviews.isEmpty()) {
+			return reviews;
+		}
 		
+		List<Long> reviewNos = reviews.stream()
+                .map(BestReviewListResponse::getReviewNo)
+                .toList();
+
+        List<KeywordRowDTO> rows = reviewMapper.getKeywordsByIds(reviewNos);
+
+        // 3) reviewNo별 keywords 그룹핑해서 주입
+        Map<Long, List<KeywordDTO>> keywordMap = new HashMap<>();
+        for (KeywordRowDTO row : rows) {
+            keywordMap.computeIfAbsent(row.getReviewNo(), k -> new ArrayList<>())
+                    .add(new KeywordDTO(row.getKeywordNo(), row.getKeywordName()));
+        }
+
+        for (BestReviewListResponse r : reviews) {
+            r.setKeywords(keywordMap.getOrDefault(r.getReviewNo(), new ArrayList<>()));
+        }
 		
 		return reviews;
 	}
@@ -311,5 +338,6 @@ public class ReviewServiceImpl implements ReviewService {
 	public List<KeywordDTO> getKeywordList() {
 		return reviewMapper.getKeywordList();
 	}
+
 
 }

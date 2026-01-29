@@ -12,8 +12,6 @@ import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
 import com.kh.jde.review.model.dto.ReviewUpdateRequest;
 
-import jakarta.validation.Valid;
-
 public interface ReviewService {
 
 	public List<ReviewListResponseDTO> getReviewList(QueryDTO request, CustomUserDetails principal);

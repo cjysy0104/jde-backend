@@ -46,10 +46,11 @@ public class CommentServiceImpl implements CommentService {
 
 		PageInfo pi = Pagination.getPageInfo(listCount, page, pageLimit, boardLimit);
 		
-		// 4. 댓글 조회
-		List<CommentDTO> comments = commentMapper.getCommentList(reviewNo, pi);
-		
 		Long memberNo = (principal != null) ? principal.getMemberNo() : null;
+		
+		// 4. 댓글 조회
+		List<CommentDTO> comments = commentMapper.getCommentList(reviewNo, memberNo, pi);
+		
 		
 		// 5. 댓글 본인 여부 추가
 		for(CommentDTO comment : comments) {

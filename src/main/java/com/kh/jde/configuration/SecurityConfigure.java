@@ -55,8 +55,8 @@ public class SecurityConfigure {
 							   requests.requestMatchers(HttpMethod.PATCH, "/api/members/**", "/api/comments/**", "/api/reviews/**").authenticated(); // 테이블의 행 중 부분만 수정
 
 							   requests.requestMatchers(HttpMethod.DELETE, "/api/bookmarks/**", "/api/members/**", "/api/reviews/**", "/api/comments/**", "/api/reviewLikes/**", "/api/commentLikes/**").authenticated(); // 삭제, 인증 필요한 기능
-							   requests.requestMatchers(HttpMethod.GET, "/api/bookmarks/**", "/api/members/**").authenticated();
-							   requests.requestMatchers(HttpMethod.POST, "/api/bookmarks/**", "/api/reviews/**", "/api/comments/**", "/api/auth/logout", "/api/reviewLikes/**", "/api/commentLikes/**", "/api/members/**").authenticated(); // 게시글 작성 및 신고 시 로그인 필요
+							   requests.requestMatchers(HttpMethod.GET, "/api/bookmarks/**", "/api/members/**", "/api/reports/**").authenticated();
+							   requests.requestMatchers(HttpMethod.POST, "/api/bookmarks/**", "/api/reviews/**", "/api/comments/**", "/api/auth/logout", "/api/reviewLikes/**", "/api/commentLikes/**", "/api/members/**", "/api/reports/**").authenticated(); // 게시글 작성 및 신고 시 로그인 필요
 							   
 							   requests.requestMatchers("/api/admin/**").hasRole("ADMIN"); // 관리자 권한이 필요한 요청 (신고 조회, 상세 조회, 처리)
 
