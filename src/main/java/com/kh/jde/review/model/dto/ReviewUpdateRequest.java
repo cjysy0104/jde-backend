@@ -24,6 +24,10 @@ public class ReviewUpdateRequest {
 	private float rating;
 	private List<Long> keywordNos;
 	
-	// Files
+	// legacy files
+	private List<Long> existingFileNos;
+	private List<Integer> existingSortOrders;
+	// new files
 	private List<MultipartFile> images;
+	private List<Integer> newSortOrders;
 }

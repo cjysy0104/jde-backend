@@ -16,6 +16,7 @@ import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.RestaurantRequestDTO;
 import com.kh.jde.review.model.dto.RestaurantResponseDTO;
 import com.kh.jde.review.model.dto.ReviewDTO;
+import com.kh.jde.review.model.dto.ReviewFileDTO;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
 import com.kh.jde.review.model.vo.RestaurantCreateVO;
 import com.kh.jde.review.model.vo.ReviewCreateVO;
@@ -68,7 +69,7 @@ public interface ReviewMapper {
 
 	void deleteFilesById(Long reviewNo);
 
-	List<String> getUrlById(Long reviewNo);
+	List<ReviewFileDTO> getFilesById(Long reviewNo);
 
 	List<BestReviewListResponse> getBestReviewList(BestReviewPagingRequest req);
 
