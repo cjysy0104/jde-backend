@@ -27,7 +27,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json;charset=UTF-8");
         
         String msg = (String) request.getAttribute("auth_error_message");
-        if (msg == null) msg = "올바르지 않은 인증 정보입니다.";
+        if (msg == null) msg = "접근이 거부되었습니다. 권한을 확인해주세요.";
 
         ErrorResponse<Object> body = ErrorResponse.builder()
                 .status(403)

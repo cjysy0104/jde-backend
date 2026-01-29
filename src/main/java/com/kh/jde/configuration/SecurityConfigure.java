@@ -68,7 +68,7 @@ public class SecurityConfigure {
 						    */
 						   .sessionManagement(manager -> 
 								   				manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-						   .exceptionHandling(ex -> ex
+						   .exceptionHandling(exception -> exception
 							          .authenticationEntryPoint(customAuthEntryPoint)
 							          .accessDeniedHandler(customAccessDeniedHandler)
 							      )
