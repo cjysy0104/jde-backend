@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,7 @@ import com.kh.jde.review.model.dto.QueryDTO;
 import com.kh.jde.review.model.dto.RestaurantRequestDTO;
 import com.kh.jde.review.model.dto.RestaurantResponseDTO;
 import com.kh.jde.review.model.dto.ReviewCreateRequest;
+import com.kh.jde.review.model.dto.ReviewFileDTO;
 import com.kh.jde.review.model.dto.ReviewListResponseDTO;
 import com.kh.jde.review.model.dto.ReviewUpdateRequest;
 import com.kh.jde.review.model.vo.RestaurantCreateVO;
@@ -118,6 +121,18 @@ public class ReviewServiceImpl implements ReviewService {
 		int result = reviewMapper.deleteById(reviewNo);
 		
 		reviewValidator.validateResult(result);
+		
+		// 4. 파일 조회
+		List<ReviewFileDTO> originFiles = reviewMapper.getFilesById(reviewNo);
+	    
+		// 5. s3 파일 삭제
+		for(ReviewFileDTO f : originFiles) {
+			try {
+				s3service.deleteFile(f.getFileUrl());
+			} catch (Exception e) {
+				deleteWitRetry(f.getFileUrl(), 5);
+			}
+		}
 	}
 	
 	private void getWriterById(Long reviewNo, CustomUserDetails principal, String action) {
@@ -275,32 +290,116 @@ public class ReviewServiceImpl implements ReviewService {
 		// 키워드 삭제 후 다시 create
 		reviewMapper.deleteKeywordsById(reviewNo); // 삭제
 		reviewMapper.createReviewKeywordMap(reviewNo, review.getKeywordNos());
+
+		List<String> newFileUrls = new ArrayList<>();
 		
-		
-		
-		// 파일 삭제 후 업로드
-		// 1. 파일 삭제: URL 호출 해 s3 제거, db 제거
-		// 2. 파일 업로드: 재사용
-		List<String> legacyUrl = reviewMapper.getUrlById(reviewNo);
-		
-		// 1.
 		try {
-			for(String url : legacyUrl) {
-				s3service.deleteFile(url);
-				legacyUrl.remove(url);
+			if(review.getImages() != null) {
+				for(MultipartFile f : review.getImages()) {
+					if (f == null || f.isEmpty()) continue;
+					String url = s3service.fileSave(f, "reviews/" + reviewNo);
+					newFileUrls.add(url);
+				}
 			}
+
 		} catch (Exception e) {
-			for(String url : legacyUrl) {
-				deleteWitRetry(url, 5);
+			// 예외 발생 시: 이전까지 업로드한 uploadUrl 전부 삭제 처리(되돌림)
+			for (String url : newFileUrls) {
+				try { 
+					s3service.deleteFile(url);
+				} catch (Exception ignore) {
+					// 실패 시 재시도
+					deleteWitRetry(url, 5);
+				}
+			}
+			throw e;
+		}
+		
+		
+		// 2. db에 기존파일 정보 배열 받기 SELECT
+		List<ReviewFileDTO> originFiles = reviewMapper.getFilesById(reviewNo);
+		
+		List<Long> reqExistingNos = review.getExistingFileNos() == null ? List.of() : review.getExistingFileNos();
+		List<Integer> reqExistingOrders = review.getExistingSortOrders() == null ? List.of() : review.getExistingSortOrders();
+		List<Integer> reqNewOrders = review.getNewSortOrders() == null ? List.of() : review.getNewSortOrders();
+
+		
+		// 3. 배열과 비교하여 삭제할 파일 배열 생성 및 살릴 파일 배열생성 후 
+		// 기존파일의URL과 새파일URL을 sortOrder 순서대로 조립
+		
+		List<ReviewFileDTO> exists = new ArrayList<>();
+		for(int i = 0; i < reqExistingNos.size(); i++) {
+			exists.add(new ReviewFileDTO(
+						reqExistingNos.get(i)
+						, null
+						, reqExistingOrders.get(i)
+						)
+					);
+		}
+		
+		List<ReviewFileDTO> toUpdate = new ArrayList<>();
+		
+		for(int i = 0; i < reqNewOrders.size(); i++) {
+			toUpdate.add(new ReviewFileDTO(
+							null
+							, newFileUrls.get(i)
+							, reqNewOrders.get(i)
+						)
+					);
+		}
+		
+		// 비교
+		Map<Long, ReviewFileDTO> existByNo = exists.stream()
+													.filter(e -> e.getFileNo() != null)
+													.collect(Collectors.toMap(ReviewFileDTO::getFileNo, Function.identity()));
+		
+        List<ReviewFileDTO> toKeep = new ArrayList<>();
+        List<ReviewFileDTO> toDelete = new ArrayList<>();
+		
+        log.info("????????????????:{}", originFiles);
+        
+		for(ReviewFileDTO origin : originFiles) {
+			ReviewFileDTO req = existByNo.get(origin.getFileNo());
+			
+			if(req != null) {
+				toKeep.add(new ReviewFileDTO(
+								origin.getFileNo()
+								, origin.getFileUrl()
+								, req.getSortOrder()
+							)
+						);
+			} else {
+				toDelete.add(origin);
 			}
 		}
 		
+		toUpdate.addAll(toKeep);
+		
+		// 4. DELETE
 		reviewMapper.deleteFilesById(reviewNo);
 		
-		// 2.
-		createFiles(reviewNo, review.getImages());
+		// 5. INSERT
+		for(ReviewFileDTO file : toUpdate) {
+			
+			reviewMapper.createReviewFile(
+					ReviewFileCreateVO.builder()
+					.reviewNo(reviewNo)
+					.fileUrl(file.getFileUrl())
+					.sortOrder(file.getSortOrder())
+					.isThumbnail(file.getSortOrder() == 1 ? "Y" : "N")
+					.build()
+					);
+		}
 		
-		
+		// 6. S3 삭제
+		for(ReviewFileDTO f : toDelete) {
+			
+			try {
+				s3service.deleteFile(f.getFileUrl());
+			} catch (Exception e) {
+				deleteWitRetry(f.getFileUrl(), 5);
+			}
+		}
 	}
 
 	@Override
