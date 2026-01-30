@@ -38,8 +38,8 @@ public class ReviewController {
 	private final ReviewService reviewService;
 	
 	@GetMapping
-	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getReviewList(@ModelAttribute QueryDTO request
-																, @AuthenticationPrincipal CustomUserDetails principal){
+	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getReviewList(@ModelAttribute QueryDTO request, 
+																					  @AuthenticationPrincipal CustomUserDetails principal){
 		
 		List<ReviewListResponseDTO> result = reviewService.getReviewList(request, principal);
 		
@@ -47,31 +47,33 @@ public class ReviewController {
 	}
 	
 	@GetMapping("captain/{captainNo}")
-	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getCaptainReviewList(@ModelAttribute QueryDTO request
-			, @AuthenticationPrincipal CustomUserDetails principal
-			, @PathVariable("captainNo") Long captainNo){
+	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getCaptainReviewList(@ModelAttribute QueryDTO request,
+																							 @AuthenticationPrincipal CustomUserDetails principal,
+																							 @PathVariable("captainNo") Long captainNo){
+		
 		List<ReviewListResponseDTO> result = reviewService.getCaptainReviewList(request, principal, captainNo);
+		
 		return SuccessResponse.ok(result, "미식대장 리뷰 전체 조회 성공");
 	}
 	
 	@GetMapping("/{reviewNo}")
-	public ResponseEntity<SuccessResponse<ReviewListResponseDTO>> getDetailReview(@PathVariable("reviewNo") Long reviewNo
-															, @AuthenticationPrincipal CustomUserDetails principal){
+	public ResponseEntity<SuccessResponse<ReviewListResponseDTO>> getDetailReview(@PathVariable("reviewNo") Long reviewNo,
+																				  @AuthenticationPrincipal CustomUserDetails principal){
 		
 		return SuccessResponse.ok(reviewService.getDetailReview(reviewNo, principal), "리뷰 상세 조회 성공");
 	}
 	
 	@DeleteMapping("/{reviewNo}")
-	public ResponseEntity<SuccessResponse<Void>> deleteById(@PathVariable("reviewNo")Long reviewNo
-															, @AuthenticationPrincipal CustomUserDetails principal){
+	public ResponseEntity<SuccessResponse<Void>> deleteById(@PathVariable("reviewNo")Long reviewNo,
+															@AuthenticationPrincipal CustomUserDetails principal){
 		reviewService.deleteById(reviewNo, principal);
 		
 		return SuccessResponse.ok("삭제 성공");
 	} 
 	
 	@PostMapping
-	public ResponseEntity<SuccessResponse<Void>> create(@ModelAttribute @Valid ReviewCreateRequest review
-			, @AuthenticationPrincipal CustomUserDetails principal){
+	public ResponseEntity<SuccessResponse<Void>> create(@ModelAttribute @Valid ReviewCreateRequest review,
+														@AuthenticationPrincipal CustomUserDetails principal){
 		
 		reviewService.create(review, principal);
 		
@@ -79,15 +81,12 @@ public class ReviewController {
 	}
 
 	@GetMapping("/me")
-	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getMyReviews(
-	        @ModelAttribute QueryDTO req,
-	        @AuthenticationPrincipal CustomUserDetails principal
-	) {
+	public ResponseEntity<SuccessResponse<List<ReviewListResponseDTO>>> getMyReviews(@ModelAttribute QueryDTO req,
+																					 @AuthenticationPrincipal CustomUserDetails principal) {
 		// 로그인 필수
 	    if (principal == null) throw new com.kh.jde.exception.AccessDeniedException("로그인이 필요합니다.");
 
-	    List<ReviewListResponseDTO> result = reviewService.getMyReviewList(req, principal);
-	    return SuccessResponse.ok(result, "내 리뷰 조회 성공");
+	    return SuccessResponse.ok(reviewService.getMyReviewList(req, principal), "내 리뷰 조회 성공");
 	}
 	
 	@PatchMapping("/{reviewNo}")
