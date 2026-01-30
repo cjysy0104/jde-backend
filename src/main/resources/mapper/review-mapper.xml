@@ -304,7 +304,7 @@
 				RV.STATUS = 'Y'
 		<!-- 미식대장(작성자) 조건 -->
 		AND
-				RV.MEMBER_NO = #{catptainNo}
+				RV.MEMBER_NO = #{captainNo}
 
 		<!-- 검색 필터 -->
 		<if test="query != null and query.query != null and query.query != ''">

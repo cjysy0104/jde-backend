@@ -8,6 +8,7 @@ import com.kh.jde.exception.AlreadyDeletedException;
 import com.kh.jde.exception.PostNotFoundException;
 import com.kh.jde.exception.UnexpectedSQLResponseException;
 import com.kh.jde.exception.UsernameNotFoundException;
+import com.kh.jde.review.model.dto.ReviewCreateRequest;
 import com.kh.jde.review.model.dto.ReviewDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,10 @@ public class ReviewValidator {
 		if(result != 1) {
 			throw new UnexpectedSQLResponseException("SQL 오류가 발생했습니다.");
 		}
+	}
+
+	public void validateReview(ReviewCreateRequest review) {
+		// TODO Auto-generated method stub
+		
 	}
 }
