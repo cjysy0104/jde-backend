@@ -127,7 +127,7 @@ src
 |------|------------------------|------------------------------|
 | 안준영 (팀장) | 회원관리 기능 | [![GitHub](https://img.shields.io/badge/GitHub-000?logo=github&logoColor=white)](https://github.com/Ahnjunyoung927) &nbsp; (https://github.com/Ahnjunyoung927) |
 | 선승제 | 관리자 기능 및 지도 기반 탐색 | [![GitHub](https://img.shields.io/badge/GitHub-000?logo=github&logoColor=white)](https://github.com/seung-2001) &nbsp; (https://github.com/seung-2001)|
-| 유성현 | 좋아요/북마크 기능  | [![GitHub](https://img.shields.io/badge/GitHub-000?logo=github&logoColor=white)](https://github.com/yoosh0610) &nbsp; (https://github.com/yoosh0610)|
+| 유성현 | 좋아요/북마크 기능 및 회원관리 기능  | [![GitHub](https://img.shields.io/badge/GitHub-000?logo=github&logoColor=white)](https://github.com/yoosh0610) &nbsp; (https://github.com/yoosh0610)|
 | 최준영 | 리뷰 조회 | [![GitHub](https://img.shields.io/badge/GitHub-000?logo=github&logoColor=white)](https://github.com/cjysy0104) &nbsp; (https://github.com/cjysy0104)|
 
 
