@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.jde.member.model.dao.MemberMapper">
+	
+	<sql id="countMember">
+		SELECT 
+		       COUNT(*)
+		  FROM 
+		       TB_MEMBER 
+		 WHERE 
+	</sql>
+	
+	<!-- 회원가입 시 중복 체크 항목 3개 -->
+	<select id="countByNickname" parameterType="string">
+		<include refid="countMember" />
+		    NICKNAME = #{nickname}
+	</select>
+	
+	<select id="countByPhone" parameterType="string">
+    	<include refid="countMember" />
+    		   PHONE = #{phone}
+	</select>
+
+	<select id="countByEmail" parameterType="string">
+		<include refid="countMember" />
+		       EMAIL = #{email}
+	</select>
+	
+	<!-- 회원가입 시 회원정보 DB INSERT -->
+	<insert id="signUp"
+			parameterType="MemberVO">
+		INSERT
+		  INTO
+		       TB_MEMBER (
+		           MEMBER_NO
+		         , EMAIL
+		         , PASSWORD
+		         , MEMBER_NAME
+		         , NICKNAME
+		         , PHONE
+		         , ENROLL_DATE
+		         , STATUS
+		         , ROLE
+		       )
+		VALUES
+		       (
+		       SEQ_MEMBER_NO.NEXTVAL
+		     , #{email}
+		     , #{password}
+		     , #{memberName}
+		     , #{nickname}
+		     , #{phone}
+		     , DEFAULT
+		     , DEFAULT
+		     , DEFAULT
+		       )
+	</insert>
+	
+	<select id="loadUser" parameterType="MemberLoginDTO">
+		SELECT
+			   m.MEMBER_NO memberNo
+		     , m.PASSWORD 
+			 , m.MEMBER_NAME memberName
+			 , m.NICKNAME
+		     , m.PHONE
+		     , m.EMAIL
+		     , m.ROLE
+		     , m.ENROLL_DATE enrollDate
+		     , m.STATUS
+		     , f.FILE_URL fileUrl
+		  FROM
+			   TB_MEMBER m
+		  LEFT
+		  JOIN
+		       TB_MEMBER_FILE f ON(m.MEMBER_NO = f.MEMBER_NO)
+		 WHERE
+			   EMAIL = #{email}
+	</select>
+	
+	<select id="findPasswordByEmail" parameterType="string">
+		SELECT
+		       PASSWORD
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       EMAIL = #{email}
+	</select>
+
+	<update id="withdrawByPassword" parameterType="string">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       EMAIL = #{email}
+	</update>
+	
+	<select id="getCaptainList">
+		SELECT
+       		   m.MEMBER_NO memberNo
+     		 , m.NICKNAME
+     		 , f.FILE_URL fileUrl
+     		 , COUNT(DISTINCT r.REVIEW_NO) reviewCount
+     		 , COUNT(rl.REVIEW_NO) likeCount
+  		  FROM 
+       		   TB_MEMBER m
+  		  JOIN 
+       		   TB_REVIEW r ON r.MEMBER_NO = m.MEMBER_NO
+   		   AND 
+               r.STATUS = 'Y'
+          LEFT
+          JOIN 
+               TB_REVIEW_LIKE rl ON rl.REVIEW_NO = r.REVIEW_NO
+          LEFT
+          JOIN
+               TB_MEMBER_FILE f ON m.MEMBER_NO = f.MEMBER_NO
+         WHERE
+               m.MEMBER_NO IN 
+                             (
+          					  SELECT 
+               						 MEMBER_NO
+          						FROM 
+               						 (
+               						  SELECT
+                      						 r.MEMBER_NO
+                    					   , RANK() OVER (
+                          								   ORDER
+                          								      BY 
+                          								         COUNT(rl.REVIEW_NO) DESC
+                         								 ) AS ranking
+                 						FROM 
+                      						 TB_REVIEW r
+                 						JOIN 
+                      						 TB_REVIEW_LIKE rl ON rl.REVIEW_NO = r.REVIEW_NO
+                					   WHERE 
+                      						 r.STATUS = 'Y'
+                					   GROUP 
+                   						  BY 
+                      						 r.MEMBER_NO
+                                     )
+          					   WHERE 
+                				     ranking &lt;= (
+                           							SELECT 
+                           								   TOP_N
+                           							  FROM  
+                           							       TB_RANKING_POLICY
+                           							 WHERE 
+                           							       POLICY_CODE = 'CAPTAIN_RANK'
+                           							   AND    
+                           							       STATUS = 'Y'
+                         						   )
+         					  )
+ 		  GROUP
+             BY 
+       			m.MEMBER_NO
+     		  , m.NICKNAME
+     		  , f.FILE_URL
+ 		  ORDER
+   			 BY 
+       			likeCount DESC
+	</select>
+
+	<!-- 비밀번호 변경 -->
+	<update id="updatePasswordByEmail" parameterType="com.kh.jde.member.model.vo.MemberVO">
+	    UPDATE
+	           TB_MEMBER
+	       SET
+	           PASSWORD = #{password}
+	     WHERE
+	           EMAIL = #{email}
+	       AND 
+	           STATUS = 'Y'
+	</update>
+
+	<!-- 이름 변경 -->
+	<update id="updateNameByEmail" parameterType="com.kh.jde.member.model.vo.MemberVO">
+	    UPDATE
+	           TB_MEMBER
+	       SET
+	           MEMBER_NAME = #{memberName}
+	     WHERE
+	           EMAIL = #{email}
+	       AND 
+	           STATUS = 'Y'
+	</update>
+
+	<!-- 닉네임 변경 -->
+	<update id="updateNicknameByEmail" parameterType="com.kh.jde.member.model.vo.MemberVO">
+	    UPDATE
+	           TB_MEMBER
+	       SET
+	           NICKNAME = #{nickname}
+	     WHERE
+	           EMAIL = #{email}
+	       AND 
+	           STATUS = 'Y'
+	</update>
+
+	<!-- 전화번호 변경 -->
+	<update id="updatePhoneByEmail" parameterType="com.kh.jde.member.model.vo.MemberVO">
+	    UPDATE
+	           TB_MEMBER
+	       SET
+	           PHONE = #{phone}
+	     WHERE
+	           EMAIL = #{email}
+	       AND STATUS = 'Y'
+	</update>
+	
+	<!-- 기본 프로필 이미지 목록 조회 -->
+	<select id="selectDefaultProfiles" resultType="com.kh.jde.admin.model.dto.DefaultImageDTO">
+	  SELECT
+	         FILE_NO    AS fileNo
+	       , FILE_NAME  AS fileName
+	       , FILE_URL   AS fileUrl
+	       , CREATED_AT AS createdAt
+	    FROM
+	         TB_DEFAULT_PROFILE
+	   ORDER BY
+	         FILE_NO ASC
+	</select>
+	
+	<!-- 기본 프로필 이미지 단건 조회 -->
+	<select id="selectDefaultProfileByNo" parameterType="long"
+	        resultType="com.kh.jde.admin.model.dto.DefaultImageDTO">
+	    SELECT
+	           FILE_NO    AS fileNo
+	         , FILE_NAME  AS fileName
+	         , FILE_URL   AS fileUrl
+	         , CREATED_AT AS createdAt
+	      FROM
+	           TB_DEFAULT_PROFILE
+	     WHERE
+	           FILE_NO = #{fileNo}
+	</select>
+	
+	<!-- 프로필URL 가져오기 -->
+	<select id="selectProfileImageUrl" parameterType="long" resultType="string">
+	    SELECT
+	           FILE_URL
+	      FROM
+	           TB_MEMBER_FILE
+	     WHERE
+	           MEMBER_NO = #{memberNo}
+	</select>
+	
+	<!-- 프로필 이미지 변경 -->	
+	<update id="upsertProfileImage" parameterType="com.kh.jde.member.model.vo.MemberFileVO">
+  		MERGE
+  		 INTO 
+  		      TB_MEMBER_FILE t USING (
+    								  SELECT
+      										 #{memberNo} AS MEMBER_NO,
+     										 #{fileUrl}  AS FILE_URL
+    									FROM 
+    										 dual
+  									 ) s ON (t.MEMBER_NO = s.MEMBER_NO)
+  		 WHEN
+  	  MATCHED
+  	     THEN
+       		  UPDATE
+                 SET
+      		         t.FILE_URL   = s.FILE_URL,
+                     t.CREATED_AT = SYSDATE
+         WHEN
+          NOT 
+      MATCHED
+         THEN
+    		  INSERT
+    		         (
+    		         FILE_NO
+    		       , MEMBER_NO
+    		       , FILE_URL
+    		       , CREATED_AT
+    		         )
+             VALUES 
+                     (
+                     SEQ_MEMBER_FILE_NO.NEXTVAL
+                   , s.MEMBER_NO
+                   , s.FILE_URL
+                   , SYSDATE
+                     )
+	</update>
+	
+	<insert id="createProfileImage">
+		INSERT
+		  INTO
+		       TB_MEMBER_FILE
+		       (
+		       FILE_NO
+		     , MEMBER_NO
+		     , FILE_URL
+		     , CREATED_AT
+		       )
+		VALUES
+		       (
+		       SEQ_MEMBER_FILE_NO.NEXTVAL
+		     , #{memberNo}
+		     , #{fileUrl}
+		     , SYSDATE
+		       )
+	</insert>
+
+	
+</mapper>

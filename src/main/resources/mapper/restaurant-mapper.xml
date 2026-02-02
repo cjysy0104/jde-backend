@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.jde.restaurant.model.dao.RestaurantMapper">
+	
+	<!-- 레스토랑 무한 스크롤 조회 -->
+	<select id="selectRestaurantList" parameterType="com.kh.jde.restaurant.model.dto.RestaurantQueryDTO" resultType="com.kh.jde.restaurant.model.dto.RestaurantListDTO">
+		SELECT
+		       RT.RESTAURANT_NO restaurantNo
+		     , RT.NORMAL_NAME normalName
+		     , RT.ADDRESS address
+		     , RT.LATITUDE latitude
+		     , RT.LONGITUDE longitude
+		     , (
+		     		SELECT FILE_URL
+		     		  FROM (
+		     		       SELECT
+		     		              RVF.FILE_URL
+		     		            , NVL(LC.LIKE_COUNT, 0) LIKE_COUNT
+		     		          FROM
+		     		               TB_REVIEW RV
+		     		          JOIN
+		     		               TB_REVIEW_FILE RVF
+		     		            ON RV.REVIEW_NO = RVF.REVIEW_NO
+		     		           AND RVF.IS_THUMNAIL = 'Y'
+		     		          LEFT
+		     		          JOIN (
+		     		               SELECT
+		     		                      REVIEW_NO
+		     		                    , COUNT(*) LIKE_COUNT
+		     		                 FROM
+		     		                      TB_REVIEW_LIKE
+		     		                 GROUP BY
+		     		                      REVIEW_NO
+		     		          ) LC
+		     		            ON LC.REVIEW_NO = RV.REVIEW_NO
+		     		         WHERE
+		     		               RV.STATUS = 'Y'
+		     		           AND RV.RESTAURANT_NO = RT.RESTAURANT_NO
+		     		         ORDER BY
+		     		               NVL(LC.LIKE_COUNT, 0) DESC
+		     		             , RV.REVIEW_NO DESC
+		     		     )
+		     		 WHERE ROWNUM = 1
+		     ) thumbnailUrl
+		  FROM
+		       TB_RESTAURANT RT
+		 <where>
+		     <if test="cursor != null">
+		         RT.RESTAURANT_NO &lt; #{cursor}
+		     </if>
+		 </where>
+		 ORDER BY
+		       RT.RESTAURANT_NO DESC
+		 FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
+	</select>
+
+	<!-- 레스토랑 키워드 검색 무한 스크롤 조회 -->
+	<select id="selectRestaurantListByKeyword" parameterType="com.kh.jde.restaurant.model.dto.RestaurantSearchDTO" resultType="com.kh.jde.restaurant.model.dto.RestaurantListDTO">
+		SELECT
+		       RT.RESTAURANT_NO restaurantNo
+		     , RT.NORMAL_NAME normalName
+		     , RT.ADDRESS address
+		     , RT.LATITUDE latitude
+		     , RT.LONGITUDE longitude
+		     , (
+		     		SELECT FILE_URL
+		     		  FROM (
+		     		       SELECT
+		     		              RVF.FILE_URL
+		     		            , NVL(LC.LIKE_COUNT, 0) LIKE_COUNT
+		     		          FROM
+		     		               TB_REVIEW RV
+		     		          JOIN
+		     		               TB_REVIEW_FILE RVF
+		     		            ON RV.REVIEW_NO = RVF.REVIEW_NO
+		     		           AND RVF.IS_THUMNAIL = 'Y'
+		     		          LEFT
+		     		          JOIN (
+		     		               SELECT
+		     		                      REVIEW_NO
+		     		                    , COUNT(*) LIKE_COUNT
+		     		                 FROM
+		     		                      TB_REVIEW_LIKE
+		     		                 GROUP BY
+		     		                      REVIEW_NO
+		     		          ) LC
+		     		            ON LC.REVIEW_NO = RV.REVIEW_NO
+		     		         WHERE
+		     		               RV.STATUS = 'Y'
+		     		           AND RV.RESTAURANT_NO = RT.RESTAURANT_NO
+		     		         ORDER BY
+		     		               NVL(LC.LIKE_COUNT, 0) DESC
+		     		             , RV.REVIEW_NO DESC
+		     		     )
+		     		 WHERE ROWNUM = 1
+		     ) thumbnailUrl
+		  FROM
+		       TB_RESTAURANT RT
+		 WHERE
+		       (RT.NORMAL_NAME LIKE '%' || #{keyword} || '%'
+		    OR RT.ADDRESS LIKE '%' || #{keyword} || '%')
+		 <if test="cursor != null">
+		   AND RT.RESTAURANT_NO &lt; #{cursor}
+		 </if>
+		 ORDER BY
+		       RT.RESTAURANT_NO DESC
+		 FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
+	</select>
+
+</mapper>

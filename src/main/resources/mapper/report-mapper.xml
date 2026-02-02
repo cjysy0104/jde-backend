@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.jde.report.model.dao.ReportMapper">
+	<!-- 댓글 신고 등록 -->
+	<insert id="insertCommentReport" parameterType="CommentReportVO">
+		INSERT
+		  INTO
+		       TB_COMMENT_REPORT (
+		           COMMENT_REPORT_NO
+		         , MEMBER_NO
+		         , COMMENT_NO
+		         , REPORT_CATEGORY_NO
+		         , REPORT_CONTENT
+		         , REPORT_PROCESS
+		         , CREATED_AT
+		         , UPDATE_AT
+		         , STATUS
+		       )
+		VALUES
+		       (
+		       SEQ_COMMENT_REPORT_NO.NEXTVAL
+		     , #{memberNo}
+		     , #{commentNo}
+		     , #{reportCategoryNo}
+		     , #{reportContent}
+		     , DEFAULT
+		     , DEFAULT
+		     , DEFAULT
+		     , DEFAULT
+		       )
+	</insert>
+	
+	<!-- 리뷰 신고 등록 -->
+	<insert id="insertReviewReport" parameterType="ReviewReportVO">
+		INSERT
+		  INTO
+		       TB_REVIEW_REPORT 
+		       (
+		       REVIEW_REPORT_NO
+		     , MEMBER_NO
+		     , REVIEW_NO
+		     , REPORT_CATEGORY_NO
+		     , REPORT_CONTENT
+		     , REPORT_PROCESS
+		     , CREATED_AT
+		     , UPDATE_AT
+		     , STATUS
+		       )
+		VALUES
+		       (
+		       SEQ_REVIEW_REPORT_NO.NEXTVAL
+		     , #{memberNo}
+		     , #{reviewNo}
+		     , #{reportCategoryNo}
+		     , #{reportContent}
+		     , DEFAULT
+		     , DEFAULT
+		     , DEFAULT
+		     , DEFAULT
+		       )
+	</insert>
+	
+	<!-- 댓글 신고 중복 체크 -->
+	<select id="countCommentReportByMemberAndComment" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT_REPORT
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND 
+		       COMMENT_NO = #{commentNo}
+		   AND 
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 리뷰 신고 중복 체크 -->
+	<select id="countReviewReportByMemberAndReview" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_REVIEW_REPORT
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND 
+		       REVIEW_NO = #{reviewNo}
+		   AND 
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 신고 카테고리 조회 -->
+	<select id="selectReportCategories" resultType="ReportCategoryVO">
+	    SELECT
+	      	   REPORT_CATEGORY_NO    AS reportCategoryNo
+	      	 , REPORT_CATEGORY_TITLE AS reportCategoryTitle
+	      FROM 
+	           TB_REPORT_CATEGORY
+	     ORDER 
+	        BY 
+	           REPORT_CATEGORY_NO
+	  </select>
+
+</mapper>

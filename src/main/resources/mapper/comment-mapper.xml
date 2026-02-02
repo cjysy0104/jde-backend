@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.jde.comment.model.dao.CommentMapper">
+	
+	<!-- 리뷰 존재 확인 -->
+	<select id="existsComment" 
+			parameterType="Long"
+			resultType="CommentDTO">
+		SELECT
+				  TC.COMMENT_NO commentNo
+				, TC.REVIEW_NO reviewNo
+				, TC.MEMBER_NO memberNo
+				, TC.CONTENT content
+				, TC.COMMENT_DATE commentDate
+		        , (
+		            SELECT COUNT(*)
+		            FROM TB_COMMENT_LIKE TCL
+		            WHERE TCL.COMMENT_NO = TC.COMMENT_NO
+		          ) likeCount
+		        , TC.STATUS status
+		    FROM
+		          TB_COMMENT TC
+		    WHERE
+		          TC.COMMENT_NO = #{commentNo}
+    </select>
+    
+    <select id="getCommentCount"
+    		parameterType="Long"
+    		resultType="int">
+    	SELECT
+    			COUNT(*)
+    	FROM
+    			TB_COMMENT TC
+    	WHERE
+    			REVIEW_NO = #{reviewNo}
+    	AND
+    			STATUS='Y'
+	</select>
+    
+    <select id="getCommentList" resultType="CommentDTO">
+	  SELECT
+	        TC.COMMENT_NO  AS commentNo
+	      , TC.MEMBER_NO   AS memberNo
+	      , TC.REVIEW_NO   AS reviewNo
+	      , M.NICKNAME     AS nickname
+	      , TC.CONTENT     AS content
+	      , TC.COMMENT_DATE AS commentDate
+	      , NVL(CNT.LIKE_COUNT, 0) AS likeCount
+	      , CASE
+	          WHEN EXISTS (
+	            SELECT 1
+	            FROM TB_COMMENT_LIKE TCL
+	            WHERE TCL.COMMENT_NO = TC.COMMENT_NO
+	              AND TCL.MEMBER_NO  = #{memberNo}
+	          ) THEN 'Y'
+	          ELSE 'N'
+	        END AS isLiked
+	  FROM TB_COMMENT TC
+	  JOIN TB_MEMBER M
+	    ON M.MEMBER_NO = TC.MEMBER_NO
+	  LEFT JOIN (
+	      SELECT COMMENT_NO, COUNT(*) AS LIKE_COUNT
+	      FROM TB_COMMENT_LIKE
+	      GROUP BY COMMENT_NO
+	  ) CNT
+	    ON CNT.COMMENT_NO = TC.COMMENT_NO
+	  WHERE TC.REVIEW_NO = #{reviewNo}
+	    AND TC.STATUS = 'Y'
+	  ORDER BY TC.COMMENT_DATE ASC
+	  OFFSET #{pi.offset} ROWS FETCH NEXT #{pi.boardLimit} ROWS ONLY
+	</select>
+
+
+	<insert id="create"
+			parameterType="CommentVO">
+		INSERT
+		INTO
+				TB_COMMENT
+				(
+				  COMMENT_NO
+				, MEMBER_NO
+				, REVIEW_NO
+				, CONTENT
+				, COMMENT_DATE
+				, STATUS
+				)
+		VALUES
+				(
+				  SEQ_COMMENT.NEXTVAL
+				, #{memberNo}
+				, #{reviewNo}
+				, #{content}
+				, SYSDATE
+				, DEFAULT
+				)
+	</insert>
+
+
+	<update id="deleteById"
+			parameterType="Long">
+		UPDATE
+				TB_COMMENT
+		SET
+				STATUS='N'
+		WHERE
+				COMMENT_NO = #{commentNo}
+		AND
+				STATUS='Y'
+	</update>
+
+
+	<update id="update"
+			parameterType="CommentUpdateDTO">
+		UPDATE
+				TB_COMMENT
+		SET
+				CONTENT=#{content}
+		WHERE
+				COMMENT_NO = #{commentNo}
+		AND
+				STATUS='Y'
+	</update>
+	
+	<select id="getMyComments"
+	        parameterType="com.kh.jde.review.model.dto.QueryDTO"
+	        resultType="CommentDTO"> 
+        SELECT
+	           TC.COMMENT_NO AS commentNo
+	         , TC.REVIEW_NO  AS reviewNo
+	         , M.NICKNAME    AS nickname
+	         , TC.CONTENT    AS content
+	         , TC.COMMENT_DATE AS commentDate
+	         , NVL(CNT.LIKE_COUNT, 0) AS likeCount
+	         , RT.NORMAL_NAME AS restaurantName
+	         
+	         , CASE 
+	             WHEN LENGTH(RV.CONTENT) > 40 THEN SUBSTR(RV.CONTENT, 1, 40) || '...'
+	             ELSE RV.CONTENT 
+	           END AS reviewContentPreview
+	      FROM
+	           TB_COMMENT TC
+	      JOIN TB_MEMBER M ON M.MEMBER_NO = TC.MEMBER_NO
+	      JOIN TB_REVIEW RV ON RV.REVIEW_NO = TC.REVIEW_NO
+	      JOIN TB_RESTAURANT RT ON RT.RESTAURANT_NO = RV.RESTAURANT_NO
+	      LEFT JOIN (
+	           SELECT COMMENT_NO, COUNT(*) LIKE_COUNT
+	           FROM TB_COMMENT_LIKE
+	           GROUP BY COMMENT_NO
+	  		   ) CNT ON CNT.COMMENT_NO = TC.COMMENT_NO
+	     WHERE
+	           TC.STATUS = 'Y'
+	       AND TC.MEMBER_NO = #{memberNo}
+	       AND RV.STATUS = 'Y'
+	
+	     ORDER BY TC.COMMENT_NO DESC
+	    
+	    OFFSET 
+	        <choose>
+	            <when test="cursor != null and cursor > 0">(#{cursor} - 1) * #{scroll.size}</when>
+	            <otherwise>0</otherwise>
+	        </choose>
+	    ROWS FETCH NEXT #{scroll.size} ROWS ONLY
+	</select>
+
+
+</mapper>

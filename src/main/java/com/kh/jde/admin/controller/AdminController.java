@@ -1,0 +1,361 @@
+package com.kh.jde.admin.controller;
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.kh.jde.admin.model.dto.CommentListDTO;
+import com.kh.jde.admin.model.dto.DefaultImageDTO;
+import com.kh.jde.admin.model.dto.MemberDetailDTO;
+import com.kh.jde.admin.model.dto.MemberListDTO;
+import com.kh.jde.admin.model.dto.MemberRoleUpdateDTO;
+import com.kh.jde.admin.model.dto.MonthlyReviewCountDTO;
+import com.kh.jde.admin.model.dto.RankRequest;
+import com.kh.jde.admin.model.dto.RankResponse;
+import com.kh.jde.admin.model.dto.ReviewListDTO;
+import com.kh.jde.admin.model.dto.SearchDTO;
+import com.kh.jde.admin.model.service.AdminService;
+import com.kh.jde.auth.model.vo.CustomUserDetails;
+import com.kh.jde.common.responseData.SuccessResponse;
+import com.kh.jde.report.model.dto.CommentReportListDTO;
+import com.kh.jde.report.model.dto.CommentReportProcessDTO;
+import com.kh.jde.report.model.dto.ReportPageResponse;
+import com.kh.jde.report.model.dto.ReviewReportListDTO;
+import com.kh.jde.report.model.dto.ReviewReportProcessDTO;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RestController
+@RequestMapping("api/admin")
+@RequiredArgsConstructor
+public class AdminController {
+	
+	private final AdminService adminService;
+	
+	// 댓글 신고 페이징 조회
+	@GetMapping("/reports/comment")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentReportListDTO>>> getCommentReportList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<CommentReportListDTO> reportPageResponse = adminService.getCommentReportList(page);
+		
+		return SuccessResponse.ok(reportPageResponse, "댓글 신고 목록 조회 성공");
+	}
+	
+	// 리뷰 신고 페이징 조회
+	@GetMapping("/reports/review")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewReportListDTO>>> getReviewReportList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<ReviewReportListDTO> reportPageResponse = adminService.getReviewReportList(page);
+		
+		return SuccessResponse.ok(reportPageResponse, "리뷰 신고 목록 조회 성공");
+	}
+	
+	// 댓글 신고 상세 조회
+	@GetMapping("/reports/comment/{reportNo}")
+	public ResponseEntity<SuccessResponse<CommentReportListDTO>> getCommentReportByNo(
+			@PathVariable(name="reportNo") Long reportNo){
+		
+		CommentReportListDTO commentReport = adminService.getCommentReportByNo(reportNo);
+		
+		return SuccessResponse.ok(commentReport, "댓글 신고 상세 조회 성공");
+	}
+	
+	// 리뷰 신고 상세 조회
+	@GetMapping("/reports/review/{reportNo}")
+	public ResponseEntity<SuccessResponse<ReviewReportListDTO>> getReviewReportByNo(
+			@PathVariable(name="reportNo") Long reportNo){
+		
+		ReviewReportListDTO reviewReport = adminService.getReviewReportByNo(reportNo);
+		
+		return SuccessResponse.ok(reviewReport, "리뷰 신고 상세 조회 성공");
+	}
+	
+	// 댓글 신고 처리
+	@PutMapping("/reports/comment/{reportNo}")
+	public ResponseEntity<SuccessResponse<CommentReportListDTO>> processCommentReport(
+			@PathVariable(name="reportNo") Long reportNo,
+			@RequestBody CommentReportProcessDTO dto){
+		
+		dto.setReportNo(reportNo);
+		CommentReportListDTO updatedReport = adminService.processCommentReport(dto);
+		
+		return SuccessResponse.ok(updatedReport, "댓글 신고가 처리되었습니다.");
+	}
+	
+	// 리뷰 신고 처리
+	@PutMapping("/reports/review/{reportNo}")
+	public ResponseEntity<SuccessResponse<ReviewReportListDTO>> processReviewReport(
+			@PathVariable(name="reportNo") Long reportNo,
+			@RequestBody ReviewReportProcessDTO dto){
+		
+		dto.setReportNo(reportNo);
+		ReviewReportListDTO updatedReport = adminService.processReviewReport(dto);
+		
+		return SuccessResponse.ok(updatedReport, "리뷰 신고가 처리되었습니다.");
+	}
+	
+	// 댓글 신고 키워드 조회
+	@GetMapping("/reports/comment/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentReportListDTO>>> getCommentReportByKeyword(
+			@ModelAttribute SearchDTO dto){
+		
+		ReportPageResponse<CommentReportListDTO> reportPageResponse = adminService.getCommentReportListByKeyword(dto);
+		
+		return SuccessResponse.ok(reportPageResponse, "댓글 신고 키워드 조회 성공");
+	}
+	
+	// 리뷰 신고 키워드 조회
+	@GetMapping("/reports/review/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewReportListDTO>>> getReviewReportByKeyword(
+			@ModelAttribute SearchDTO dto){
+		ReportPageResponse<ReviewReportListDTO> reportPageResponse = adminService.getReviewReportListByKeyword(dto);
+		
+		return SuccessResponse.ok(reportPageResponse, "리뷰 신고 키워드 조회 성공");
+	}
+	
+	// 회원 페이징 조회
+	@GetMapping("/members")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<MemberListDTO>>> getMemberList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<MemberListDTO> memberPageResponse = adminService.getMemberList(page);
+		
+		return SuccessResponse.ok(memberPageResponse, "회원 목록 조회 성공");
+	}
+	
+	// 회원 키워드 조회
+	@GetMapping("/members/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<MemberListDTO>>> getMemberListByKeyword(
+			@ModelAttribute SearchDTO dto){		
+
+		log.info("keyword : {}",  dto.getKeyword());
+
+		ReportPageResponse<MemberListDTO> memberPageResponse = adminService.getMemberListByKeyword(dto);
+		
+		return SuccessResponse.ok(memberPageResponse, "회원 키워드 조회 성공");
+	}
+	
+	// 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹)
+	@GetMapping("/members/{memberNo}")
+	public ResponseEntity<SuccessResponse<MemberDetailDTO>> getMemberByNo(
+			@PathVariable(name="memberNo") Long memberNo){
+		
+		MemberDetailDTO member = adminService.getMemberByNo(memberNo);
+		
+		return SuccessResponse.ok(member, "회원 상세 조회 성공");
+	}
+	
+	// 여러 랭킹 기준 조회
+	@GetMapping("rank")
+	public ResponseEntity<SuccessResponse<RankResponse>> getRanks(){
+		List<RankResponse> ranks = adminService.getRanks();
+		
+		
+		return SuccessResponse.ok(ranks, "랭킹 기준 조회 성공");
+	}
+
+	// 미식대장 랭킹 몇위까지 보여줄 것인지 변경 가능	
+	@PatchMapping("rank/{topN:\\d+}")
+	public ResponseEntity<SuccessResponse<String>> updateCaptainRankPolicy(@PathVariable(name="topN") @Min(value=0, message="0이상의 정수만 입력해주세요.") int topN){
+		adminService.updateCaptainRankPolicy(topN);
+		
+		return SuccessResponse.ok("미식대장 랭킹 기준을 변경했습니다.");
+	}
+	
+	// 랭킹 기준 변경
+	@PatchMapping("rank")
+	public ResponseEntity<SuccessResponse<String>> updateRankPolicy(@RequestBody @Valid RankRequest request){
+		adminService.updateRankPolicy(request);
+		return SuccessResponse.ok("미식대장 랭킹 기준을 변경했습니다.");
+	}
+	
+	
+	// 회원 권한 변경
+	@PutMapping("/members/{memberNo}/role")
+	public ResponseEntity<SuccessResponse<String>> updateMemberRole(
+			@PathVariable(name="memberNo") Long memberNo,
+			@RequestBody MemberRoleUpdateDTO dto,
+			@AuthenticationPrincipal CustomUserDetails user){
+		
+		dto.setMemberNo(memberNo);
+		dto.setCurrentMemberNo(user.getMemberNo());
+		
+		adminService.updateMemberRole(dto);
+		
+		return SuccessResponse.ok("회원 권한이 변경되었습니다.");
+	}
+	
+	// 회원 삭제
+	@DeleteMapping("/members/{memberNo}")
+	public ResponseEntity<SuccessResponse<String>> deleteMember(
+			@PathVariable(name="memberNo") Long memberNo){
+		
+		adminService.deleteMember(memberNo);
+		
+		return SuccessResponse.ok("회원이 삭제 되었습니다.");
+	}
+	
+	// 댓글 페이징 조회
+	@GetMapping("/comments")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentListDTO>>> getCommentList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<CommentListDTO> commentPageResponse = adminService.getCommentList(page);
+		
+		return SuccessResponse.ok(commentPageResponse, "댓글 목록 조회 성공");
+	}
+	
+	// 댓글 상세 조회
+	@GetMapping("/comments/{commentNo}")
+	public ResponseEntity<SuccessResponse<CommentListDTO>> getCommentByNo(
+			@PathVariable(name="commentNo") Long commentNo){
+		
+		CommentListDTO comment = adminService.getCommentByNo(commentNo);
+		
+		return SuccessResponse.ok(comment, "댓글 상세 조회 성공");
+	}
+	
+	// 댓글 키워드 조회
+	@GetMapping("/comments/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<CommentListDTO>>> getCommentByKeyword(
+			@ModelAttribute SearchDTO dto){
+		
+		ReportPageResponse<CommentListDTO> commentPageResponse = adminService.getCommentByKeyword(dto);
+		
+		return SuccessResponse.ok(commentPageResponse, "댓글 키워드 조회 성공");
+	}
+	
+
+	// 댓글 삭제
+	@DeleteMapping("/comments/{commentNo}")
+	public ResponseEntity<SuccessResponse<String>> deleteComment(
+			@PathVariable(name="commentNo") Long commentNo){
+		
+		adminService.deleteComment(commentNo);
+		
+		return SuccessResponse.ok("댓글이 삭제 되었습니다.");
+	}
+
+	// 리뷰 페이징 조회
+	@GetMapping("/reviews")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewListDTO>>> getReviewList(
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		
+		ReportPageResponse<ReviewListDTO> commentPageResponse = adminService.getReviewList(page);
+		
+		return SuccessResponse.ok(commentPageResponse, "리뷰 목록 조회 성공");
+	}
+	
+	// 리뷰 상세 조회
+	@GetMapping("/reviews/{reviewNo}")
+	public ResponseEntity<SuccessResponse<ReviewListDTO>> getReviewsByNo(
+			@PathVariable(name="reviewNo") Long reviewNo){
+			
+		ReviewListDTO comment = adminService.getReviewByNo(reviewNo);
+			
+		return SuccessResponse.ok(comment, "리뷰 상세 조회 성공");
+	}
+	
+	// 리뷰 키워드 조회
+	@GetMapping("/reviews/keyword")
+	public ResponseEntity<SuccessResponse<ReportPageResponse<ReviewListDTO>>> getReviewsByKeyword(
+			@ModelAttribute SearchDTO dto){
+		ReportPageResponse<ReviewListDTO> reviewPageResponse = adminService.getReviewsByKeyword(dto);
+		System.out.println("keyword=[" + dto.getKeyword() + "]");
+		return SuccessResponse.ok(reviewPageResponse, "리뷰 키워드 조회 성공");
+	}
+	
+	// 리뷰 삭제
+	@DeleteMapping("/reviews/{reviewNo}")
+	public ResponseEntity<SuccessResponse<String>> deleteReview(
+			@PathVariable(name="reviewNo") Long reviewNo){
+		adminService.deleteReview(reviewNo);
+		
+		return SuccessResponse.ok("리뷰가 삭제 되었습니다.");
+	}
+
+	// 기본 프로필 이미지 등록하기
+	@PostMapping("/defaultImage")
+	public ResponseEntity<SuccessResponse<String>> createDefaultImage(@RequestParam("fileName") @NotBlank(message = "파일 이름이 입력되지 않았습니다.") String fileName, @RequestPart("file") MultipartFile file){
+		adminService.createDefaultImage(fileName, file);
+		return SuccessResponse.created("회원 기본 이미지 등록에 성공했습니다.");
+	}
+	
+	// 기본 프로필 이미지 조회
+	@GetMapping("/defaultImage")
+	public ResponseEntity<SuccessResponse<DefaultImageDTO>> GetDefaultImage(){
+		List<DefaultImageDTO> defaultImages = adminService.getDefaultImage();
+		return SuccessResponse.ok(defaultImages, "기본이미지 조회 성공");
+	}
+	
+	
+	// 기본 프로필 이미지 삭제
+	@DeleteMapping("/defaultImage")
+	public ResponseEntity<SuccessResponse<String>> deleteDefaultImage(@RequestBody DefaultImageDTO defaultImage){
+		adminService.deleteDefaultImage(defaultImage);
+		return SuccessResponse.ok("회원 기본이미지 삭제 성공");
+	}
+	
+	// 월별 리뷰 수
+	@GetMapping("/reviews/monthly")
+	public ResponseEntity<SuccessResponse<List<MonthlyReviewCountDTO>>> getMonthlyReviewCount(){
+		List<MonthlyReviewCountDTO> monthlyReviewCount = adminService.getMonthlyReviewCount();
+		return SuccessResponse.ok(monthlyReviewCount, "월별 리뷰 수 조회 성공");
+	}
+	
+	// 신규 가입자 수 (최근 1개월)
+	@GetMapping("/members/new")
+	public ResponseEntity<SuccessResponse<Integer>> getNewMemberCountLastMonth(){
+		int newMemberCount = adminService.getNewMemberCountLastMonth();
+		return SuccessResponse.ok(newMemberCount, "최근 1개월 신규 가입자 수 조회 성공");
+	}
+	
+	// 이전 달 가입자 수
+	@GetMapping("/members/previous")
+	public ResponseEntity<SuccessResponse<Integer>> getNewMemberCountPreviousMonth(){
+		int previousMonthCount = adminService.getNewMemberCountPreviousMonth();
+		return SuccessResponse.ok(previousMonthCount, "이전 달 가입자 수 조회 성공");
+	}
+	
+	// 이용자 전체 수
+	@GetMapping("/members/total")
+	public ResponseEntity<SuccessResponse<Integer>> getTotalMemberCount(){
+		int totalMemberCount = adminService.getTotalMemberCount();
+		return SuccessResponse.ok(totalMemberCount, "이용자 전체 수 조회 성공");
+	}
+	
+	
+	
+	
+}
+	
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1232 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.jde.admin.model.dao.AdminMapper">
+	
+	<!-- 
+	
+	리스트 조회하는 기능들 흐름
+1단계 (가장 안쪽)
+- 조인 + 검색 + ORDER BY CREATED_AT DESC
+
+2단계
+- ROWNUM <= offset + boardLimit
+
+3단계 (바깥)
+- RNUM > offset
+	 -->
+	
+	<!-- 댓글 신고 전체 개수 조회 -->
+	<select id="countAllCommentReports" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT_REPORT
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 댓글 신고 페이징 조회 -->
+	<select id="selectCommentReportList" resultType="CommentReportListDTO">
+		SELECT
+		       R.COMMENT_REPORT_NO commentReportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.COMMENT_NO commentNo
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              COMMENT_REPORT_NO
+		            , MEMBER_NO
+		            , COMMENT_NO
+		            , REPORT_CATEGORY_NO
+		            , REPORT_CONTENT
+		            , REPORT_PROCESS
+		            , CREATED_AT
+		            , UPDATE_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     COMMENT_REPORT_NO
+		                   , MEMBER_NO
+		                   , COMMENT_NO
+		                   , REPORT_CATEGORY_NO
+		                   , REPORT_CONTENT
+		                   , REPORT_PROCESS
+		                   , CREATED_AT
+		                   , UPDATE_AT
+		                   , STATUS
+		                FROM
+		                     TB_COMMENT_REPORT
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
+	
+	<!-- 댓글 신고 키워드 검색 전체 개수 조회 -->
+	<select id="countCommentReportsByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.STATUS = 'Y'
+		   AND (
+		            R.REPORT_CONTENT LIKE '%' || #{keyword} || '%'
+		         OR C.CONTENT LIKE '%' || #{keyword} || '%'
+		         OR RC.REPORT_CATEGORY_TITLE LIKE '%' || #{keyword} || '%'
+		         OR M.NICKNAME LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 댓글 신고 키워드 검색 페이징 조회 -->
+	<select id="selectCommentReportListByKeyword" parameterType="map" resultType="CommentReportListDTO">
+		SELECT
+		       R.COMMENT_REPORT_NO commentReportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.COMMENT_NO commentNo
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              COMMENT_REPORT_NO
+		            , MEMBER_NO
+		            , COMMENT_NO
+		            , REPORT_CATEGORY_NO
+		            , REPORT_CONTENT
+		            , REPORT_PROCESS
+		            , CREATED_AT
+		            , UPDATE_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     R2.COMMENT_REPORT_NO
+		                   , R2.MEMBER_NO
+		                   , R2.COMMENT_NO
+		                   , R2.REPORT_CATEGORY_NO
+		                   , R2.REPORT_CONTENT
+		                   , R2.REPORT_PROCESS
+		                   , R2.CREATED_AT
+		                   , R2.UPDATE_AT
+		                   , R2.STATUS
+		                FROM
+		                     TB_COMMENT_REPORT R2
+		               INNER JOIN
+		                     TB_COMMENT C2
+		                  ON R2.COMMENT_NO = C2.COMMENT_NO
+		               INNER JOIN
+		                     TB_REPORT_CATEGORY RC2
+		                  ON R2.REPORT_CATEGORY_NO = RC2.REPORT_CATEGORY_NO
+		               INNER JOIN
+		                     TB_MEMBER M2
+		                  ON R2.MEMBER_NO = M2.MEMBER_NO
+		               WHERE
+		                     R2.STATUS = 'Y'
+		                 AND (
+		                          R2.REPORT_CONTENT LIKE '%' || #{keyword} || '%'
+		                       OR C2.CONTENT LIKE '%' || #{keyword} || '%'
+		                       OR RC2.REPORT_CATEGORY_TITLE LIKE '%' || #{keyword} || '%'
+		                       OR M2.NICKNAME LIKE '%' || #{keyword} || '%'
+		                     )
+		               ORDER BY
+		                     R2.CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
+	
+	<!-- 리뷰 신고 전체 개수 조회 -->
+	<select id="countAllReviewReports" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_REVIEW_REPORT
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 리뷰 신고 페이징 조회 -->
+	<select id="selectReviewReportList" resultType="ReviewReportListDTO">
+		SELECT
+		       R.REVIEW_REPORT_NO reviewReportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.REVIEW_NO reviewNo
+		     , RV.CONTENT reviewContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              REVIEW_REPORT_NO
+		            , MEMBER_NO
+		            , REVIEW_NO
+		            , REPORT_CATEGORY_NO
+		            , REPORT_CONTENT
+		            , REPORT_PROCESS
+		            , CREATED_AT
+		            , UPDATE_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     REVIEW_REPORT_NO
+		                   , MEMBER_NO
+		                   , REVIEW_NO
+		                   , REPORT_CATEGORY_NO
+		                   , REPORT_CONTENT
+		                   , REPORT_PROCESS
+		                   , CREATED_AT
+		                   , UPDATE_AT
+		                   , STATUS
+		                FROM
+		                     TB_REVIEW_REPORT
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_REVIEW RV
+		    ON R.REVIEW_NO = RV.REVIEW_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
+	
+	<!-- 리뷰 신고 키워드 검색 전체 개수 조회 -->
+	<select id="countReviewReportsByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_REVIEW_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_REVIEW RV
+		    ON R.REVIEW_NO = RV.REVIEW_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.STATUS = 'Y'
+		   AND (
+		            R.REPORT_CONTENT LIKE '%' || #{keyword} || '%'
+		         OR RV.CONTENT LIKE '%' || #{keyword} || '%'
+		         OR RC.REPORT_CATEGORY_TITLE LIKE '%' || #{keyword} || '%'
+		         OR M.NICKNAME LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 리뷰 신고 키워드 검색 페이징 조회 -->
+	<select id="selectReviewReportListByKeyword" parameterType="map" resultType="ReviewReportListDTO">
+		SELECT
+		       R.REVIEW_REPORT_NO reviewReportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.REVIEW_NO reviewNo
+		     , RV.CONTENT reviewContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              REVIEW_REPORT_NO
+		            , MEMBER_NO
+		            , REVIEW_NO
+		            , REPORT_CATEGORY_NO
+		            , REPORT_CONTENT
+		            , REPORT_PROCESS
+		            , CREATED_AT
+		            , UPDATE_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     R2.REVIEW_REPORT_NO
+		                   , R2.MEMBER_NO
+		                   , R2.REVIEW_NO
+		                   , R2.REPORT_CATEGORY_NO
+		                   , R2.REPORT_CONTENT
+		                   , R2.REPORT_PROCESS
+		                   , R2.CREATED_AT
+		                   , R2.UPDATE_AT
+		                   , R2.STATUS
+		                FROM
+		                     TB_REVIEW_REPORT R2
+		               INNER JOIN
+		                     TB_MEMBER M2
+		                  ON R2.MEMBER_NO = M2.MEMBER_NO
+		               INNER JOIN
+		                     TB_REVIEW RV2
+		                  ON R2.REVIEW_NO = RV2.REVIEW_NO
+		               INNER JOIN
+		                     TB_REPORT_CATEGORY RC2
+		                  ON R2.REPORT_CATEGORY_NO = RC2.REPORT_CATEGORY_NO
+		               WHERE
+		                     R2.STATUS = 'Y'
+		                 AND (
+		                          R2.REPORT_CONTENT LIKE '%' || #{keyword} || '%'
+		                       OR RV2.CONTENT LIKE '%' || #{keyword} || '%'
+		                       OR RC2.REPORT_CATEGORY_TITLE LIKE '%' || #{keyword} || '%'
+		                       OR M2.NICKNAME LIKE '%' || #{keyword} || '%'
+		                     )
+		               ORDER BY
+		                     R2.CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_REVIEW RV
+		    ON R.REVIEW_NO = RV.REVIEW_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
+	
+	<!-- 댓글 신고 상세 조회 -->
+	<select id="selectCommentReportByNo" resultType="CommentReportListDTO">
+		SELECT
+		       R.COMMENT_REPORT_NO commentReportNo
+		     , R.COMMENT_REPORT_NO reportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.COMMENT_NO commentNo
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       TB_COMMENT_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.COMMENT_REPORT_NO = #{reportNo}
+		   AND R.STATUS = 'Y'
+	</select>
+	
+	<!-- 댓글 신고 상세 조회 (처리 후 조회용 - STATUS 조건 없음) -->
+	<select id="selectCommentReportByNoAfterProcess" resultType="CommentReportListDTO">
+		SELECT
+		       R.COMMENT_REPORT_NO commentReportNo
+		     , R.COMMENT_REPORT_NO reportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.COMMENT_NO commentNo
+		     , C.REVIEW_NO reviewNo
+		     , C.CONTENT commentContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       TB_COMMENT_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_COMMENT C
+		    ON R.COMMENT_NO = C.COMMENT_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.COMMENT_REPORT_NO = #{reportNo}
+	</select>
+	
+	<!-- 리뷰 신고 상세 조회 -->
+	<select id="selectReviewReportByNo" resultType="ReviewReportListDTO">
+		SELECT
+		       R.REVIEW_REPORT_NO reviewReportNo
+		     , R.REVIEW_REPORT_NO reportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.REVIEW_NO reviewNo
+		     , RV.CONTENT reviewContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       TB_REVIEW_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_REVIEW RV
+		    ON R.REVIEW_NO = RV.REVIEW_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.REVIEW_REPORT_NO = #{reportNo}
+		   AND R.STATUS = 'Y'
+	</select>
+	
+	<!-- 리뷰 신고 상세 조회 (처리 후 조회용 - STATUS 조건 없음) -->
+	<select id="selectReviewReportByNoAfterProcess" resultType="ReviewReportListDTO">
+		SELECT
+		       R.REVIEW_REPORT_NO reviewReportNo
+		     , R.REVIEW_REPORT_NO reportNo
+		     , R.MEMBER_NO memberNo
+		     , M.NICKNAME memberNickname
+		     , R.REVIEW_NO reviewNo
+		     , RV.CONTENT reviewContent
+		     , R.REPORT_CATEGORY_NO reportCategoryNo
+		     , RC.REPORT_CATEGORY_TITLE reportCategoryTitle
+		     , R.REPORT_CONTENT reportContent
+		     , R.REPORT_PROCESS reportProcess
+		     , R.CREATED_AT createdAt
+		     , R.UPDATE_AT updateAt
+		     , R.STATUS status
+		  FROM
+		       TB_REVIEW_REPORT R
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON R.MEMBER_NO = M.MEMBER_NO
+		 INNER JOIN
+		       TB_REVIEW RV
+		    ON R.REVIEW_NO = RV.REVIEW_NO
+		 INNER JOIN
+		       TB_REPORT_CATEGORY RC
+		    ON R.REPORT_CATEGORY_NO = RC.REPORT_CATEGORY_NO
+		 WHERE
+		       R.REVIEW_REPORT_NO = #{reportNo}
+	</select>
+	
+	<!-- 댓글 신고 처리 업데이트 -->
+	<update id="updateCommentReportProcess" parameterType="CommentReportProcessDTO">
+		UPDATE
+		       TB_COMMENT_REPORT
+		   SET
+		       REPORT_PROCESS = #{reportProcess}
+		     , UPDATE_AT = SYSDATE
+		     , STATUS = CASE 
+		                    WHEN #{reportProcess} IN ('RESOLVED', 'REJECTED') THEN 'N'
+		                    ELSE STATUS
+		                 END
+		 WHERE
+		       COMMENT_REPORT_NO = #{reportNo}
+		   AND 
+		       STATUS = 'Y'
+	</update>
+	
+	<!-- 리뷰 신고 처리 업데이트 -->
+	<update id="updateReviewReportProcess" parameterType="ReviewReportProcessDTO">
+		UPDATE
+		       TB_REVIEW_REPORT
+		   SET
+		       REPORT_PROCESS = #{reportProcess}
+		     , UPDATE_AT = SYSDATE
+		     , STATUS = CASE 
+		                    WHEN #{reportProcess} IN ('RESOLVED', 'REJECTED') THEN 'N'
+		                    ELSE STATUS
+		                 END
+		 WHERE
+		       REVIEW_REPORT_NO = #{reportNo}
+		   AND 
+		       STATUS = 'Y'
+	</update>
+	
+	<!-- 회원 전체 개수 조회 -->
+	<select id="countAllMembers" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 회원 페이징 조회 (개인정보 마스킹) -->
+	<select id="selectMemberList" resultType="MemberListDTO">
+		SELECT
+		       MEMBER_NO memberNo
+		     , CASE 
+		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
+		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
+		       END email
+		     , CASE 
+		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
+		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
+		            ELSE SUBSTR(MEMBER_NAME, 1, FLOOR(LENGTH(MEMBER_NAME)/2)) || '*' || SUBSTR(MEMBER_NAME, FLOOR(LENGTH(MEMBER_NAME)/2) + 2)
+		       END memberName
+		     , NICKNAME nickname
+		     , CASE 
+		            WHEN INSTR(PHONE, '-') = 0 THEN PHONE
+		            ELSE SUBSTR(PHONE, 1, 3) || '-****-' || SUBSTR(PHONE, -4)
+		       END phone
+		     , ENROLL_DATE enrollDate
+		     , STATUS status
+		     , ROLE role
+		  FROM
+		       (
+		       SELECT
+		              MEMBER_NO
+		            , EMAIL
+		            , MEMBER_NAME
+		            , NICKNAME
+		            , PHONE
+		            , ENROLL_DATE
+		            , STATUS
+		            , ROLE
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     MEMBER_NO
+		                   , EMAIL
+		                   , MEMBER_NAME
+		                   , NICKNAME
+		                   , PHONE
+		                   , ENROLL_DATE
+		                   , STATUS
+		                   , ROLE
+		                FROM
+		                     TB_MEMBER
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     ENROLL_DATE DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       )
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       ENROLL_DATE DESC
+	</select>
+	
+	<!-- 회원 키워드 검색 전체 개수 조회 -->
+	<select id="countMembersByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+		   AND (
+		            EMAIL LIKE '%' || #{keyword} || '%'
+		         OR MEMBER_NAME LIKE '%' || #{keyword} || '%'
+		         OR NICKNAME LIKE '%' || #{keyword} || '%'
+		         OR PHONE LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 회원 키워드 검색 페이징 조회 (개인정보 마스킹) -->
+	<select id="selectMemberListByKeyword" parameterType="map" resultType="MemberListDTO">
+		SELECT
+		       MEMBER_NO memberNo
+		     , CASE 
+		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
+		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
+		       END email
+		     , CASE 
+		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
+		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
+		            ELSE SUBSTR(MEMBER_NAME, 1, FLOOR(LENGTH(MEMBER_NAME)/2)) || '*' || SUBSTR(MEMBER_NAME, FLOOR(LENGTH(MEMBER_NAME)/2) + 2)
+		       END memberName
+		     , NICKNAME nickname
+		     , CASE 
+		            WHEN INSTR(PHONE, '-') = 0 THEN PHONE
+		            ELSE SUBSTR(PHONE, 1, 3) || '-****-' || SUBSTR(PHONE, -4)
+		       END phone
+		     , ENROLL_DATE enrollDate
+		     , STATUS status
+		     , ROLE role
+		  FROM
+		       (
+		       SELECT
+		              MEMBER_NO
+		            , EMAIL
+		            , MEMBER_NAME
+		            , NICKNAME
+		            , PHONE
+		            , ENROLL_DATE
+		            , STATUS
+		            , ROLE
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     MEMBER_NO
+		                   , EMAIL
+		                   , MEMBER_NAME
+		                   , NICKNAME
+		                   , PHONE
+		                   , ENROLL_DATE
+		                   , STATUS
+		                   , ROLE
+		                FROM
+		                     TB_MEMBER
+		               WHERE
+		                     STATUS = 'Y'
+		                 AND (
+		                          EMAIL LIKE '%' || #{keyword} || '%'
+		                       OR MEMBER_NAME LIKE '%' || #{keyword} || '%'
+		                       OR NICKNAME LIKE '%' || #{keyword} || '%'
+		                       OR PHONE LIKE '%' || #{keyword} || '%'
+		                     )
+		               ORDER BY
+		                     ENROLL_DATE DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       )
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       ENROLL_DATE DESC
+	</select>
+	
+	<!-- 회원 상세 조회 (비밀번호 제외, 개인정보 마스킹) -->
+	<select id="selectMemberByNo" resultType="MemberDetailDTO">
+		SELECT
+		       MEMBER_NO memberNo
+		     , CASE 
+		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
+		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
+		       END email
+		     , CASE 
+		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
+		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
+		            ELSE SUBSTR(MEMBER_NAME, 1, FLOOR(LENGTH(MEMBER_NAME)/2)) || '*' || SUBSTR(MEMBER_NAME, FLOOR(LENGTH(MEMBER_NAME)/2) + 2)
+		       END memberName
+		     , NICKNAME nickname
+		     , CASE 
+		            WHEN INSTR(PHONE, '-') = 0 THEN PHONE
+		            ELSE SUBSTR(PHONE, 1, 3) || '-****-' || SUBSTR(PHONE, -4)
+		       END phone
+		     , ENROLL_DATE enrollDate
+		     , STATUS status
+		     , ROLE role
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</select>
+	
+	<!-- 회원 권한 변경 -->
+	<update id="updateMemberRole" parameterType="MemberRoleUpdateDTO">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       ROLE = #{role}
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+	<!-- 회원 삭제 (STATUS를 'N'으로 변경) -->
+	<update id="deleteMember">
+		UPDATE
+		       TB_MEMBER
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       MEMBER_NO = #{memberNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+	<!-- 랭킹 전체 조회 -->
+	<select id="getRanks" resultType="RankResponse">
+		SELECT
+		       POLICY_CODE policyCode
+		     , POLICY_NAME policyName
+		     , TOP_N topN
+		     , PERIOD_DAYS periodDays
+		     , STATUS status
+		     , DESCRIPTION description
+		     , CREATED_AT createdAt
+		     , UPDATED_AT updatedAt
+		     , POLICY_ID policyId
+		  FROM
+		       TB_RANKING_POLICY
+		 ORDER
+		    BY
+		       CREATED_AT DESC
+	</select>
+	
+	<!-- 미식대장 랭킹 기준 변경 -->
+	<update id="updateCaptainRankPolicy">
+		UPDATE
+		       TB_RANKING_POLICY
+		   SET
+		       TOP_N = #{topN}
+		 WHERE
+		       POLICY_CODE = 'CAPTAIN_RANK'
+	</update>
+	
+	<!-- 랭킹 기준 변경 -->
+	<update id="updateRankPolicy">
+		UPDATE
+		       TB_RANKING_POLICY
+		   SET
+		       POLICY_CODE = #{policyCode}
+		     , POLICY_NAME = #{policyName}
+		     , TOP_N = #{topN}
+		     , PERIOD_DAYS = #{periodDays}
+		     , STATUS = #{status}
+		     , DESCRIPTION = #{description}
+	 	 WHERE
+	 	       POLICY_ID = {policyId}
+	</update>
+	
+	<!-- 댓글 전체 개수 조회 -->
+	<select id="countAllComments" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 댓글 페이징 조회 -->
+	<select id="selectCommentList" resultType="CommentListDTO">
+	    SELECT
+	           C.COMMENT_NO      AS commentNo
+	         , C.MEMBER_NO       AS memberNo
+	         , M.MEMBER_NAME     AS author
+	         , C.REVIEW_NO       AS reviewNo
+	         , C.CONTENT         AS commentContent
+	         , C.COMMENT_DATE    AS commentDate
+	         , C.STATUS          AS status
+	      FROM
+	           (
+	           SELECT
+	                  C2.COMMENT_NO
+	                , C2.MEMBER_NO
+	                , C2.REVIEW_NO
+	                , C2.CONTENT
+	                , C2.COMMENT_DATE
+	                , C2.STATUS
+	                , ROWNUM AS RNUM
+	             FROM
+	                  (
+	                  SELECT
+	                         COMMENT_NO
+	                       , MEMBER_NO
+	                       , REVIEW_NO
+	                       , CONTENT
+	                       , COMMENT_DATE
+	                       , STATUS
+	                    FROM
+	                         TB_COMMENT
+	                   WHERE
+	                         STATUS = 'Y'
+	                   ORDER BY
+	                         COMMENT_DATE DESC
+	                  ) C2
+	            WHERE
+	                  ROWNUM &lt;= #{offset} + #{boardLimit}
+	           ) C
+	      INNER JOIN
+	           TB_MEMBER M
+	        ON C.MEMBER_NO = M.MEMBER_NO
+	     WHERE
+	           C.RNUM &gt; #{offset}
+	     ORDER BY
+	           C.COMMENT_DATE DESC
+
+	</select>
+
+	
+	<!-- 댓글 키워드 검색 전체 개수 조회 -->
+	<select id="countCommentsByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_COMMENT C
+		 INNER JOIN
+		       TB_MEMBER M
+		    ON C.MEMBER_NO = M.MEMBER_NO
+		 WHERE
+		       C.STATUS = 'Y'
+		   AND (
+		            C.CONTENT LIKE '%' || #{keyword} || '%'
+		         OR M.MEMBER_NAME LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 댓글 키워드 검색 페이징 조회 -->
+	<select id="selectCommentListByKeyword" parameterType="map" resultType="CommentListDTO">
+	    SELECT
+	           C.COMMENT_NO      AS commentNo
+	         , C.MEMBER_NO       AS memberNo
+	         , M.MEMBER_NAME     AS author
+	         , C.REVIEW_NO       AS reviewNo
+	         , C.CONTENT         AS commentContent
+	         , C.COMMENT_DATE    AS commentDate
+	         , C.STATUS          AS status
+	      FROM
+	           (
+	           SELECT
+	                  C2.COMMENT_NO
+	                , C2.MEMBER_NO
+	                , C2.REVIEW_NO
+	                , C2.CONTENT
+	                , C2.COMMENT_DATE
+	                , C2.STATUS
+	                , ROWNUM AS RNUM
+	             FROM
+	                  (
+	                  SELECT
+	                         C3.COMMENT_NO
+	                       , C3.MEMBER_NO
+	                       , C3.REVIEW_NO
+	                       , C3.CONTENT
+	                       , C3.COMMENT_DATE
+	                       , C3.STATUS
+	                    FROM
+	                         TB_COMMENT C3
+	                   INNER JOIN
+	                         TB_MEMBER M3
+	                      ON C3.MEMBER_NO = M3.MEMBER_NO
+	                   WHERE
+	                         C3.STATUS = 'Y'
+	                     AND (
+	                              C3.CONTENT LIKE '%' || #{keyword} || '%'
+	                           OR M3.MEMBER_NAME LIKE '%' || #{keyword} || '%'
+	                         )
+	                   ORDER BY
+	                         C3.COMMENT_DATE DESC
+	                  ) C2
+	            WHERE
+	                  ROWNUM &lt;= #{offset} + #{boardLimit}
+	           ) C
+	      INNER JOIN
+	           TB_MEMBER M
+	        ON C.MEMBER_NO = M.MEMBER_NO
+	     WHERE
+	           C.RNUM &gt; #{offset}
+	     ORDER BY
+	           C.COMMENT_DATE DESC
+	</select>
+
+	
+	<!-- 댓글 상세 조회 -->
+	<select id="selectCommentByNo" resultType="CommentListDTO">
+	    SELECT
+	           C.COMMENT_NO      AS commentNo
+	         , C.MEMBER_NO       AS memberNo
+	         , M.MEMBER_NAME     AS author
+	         , C.REVIEW_NO       AS reviewNo
+	         , C.CONTENT         AS commentContent
+	         , C.COMMENT_DATE    AS commentDate
+	         , C.STATUS          AS status
+	      FROM
+	           TB_COMMENT C
+	      INNER JOIN
+	           TB_MEMBER M
+	        ON C.MEMBER_NO = M.MEMBER_NO
+	     WHERE
+	           C.COMMENT_NO = #{commentNo}
+	       AND C.STATUS = 'Y'
+	</select>
+	
+	<!-- 댓글 삭제 (STATUS를 'N'으로 변경) -->
+	<update id="deleteComment">
+		UPDATE
+		       TB_COMMENT
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       COMMENT_NO = #{commentNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+	<!-- 회원 프로필 이미지 이름 중복체크 -->
+	<select id="countByFileName" resultType="int">
+		SELECT
+		       COUNT(*) AS cnt
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 WHERE
+		       FILE_NAME = #{fileName}
+	</select>
+	
+	<!-- 회원 기본 프로필 이미지 등록 -->
+	<insert id="createDefaultImage">
+		INSERT
+		  INTO
+		       TB_DEFAULT_PROFILE
+		       (
+		       FILE_NO
+		     , FILE_NAME
+		     , FILE_URL
+		     , CREATED_AT
+		       )
+		VALUES
+		       (
+		       SEQ_DEFAULT_PROFILE.NEXTVAL
+		     , #{fileName}
+		     , #{fileUrl}
+		     , SYSDATE
+		       )
+	</insert>
+	
+	<select id="getDefaultImage" resultType="DefaultImageDTO">
+		SELECT
+               FILE_NO fileNo
+             , FILE_NAME fileName
+             , FILE_URL fileUrl
+             , CREATED_AT createdAt
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 ORDER
+		    BY
+		       CREATED_AT DESC
+	</select>
+	
+	<!-- 리뷰 전체 개수 조회 -->
+	<select id="countAllReviews" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_REVIEW
+		 WHERE
+		       STATUS = 'Y'
+	</select>
+	
+	<!-- 월별 리뷰 수 조회 (최근 1년) -->
+	<select id="selectMonthlyReviewCount" resultType="MonthlyReviewCountDTO">
+		SELECT
+		       TO_CHAR(TRUNC(CREATED_AT, 'MM'), 'YYYY-MM') AS yearMonth
+		     , COUNT(*) AS count
+		  FROM
+		       TB_REVIEW
+		 WHERE
+		       STATUS = 'Y'
+		  AND 
+		  	   CREATED_AT >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -11)
+		GROUP 
+		   BY
+		       TRUNC(CREATED_AT, 'MM')
+		ORDER 
+		   BY
+		       TRUNC(CREATED_AT, 'MM') DESC
+	</select>
+	
+	<!-- 최근 1개월 신규 가입자 수 조회 -->
+	<select id="selectNewMemberCountLastMonth" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+		   AND ENROLL_DATE >= ADD_MONTHS(SYSDATE, -1)
+	</select>
+	
+	<!-- 이전 달 가입자 수 조회 -->
+	<select id="selectNewMemberCountPreviousMonth" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_MEMBER
+		 WHERE
+		       STATUS = 'Y'
+		   AND ENROLL_DATE >= TRUNC(ADD_MONTHS(SYSDATE, -1), 'MM')
+		   AND ENROLL_DATE &lt; TRUNC(SYSDATE, 'MM')
+	</select>
+	
+	<!-- 리뷰 페이징 조회 -->
+	<select id="selectReviewList" resultType="ReviewListDTO">
+		SELECT
+		       R.REVIEW_NO reviewNo
+		     , R.MEMBER_NO memberNo
+		     , R.RESTAURANT_NO restaurantNo
+		     , RE.NORMAL_NAME normalName
+		     , RE.ADDRESS address
+		     , R.CONTENT reviewContent
+		     , R.CREATED_AT createdAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              REVIEW_NO
+		            , MEMBER_NO
+		            , RESTAURANT_NO
+		            , CONTENT
+		            , CREATED_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                      REVIEW_NO
+		            		, MEMBER_NO
+		            		, RESTAURANT_NO
+		            		, CONTENT
+		            		, CREATED_AT
+		            		, STATUS
+		            		, ROWNUM RNUM
+		                FROM
+		                     TB_REVIEW
+		               WHERE
+		                     STATUS = 'Y'
+		               ORDER BY
+		                     CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) 
+		  R
+		  LEFT JOIN
+		       TB_RESTAURANT RE
+		       ON RE.RESTAURANT_NO = R.RESTAURANT_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
+	
+	<!-- 리뷰 키워드 검색 전체 개수 조회 -->
+	<select id="countReviewsByKeyword" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_REVIEW R
+		 LEFT JOIN
+		       TB_RESTAURANT RE
+		    ON R.RESTAURANT_NO = RE.RESTAURANT_NO
+		 WHERE
+		       R.STATUS = 'Y'
+		   AND (
+		            R.CONTENT LIKE '%' || #{keyword} || '%'
+		         OR RE.NORMAL_NAME LIKE '%' || #{keyword} || '%'
+		       )
+	</select>
+	
+	<!-- 리뷰 키워드 검색 페이징 조회 -->
+	<select id="selectReviewListByKeyword" parameterType="map" resultType="ReviewListDTO">
+		SELECT
+		       R.REVIEW_NO reviewNo
+		     , R.MEMBER_NO memberNo
+		     , R.RESTAURANT_NO restaurantNo
+		     , RE.NORMAL_NAME normalName
+		     , RE.ADDRESS address
+		     , R.CONTENT reviewContent
+		     , R.CREATED_AT createdAt
+		     , R.STATUS status
+		  FROM
+		       (
+		       SELECT
+		              REVIEW_NO
+		            , MEMBER_NO
+		            , RESTAURANT_NO
+		            , CONTENT
+		            , CREATED_AT
+		            , STATUS
+		            , ROWNUM RNUM
+		         FROM
+		              (
+		              SELECT
+		                     R2.REVIEW_NO
+		                   , R2.MEMBER_NO
+		                   , R2.RESTAURANT_NO
+		                   , R2.CONTENT
+		                   , R2.CREATED_AT
+		                   , R2.STATUS
+		                FROM
+		                     TB_REVIEW R2
+		               LEFT JOIN
+		                     TB_RESTAURANT RE2
+		                  ON R2.RESTAURANT_NO = RE2.RESTAURANT_NO
+		               WHERE
+		                     R2.STATUS = 'Y'
+		                 AND (
+		                          R2.CONTENT LIKE '%' || #{keyword} || '%'
+		                       OR RE2.NORMAL_NAME LIKE '%' || #{keyword} || '%'
+		                     )
+		               ORDER BY
+		                     R2.CREATED_AT DESC
+		              )
+		        WHERE
+		              ROWNUM &lt;= #{offset} + #{boardLimit}
+		       ) R
+		 LEFT JOIN
+		       TB_RESTAURANT RE
+		    ON R.RESTAURANT_NO = RE.RESTAURANT_NO
+		 WHERE
+		       RNUM &gt; #{offset}
+		 ORDER BY
+		       R.CREATED_AT DESC
+	</select>
+	
+	<!-- 리뷰 상세 조회 -->
+	<select id="selectReviewByNo" resultType="ReviewListDTO">
+		SELECT
+		       R.REVIEW_NO reviewNo
+		     , R.MEMBER_NO memberNo
+		     , R.RESTAURANT_NO restaurantNo
+		     , RE.NORMAL_NAME normalName
+		     , RE.ADDRESS address
+		     , R.CONTENT reviewContent
+		     , R.CREATED_AT createdAt
+		     , R.STATUS status
+		  FROM
+		       TB_REVIEW R
+		  LEFT
+		  JOIN
+		  	   TB_RESTAURANT RE
+		  	ON
+		       R.RESTAURANT_NO = RE.RESTAURANT_NO
+		 WHERE
+		       REVIEW_NO = #{reviewNo}
+		   AND STATUS = 'Y'
+	</select>
+	
+	<!-- 리뷰 삭제 (STATUS를 'N'으로 변경) -->
+	<update id="deleteReview">
+		UPDATE
+		       TB_REVIEW
+		   SET
+		       DELETED_AT = SYSDATE
+		     , STATUS = 'N'
+		 WHERE
+		       REVIEW_NO = #{reviewNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+	<!-- 회원 기본 프로필 이미지 존재여부 확인 -->
+	<select id="getDefaultImageByFileNo" resultType="int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 WHERE
+		       FILE_NO = #{fileNo}
+	</select>
+	
+	
+	<!-- 회원 기본 프로필 이미지 삭제 -->
+	<delete id="deleteDefaultImageByFileNo">
+		DELETE
+		  FROM
+		       TB_DEFAULT_PROFILE
+		 WHERE
+		       FILE_NO = #{fileNo}
+	</delete>
+	
+
+</mapper>

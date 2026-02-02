@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: eco
+  mvc:
+    static-path-pattern: /uploads/**
+  web:
+    resources:
+      static-locations: file:uploads/
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  profiles:
+    include:
+    - private
+
+server:
+  port: 8080
