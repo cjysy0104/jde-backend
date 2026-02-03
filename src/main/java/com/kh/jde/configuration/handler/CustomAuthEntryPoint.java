@@ -40,7 +40,7 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
         response.getWriter().write(objectMapper.writeValueAsString(body));
     }
     
-    // 
+    // 응답구조 상 uri 정보를 넘기기위한 코드(본인 응답구조에 없다면 제외해도 됨)
     private String getOriginalPath(HttpServletRequest request) {
         Object uri = request.getAttribute("jakarta.servlet.error.request_uri");
         return (uri != null) ? uri.toString() : request.getRequestURI();
