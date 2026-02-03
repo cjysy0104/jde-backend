@@ -68,9 +68,9 @@ public class SecurityConfigure {
 						    */
 						   .sessionManagement(manager -> 
 								   				manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-						   .exceptionHandling(exception -> exception
-							          .authenticationEntryPoint(customAuthEntryPoint)
-							          .accessDeniedHandler(customAccessDeniedHandler)
+						   .exceptionHandling(exception -> 
+						   						exception.authenticationEntryPoint(customAuthEntryPoint)
+						   								 .accessDeniedHandler(customAccessDeniedHandler)
 							      )
 						   .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 						   .build();
