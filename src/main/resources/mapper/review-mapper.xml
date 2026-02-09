@@ -811,27 +811,31 @@
 
 
 	<select id="getBestReviewList" parameterType="map" resultMap="bestReviewListMap">
- 	 SELECT
+	  SELECT
 	        RV.REVIEW_NO
 	      , (
-			    SELECT RVF.FILE_URL
-			    FROM TB_REVIEW_FILE RVF
-			    WHERE RVF.REVIEW_NO = RV.REVIEW_NO
-			      AND RVF.IS_THUMNAIL = 'Y'
-			    FETCH FIRST 1 ROWS ONLY
-			  ) AS THUMBNAIL_URL
+	          SELECT RVF.FILE_URL
+	          FROM TB_REVIEW_FILE RVF
+	          WHERE RVF.REVIEW_NO = RV.REVIEW_NO
+	            AND RVF.IS_THUMNAIL = 'Y'
+	          FETCH FIRST 1 ROWS ONLY
+	        ) AS THUMBNAIL_URL
 	      , R.NORMAL_NAME AS RESTAURANT_NAME
 	      , M.NICKNAME
 	      , RV.RATING
-	      , NVL(LK.LIKE_CNT, 0) AS RECENT_LIKE_COUNT
+	      , NVL(LK.LIKE_CNT, 0) AS WEEK_LIKE_COUNT
 	  FROM TB_REVIEW RV
 	  JOIN TB_RESTAURANT R ON R.RESTAURANT_NO = RV.RESTAURANT_NO
 	  JOIN TB_MEMBER M ON M.MEMBER_NO = RV.MEMBER_NO
+	
+	  <!-- 최근 7일 좋아요만 집계 -->
 	  LEFT JOIN (
 	      SELECT REVIEW_NO, COUNT(*) AS LIKE_CNT
 	      FROM TB_REVIEW_LIKE
+	      WHERE REVIEW_LIKE_DATE >= (SYSDATE - 7)
 	      GROUP BY REVIEW_NO
 	  ) LK ON LK.REVIEW_NO = RV.REVIEW_NO
+	
 	  WHERE 1=1
 	    AND RV.STATUS = 'Y'
 	
@@ -843,6 +847,8 @@
 	        AND RKM.KEYWORD_NO = #{keywordNo}
 	    )
 	  </if>
+	
+	  <!-- 커서 페이징: 최근 7일 좋아요 수 + review_no 조합 -->
 	  <if test="cursor != null and cursorLikeCount != null">
 	    AND (
 	      NVL(LK.LIKE_CNT, 0) &lt; #{cursorLikeCount}
@@ -852,9 +858,11 @@
 	      )
 	    )
 	  </if>
-	  ORDER BY RECENT_LIKE_COUNT DESC, RV.REVIEW_NO DESC
+	
+	  ORDER BY WEEK_LIKE_COUNT DESC, RV.REVIEW_NO DESC
 	  FETCH FIRST #{scroll.sizePlusOne} ROWS ONLY
 	</select>
+
 
 	<select id="getKeywordsByIds" resultType="com.kh.jde.review.model.dto.KeywordRowDTO">
     SELECT
