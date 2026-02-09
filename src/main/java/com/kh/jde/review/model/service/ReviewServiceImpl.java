@@ -1,6 +1,7 @@
 package com.kh.jde.review.model.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import com.kh.jde.review.model.dto.BestReviewListResponse;
 import com.kh.jde.review.model.dto.BestReviewPagingRequest;
 import com.kh.jde.review.model.dto.CaptainQueryDTO;
 import com.kh.jde.review.model.dto.DetailReviewDTO;
+import com.kh.jde.review.model.dto.FileUpdateResult;
 import com.kh.jde.review.model.dto.KeywordDTO;
 import com.kh.jde.review.model.dto.KeywordRowDTO;
 import com.kh.jde.review.model.dto.QueryDTO;
@@ -315,10 +317,7 @@ public class ReviewServiceImpl implements ReviewService {
 	 * review 유효성과 작성자 여부 체크 후 
 	 * 해당 리뷰 글의 UPDATE를 진행합니다.
 	 * 이후 해당 리뷰에 해당하는 키워드 매핑을 DELETE 후 다시 CREATE 합니다.
-	 * 파일 수정은 먼저 새로운 파일을 S3에 업로드 후 DB에 기존 파일URL을 SELECT해와서
-	 * 새롭게 업로드해 받은 URL과 남겨진 기존 파일 URL을 조합한 뒤 
-	 * DB에 INSERT합니다.
-	 * DB 작업이 완료되면 삭제될 기존파일을 URL 통해 S3 삭제합니다.
+	 * 이후 파일 수정 처리를 진행합니다.
 	 * 
 	 * @param reviewNo 게시글번호PK
 	 * @param review 요청: content 등 수정될 리뷰 본문 정보와 유지될 기존파일의 URL, 새롭게 생성될 파일 및 정렬순서가 담겨있습니다.
@@ -327,39 +326,99 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	@Transactional
 	public void update(Long reviewNo, ReviewUpdateRequest review, CustomUserDetails principal) {
-
+		
+		// 유효성 검사 및 권한 체크
+		validateReviewUpdate(reviewNo, principal);
+		
+		// 리뷰 본문 업데이트
+		updateReviewContent(reviewNo, review);
+		
+		// 키워드 업데이트
+		updateKeywords(reviewNo, review.getKeywordNos());
+		
+		// 파일 업데이트
+		updateFiles(reviewNo, review);
+	}
+	
+	private void validateReviewUpdate(Long reviewNo, CustomUserDetails principal) {
 		// 데이터 유효성 검사 하기
 		getReviewOrThrow(reviewNo);
 		// 작성자 여부 체크
 		getWriterById(reviewNo, principal, "수정");
-		
-		// 리뷰글 db로 update
-		ReviewUpdateVo requestReview = ReviewUpdateVo.builder()
-													 .reviewNo(reviewNo)
-													 .content(review.getContent())
-													 .rating(review.getRating())
-													 .build();
-		reviewMapper.update(requestReview);
-		
-		// 키워드 삭제 후 다시 create
-		reviewMapper.deleteKeywordsById(reviewNo); // 삭제
-		reviewMapper.createReviewKeywordMap(reviewNo, review.getKeywordNos());
+	}
 
+	private void updateReviewContent(Long reviewNo, ReviewUpdateRequest review) {
+		ReviewUpdateVo requestReview = ReviewUpdateVo.builder()
+				.reviewNo(reviewNo)
+				.content(review.getContent())
+				.rating(review.getRating())
+				.build();
+		reviewMapper.update(requestReview);
+	}
+	
+	private void updateKeywords(Long reviewNo, List<Long> keywordNos) {
+		reviewMapper.deleteKeywordsById(reviewNo); // 기존 Keywords 전체 DELETE
+		reviewMapper.createReviewKeywordMap(reviewNo, keywordNos); // Keywords INSERT
+	}
+	
+	/**
+	 * 파일 수정 처리
+	 * 
+	 * 먼저 새로운 파일을 S3에 업로드하여 URL을 확보합니다.
+	 * 이후 DB에 기존 파일을 조회해 비교하여 
+	 * 유지 삭제 생성할 파일을 분류합니다.
+	 * 분류한 파일을 DB에 갱신합니다.
+	 * 모든 DB 작업을 마치면 S3에 파일 삭제를 요청합니다.
+	 * 
+	 * @param reviewNo 게시글번호PK
+	 * @param review 요청: content 등 수정될 리뷰 본문 정보와 유지될 기존파일의 URL, 새롭게 생성될 파일 및 정렬순서가 담겨있습니다.
+	 */
+	private void updateFiles(Long reviewNo, ReviewUpdateRequest review) {
 		// 1. 새로운 파일 S3에 업로드
 		List<String> newFileUrls = s3manager.createFiles("review", reviewNo, review.getImages(), RETRY_ATTEMPT);
-
-		
 		
 		// 2. db에 기존파일 정보 배열 받기 SELECT
 		List<ReviewFileDTO> originFiles = reviewMapper.getFilesById(reviewNo);
 		
-		List<Long> reqExistingNos = review.getExistingFileNos() == null ? List.of() : review.getExistingFileNos();
-		List<Integer> reqExistingOrders = review.getExistingSortOrders() == null ? List.of() : review.getExistingSortOrders();
-		List<Integer> reqNewOrders = review.getNewSortOrders() == null ? List.of() : review.getNewSortOrders();
-
+		// 3. 파일 분류
+		FileUpdateResult fileUpdateResult = classifyFiles(originFiles, review, newFileUrls);
 		
-		// 3. 배열과 비교하여 삭제할 파일 배열 생성 및 살릴 파일 배열생성 후 
+		// 4. DB 갱신
+		refreshFileRecords(reviewNo, fileUpdateResult.getFilesToKeep());
+		
+		// 5. S3 삭제
+		deleteFilesFromS3(fileUpdateResult.getFilesToDelete());
+	}
+	
+	private void deleteFilesFromS3(List<ReviewFileDTO> filesToDelete) {
+		// S3 삭제
+		List<String> deleteUrls = filesToDelete.stream()
+												.map(ReviewFileDTO::getFileUrl)
+												.collect(Collectors.toList());
+		s3manager.deleteUrls(deleteUrls, RETRY_ATTEMPT);
+	}
+
+	private void refreshFileRecords(Long reviewNo, List<ReviewFileDTO> filesToKeep) {
+		// DELETE
+		reviewMapper.deleteFilesById(reviewNo);
+		
+		List<String> updateUrls = filesToKeep.stream()
+										.sorted(Comparator.comparing(ReviewFileDTO::getSortOrder))
+										.map(ReviewFileDTO::getFileUrl)
+										.collect(Collectors.toList());
+		
+		// INSERT
+		createFiles(reviewNo, updateUrls);		
+	}
+
+	private FileUpdateResult classifyFiles(List<ReviewFileDTO> originFiles,
+										ReviewUpdateRequest review,
+										List<String> newFileUrls) {
+		// 배열과 비교하여 삭제할 파일 배열 생성 및 살릴 파일 배열생성 후 
 		// 기존파일의URL과 새파일URL을 sortOrder 순서대로 조립
+		List<Long> reqExistingNos = orEmpty(review.getExistingFileNos());
+		List<Integer> reqExistingOrders = orEmpty(review.getExistingSortOrders());
+		List<Integer> reqNewOrders = orEmpty(review.getNewSortOrders());
 		
 		List<ReviewFileDTO> exists = new ArrayList<>();
 		for(int i = 0; i < reqExistingNos.size(); i++) {
@@ -406,20 +465,12 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		toUpdate.addAll(toKeep);
 		
-		// 4. DELETE
-		reviewMapper.deleteFilesById(reviewNo);
-		
-		// 5. INSERT
-		List<String> updateUrls = toUpdate.stream()
-										.map(ReviewFileDTO::getFileUrl)
-										.collect(Collectors.toList());
-		createFiles(reviewNo, updateUrls);
-		
-		// 6. S3 삭제
-		List<String> deleteUrls = toDelete.stream()
-										.map(ReviewFileDTO::getFileUrl)
-										.collect(Collectors.toList());
-		s3manager.deleteUrls(deleteUrls, RETRY_ATTEMPT);
+		return new FileUpdateResult(toUpdate, toDelete);
+	}
+	
+
+	private <T> List<T> orEmpty(List<T> list) {
+	    return list == null ? List.of() : list;
 	}
 
 	/**
