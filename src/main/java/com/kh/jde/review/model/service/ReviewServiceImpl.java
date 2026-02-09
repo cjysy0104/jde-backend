@@ -1,6 +1,7 @@
 package com.kh.jde.review.model.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -402,6 +403,7 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewMapper.deleteFilesById(reviewNo);
 		
 		List<String> updateUrls = filesToKeep.stream()
+										.sorted(Comparator.comparing(ReviewFileDTO::getSortOrder))
 										.map(ReviewFileDTO::getFileUrl)
 										.collect(Collectors.toList());
 		
@@ -463,7 +465,7 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		toUpdate.addAll(toKeep);
 		
-		return new FileUpdateResult(toKeep, toDelete);
+		return new FileUpdateResult(toUpdate, toDelete);
 	}
 	
 
