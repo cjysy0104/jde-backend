@@ -51,7 +51,6 @@ public class MemberServiceImpl implements MemberService {
 		// 닉네임, 이메일 중복 체크
 		
 		// 비밀번호 암호화
-		// String encodedPwd = passwordEncoder.encode(member.getPassword());
 		Password password = Password.toEncoded(member.getPassword(), passwordEncoder);
 		
 		MemberVO signUpMember = MemberVO.builder()
