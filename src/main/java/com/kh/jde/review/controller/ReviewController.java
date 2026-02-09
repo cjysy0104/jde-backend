@@ -93,7 +93,6 @@ public class ReviewController {
 	public ResponseEntity<SuccessResponse<Void>> update(@PathVariable("reviewNo")Long reviewNo,
 														@ModelAttribute ReviewUpdateRequest review,
 														@AuthenticationPrincipal CustomUserDetails principal){
-		log.info("????????????????:{}", review);
 		reviewService.update(reviewNo, review, principal);
 		
 		return SuccessResponse.created("수정 성공");
