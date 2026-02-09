@@ -94,8 +94,6 @@ public class ReviewController {
 														@ModelAttribute ReviewUpdateRequest review,
 														@AuthenticationPrincipal CustomUserDetails principal){
 		
-		
-		log.info("?????????????? {} ", review);
 		reviewService.update(reviewNo, review, principal);
 		
 		return SuccessResponse.created("수정 성공");
