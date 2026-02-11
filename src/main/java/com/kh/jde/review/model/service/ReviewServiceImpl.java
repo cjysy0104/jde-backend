@@ -256,9 +256,12 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		RestaurantResponseDTO restaurantResponse = reviewMapper.getRestaurantByName(requestRestaurant);
 		
-		if(restaurantResponse == null) createRestaurant(review);
+		if(restaurantResponse != null) {
+			return restaurantResponse.getRestaurantNo();
+		} 
 		
-		return restaurantResponse.getRestaurantNo();
+		return createRestaurant(review);
+		
 	}
 	
 	private Long createRestaurant(ReviewCreateRequest review) {
