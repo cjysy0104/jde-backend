@@ -40,8 +40,8 @@ public class AuthController {
 	}
 	
 	@PostMapping("refresh")
-	public ResponseEntity<SuccessResponse<AccessTokenResponseDTO>> reissueAccessToken(@RequestBody String refreshToken){
-		AccessTokenResponseDTO accessToken = authService.reissueAccessToken(refreshToken);
+	public ResponseEntity<SuccessResponse<AccessTokenResponseDTO>> reissueAccessToken(@RequestBody RefreshTokenRequestDTO refreshToken){
+		AccessTokenResponseDTO accessToken = authService.reissueAccessToken(refreshToken.getRefreshToken());
 		return SuccessResponse.ok(accessToken, "로그인 연장 성공");
 	}
 	
