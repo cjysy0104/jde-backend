@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -93,9 +94,6 @@ public class ReviewController {
 	public ResponseEntity<SuccessResponse<Void>> update(@PathVariable("reviewNo")Long reviewNo,
 														@ModelAttribute ReviewUpdateRequest review,
 														@AuthenticationPrincipal CustomUserDetails principal){
-		
-		
-		log.info("?????????????? {} ", review);
 		reviewService.update(reviewNo, review, principal);
 		
 		return SuccessResponse.created("수정 성공");
