@@ -556,10 +556,13 @@
 		SELECT
 		       MEMBER_NO memberNo
 		     , CASE 
-		            WHEN LENGTH(EMAIL) &lt;= 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
-		            WHEN INSTR(EMAIL, '@') - 1 &lt;= 4 THEN EMAIL
-		            ELSE SUBSTR(EMAIL, 1, 2) || '****' || SUBSTR(EMAIL, INSTR(EMAIL, '@') - 2) || '@' || SUBSTR(EMAIL, INSTR(EMAIL, '@') + 1)
-		       END email
+				    WHEN LENGTH(EMAIL) &lt; 4 OR INSTR(EMAIL, '@') = 0 THEN EMAIL
+				    WHEN INSTR(EMAIL, '@') - 1 &lt; 4 THEN EMAIL
+				    ELSE 
+				        SUBSTR(EMAIL, 1, 2) 
+				        || '****' 
+				        || SUBSTR(EMAIL, INSTR(EMAIL, '@'))
+			   END email
 		     , CASE 
 		            WHEN LENGTH(MEMBER_NAME) &lt;= 1 THEN MEMBER_NAME
 		            WHEN LENGTH(MEMBER_NAME) = 2 THEN SUBSTR(MEMBER_NAME, 1, 1) || '*'
