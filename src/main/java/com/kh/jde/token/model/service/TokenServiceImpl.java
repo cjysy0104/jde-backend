@@ -63,7 +63,7 @@ public class TokenServiceImpl implements TokenService {
 	}
 	
 	@Transactional
-	public String validateToken(String refreshToken) {
+	public Map<String, String> validateToken(String refreshToken) {
 		RefreshToken token = tokenMapper.findByToken(refreshToken);
 		// DB에서 토큰 조회해서 검증하기
 		if(token == null) {
@@ -83,15 +83,17 @@ public class TokenServiceImpl implements TokenService {
 		}
 		
 		String username = claims.getSubject();
-		String accessToken = createAccessToken(username);
-		return accessToken;
+		Map<String, String> tokens = createTokens(username);
+		return tokens;
 	}
 
 	// AccessToken만 만들기
+	/* 로그인 자동 연장 시에는 리프레시 토큰도 같이 반환하도록 정책을 변경
+	 * 이에 따라 로그인 시 사용하는 createTokens메서드를 사용하게되어 이 메서드는 사용하지 않음. 
 	private String createAccessToken(String username){
 		String accessToken = tokenUtil.getAccessToken(username);
 		
 		return accessToken;
 	}
-
+	*/
 }

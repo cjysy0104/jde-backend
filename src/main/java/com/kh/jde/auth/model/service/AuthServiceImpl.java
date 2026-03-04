@@ -81,9 +81,10 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public AccessTokenResponseDTO reissueAccessToken(String refreshToken) {
-		String newAccessToken = tokenService.validateToken(refreshToken);
+		Map<String, String> tokens = tokenService.validateToken(refreshToken);
 		AccessTokenResponseDTO accessToken = AccessTokenResponseDTO.builder()
-																	  .accessToken(newAccessToken)
+																	  .accessToken(tokens.get("accessToken"))
+																	  .refreshToken(tokens.get("refreshToken"))
 																	  .build();
 		return accessToken;
 	}
